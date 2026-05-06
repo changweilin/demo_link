@@ -87,8 +87,8 @@ const skillCards = [
   },
   {
     icon: <Code2 />,
-    title: "互動式產品工程",
-    text: "以 C/C++、Python、JavaScript 建構可操作的工具、遊戲與資料視覺化介面，重視測試與調校流程。",
+    title: "AI 工具輔助開發",
+    text: "善用 Claude Code、ChatGPT Codex、Antigravity 等工具加速需求拆解、原型實作、重構、測試與文件整理，並維持可驗證的工程品質。",
   },
 ];
 
@@ -281,7 +281,10 @@ function App() {
             <p className="eyebrow">Skill Set</p>
             <h2 id="skills-title">技能</h2>
           </div>
-          <p>履歷以演算法、深度學習、訊號處理與物理背景為主軸；作品則把這些能力落到地圖工具、AI 遊戲與互動網頁。</p>
+          <p>
+            履歷以演算法、深度學習、訊號處理、物理背景與 AI 工具實作能力為主軸；作品則把這些能力落到地圖工具、AI
+            遊戲與互動網頁。
+          </p>
         </div>
         <div className="skill-grid">
           {skillCards.map((skill) => (
