@@ -1,8 +1,12 @@
-# Chang Wei Lin Portfolio
+# 張維麟作品集
 
-高質感軟體工程師作品集，使用 Vite、React、TypeScript 建置。作品與個人資料集中在 `src/data/portfolio.json`。
+Vite + React + TypeScript 建置的個人作品集首頁。繁體中文內容集中在 `src/data/portfolio.json`，目前收錄 Cake 履歷與三個公開作品：
 
-## Local Dev
+- Mapping Elf: https://changweilin.github.io/mapping_elf/
+- Hex Snake: https://changweilin.github.io/hex_snake/
+- Railway Elf: https://changweilin.github.io/railway_elf/
+
+## 本機開發
 
 ```bash
 npm install
@@ -17,9 +21,9 @@ http://<your-tailscale-ip>:5173/
 
 如果 5173 被占用，Vite 會顯示實際 port，手機改用該 port 即可。
 
-## GitHub Pages
+## GitHub Pages 部署
 
-這個專案已包含 GitHub Actions workflow：`.github/workflows/deploy.yml`。
+專案已包含 GitHub Actions workflow：`.github/workflows/deploy.yml`。
 
 部署前請在 GitHub repository 設定：
 

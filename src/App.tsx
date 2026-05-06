@@ -1,20 +1,23 @@
 import {
+  Activity,
   ArrowRight,
-  BriefcaseBusiness,
+  BrainCircuit,
   Check,
   ChevronRight,
-  Clipboard,
   Code2,
-  DatabaseZap,
+  Compass,
   ExternalLink,
+  Gamepad2,
   Github,
-  Layers3,
   Linkedin,
-  Mail,
-  Network,
-  RadioTower,
+  Map,
+  Microscope,
+  Mountain,
+  Radar,
   Sparkles,
-  TerminalSquare,
+  Telescope,
+  Train,
+  Waves,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import portfolio from "./data/portfolio.json";
@@ -36,58 +39,112 @@ type Project = {
   links: LinkSet;
 };
 
-const projects = portfolio.projects as Project[];
-const profile = portfolio.profile;
-const categories = ["All", ...Array.from(new Set(projects.map((project) => project.category)))];
-const heroProject = projects.find((project) => project.featured) ?? projects[0];
-const linkLabels: Record<keyof LinkSet, string> = {
-  demo: "Live Demo",
-  repo: "GitHub",
-  caseStudy: "Case Study",
+type SocialLink = {
+  label: string;
+  url: string;
 };
 
+type Profile = {
+  name: string;
+  englishName: string;
+  role: string;
+  location: string;
+  resumeUrl: string;
+  intro: string;
+  quote: {
+    zh: string;
+    en: string;
+    source: string;
+  };
+  socialLinks: SocialLink[];
+};
+
+const projects = portfolio.projects as Project[];
+const profile = portfolio.profile as Profile;
+const categories = ["全部", ...Array.from(new Set(projects.map((project) => project.category)))];
+const heroProject = projects[0];
+const linkLabels: Record<keyof LinkSet, string> = {
+  demo: "開啟作品",
+  repo: "GitHub",
+  caseStudy: "專案筆記",
+};
+
+const skillCards = [
+  {
+    icon: <BrainCircuit />,
+    title: "演算法與深度學習",
+    text: "熟悉 DSP、影像/生理訊號處理、Random Forest、CNN、DNN、Transformer 與 Stable Diffusion 等技術脈絡。",
+  },
+  {
+    icon: <Waves />,
+    title: "音訊與嵌入式最佳化",
+    text: "曾開發語音編碼、音高追蹤、變速變調、VAD、降噪、節拍偵測與 MCU 資源受限環境最佳化。",
+  },
+  {
+    icon: <Microscope />,
+    title: "物理與光學背景",
+    text: "具天文、光學、電磁學、雷射與顯微技術背景，能把物理直覺轉換為可驗證的演算法模型。",
+  },
+  {
+    icon: <Code2 />,
+    title: "互動式產品工程",
+    text: "以 C/C++、Python、JavaScript 建構可操作的工具、遊戲與資料視覺化介面，重視測試與調校流程。",
+  },
+];
+
+const principleCards = [
+  {
+    icon: <Telescope />,
+    title: "從現象回到模型",
+    text: "先理解問題背後的物理、訊號或資料結構，再選擇合適的演算法與介面呈現方式。",
+  },
+  {
+    icon: <Radar />,
+    title: "用模擬檢查直覺",
+    text: "對遊戲平衡、AI 策略與訊號處理參數保持可重跑的模擬流程，讓調整有依據。",
+  },
+  {
+    icon: <Mountain />,
+    title: "把工具帶到真實場景",
+    text: "從戶外路線規劃到瀏覽器遊戲，偏好能被實際使用、反覆測試與持續改善的作品。",
+  },
+];
+
 function App() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("全部");
   const [selectedProject, setSelectedProject] = useState<Project>(heroProject);
   const [copied, setCopied] = useState(false);
 
   const visibleProjects = useMemo(() => {
-    if (activeCategory === "All") return projects;
+    if (activeCategory === "全部") return projects;
     return projects.filter((project) => project.category === activeCategory);
   }, [activeCategory]);
 
-  const handleCopyEmail = async () => {
-    let didCopy = false;
+  const handleCopyProfile = async () => {
+    const text = `${profile.name} / ${profile.role}\n${profile.resumeUrl}`;
 
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(profile.email);
-        didCopy = true;
-      }
+      await navigator.clipboard?.writeText(text);
     } catch {
-      didCopy = false;
-    }
-
-    if (!didCopy) {
       const textarea = document.createElement("textarea");
-      textarea.value = profile.email;
+      textarea.value = text;
       textarea.setAttribute("readonly", "true");
       textarea.style.position = "fixed";
       textarea.style.opacity = "0";
       document.body.appendChild(textarea);
       textarea.select();
-      didCopy = document.execCommand("copy");
+      document.execCommand("copy");
       document.body.removeChild(textarea);
     }
 
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 6000);
+    window.setTimeout(() => setCopied(false), 4200);
   };
 
   return (
     <main>
-      <header className="site-header" aria-label="Primary navigation">
-        <a className="brand" href="#top" aria-label={`${profile.name} homepage`}>
+      <header className="site-header" aria-label="主選單">
+        <a className="brand" href="#top" aria-label={`${profile.name} 首頁`}>
           <span className="brand-mark" aria-hidden="true">
             &gt;_
           </span>
@@ -97,14 +154,14 @@ function App() {
           <a href="#works">作品集</a>
           <a href="#featured">精選作品</a>
           <a href="#skills">技能</a>
-          <a href="#principles">工作原則</a>
-          <a href="#contact">聯絡我</a>
+          <a href="#principles">工作方式</a>
+          <a href="#contact">聯絡</a>
         </nav>
       </header>
 
       <section id="top" className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow">&lt; Senior Software Engineer /&gt;</p>
+          <p className="eyebrow">&lt; Algorithm Engineer / AI Software /&gt;</p>
           <h1 id="hero-title">{profile.name}</h1>
           <p className="role">{profile.role}</p>
           <span className="title-rule" aria-hidden="true" />
@@ -121,38 +178,29 @@ function App() {
               查看作品
               <ArrowRight size={20} aria-hidden="true" />
             </a>
-            <button className="button button-secondary" type="button" onClick={handleCopyEmail}>
-              {copied ? "已複製" : "聯絡我"}
-              {copied ? <Check size={19} aria-hidden="true" /> : <Mail size={19} aria-hidden="true" />}
-            </button>
-          </div>
-          <div className="social-links" aria-label="Social links">
-            {profile.socialLinks.map((link) => (
-              <a key={link.label} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
-                {link.label === "GitHub" ? <Github size={22} /> : <Linkedin size={22} />}
-              </a>
-            ))}
-            <a href={`mailto:${profile.email}`} aria-label="Email">
-              <Mail size={22} />
+            <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
+              查看履歷
+              <ExternalLink size={19} aria-hidden="true" />
             </a>
           </div>
+          <SocialLinks links={profile.socialLinks} />
         </div>
 
-        <div className="hero-panel" aria-label={`${heroProject.title} project preview`}>
-          <DashboardPreview />
+        <div className="hero-panel" aria-label={`${heroProject.title} 專案摘要`}>
+          <ProjectConsole selectedProject={selectedProject} onSelect={setSelectedProject} />
           <article className="hero-project">
             <span className="pill">精選作品</span>
             <div>
-              <h2>{heroProject.title}</h2>
-              <p>{heroProject.summary}</p>
+              <h2>{selectedProject.title}</h2>
+              <p>{selectedProject.summary}</p>
             </div>
             <div className="tag-row">
-              {heroProject.tags.slice(0, 6).map((tag) => (
+              {selectedProject.tags.slice(0, 6).map((tag) => (
                 <span key={tag}>{tag}</span>
               ))}
             </div>
-            <a href={heroProject.links.caseStudy || heroProject.links.demo || heroProject.links.repo} target="_blank" rel="noreferrer">
-              查看專案
+            <a href={selectedProject.links.demo || selectedProject.links.repo} target="_blank" rel="noreferrer">
+              開啟作品
               <ExternalLink size={17} aria-hidden="true" />
             </a>
           </article>
@@ -191,7 +239,7 @@ function App() {
             <p className="eyebrow">Portfolio Index</p>
             <h2 id="works-title">作品集</h2>
           </div>
-          <div className="filter-group" aria-label="Filter projects by category">
+          <div className="filter-group" aria-label="依作品類型篩選">
             {categories.map((category) => (
               <button
                 key={category}
@@ -205,7 +253,7 @@ function App() {
           </div>
         </div>
         <div className="work-layout">
-          <div className="project-list" aria-label="Project list">
+          <div className="project-list" aria-label="作品列表">
             {visibleProjects.map((project) => (
               <button
                 key={project.title}
@@ -215,7 +263,9 @@ function App() {
               >
                 <span>
                   <strong>{project.title}</strong>
-                  <small>{project.category} / {project.year}</small>
+                  <small>
+                    {project.category} / {project.year}
+                  </small>
                 </span>
                 <ChevronRight size={18} aria-hidden="true" />
               </button>
@@ -228,48 +278,47 @@ function App() {
       <section id="skills" className="section-shell skills" aria-labelledby="skills-title">
         <div className="section-heading compact">
           <div>
-            <p className="eyebrow">Engineering Stack</p>
+            <p className="eyebrow">Skill Set</p>
             <h2 id="skills-title">技能</h2>
           </div>
-          <p>從產品問題、系統邊界到部署流程，都用可觀測、可測試、可維護的方式收斂。</p>
+          <p>履歷以演算法、深度學習、訊號處理與物理背景為主軸；作品則把這些能力落到地圖工具、AI 遊戲與互動網頁。</p>
         </div>
         <div className="skill-grid">
-          <SkillCard icon={<TerminalSquare />} title="Backend Systems" text="API design、事件流、資料一致性與高可用服務設計。" />
-          <SkillCard icon={<RadioTower />} title="Platform Engineering" text="Kubernetes、CI/CD、Observability 與 release automation。" />
-          <SkillCard icon={<Code2 />} title="Frontend Craft" text="React、TypeScript、設計系統與精準的產品互動細節。" />
-          <SkillCard icon={<DatabaseZap />} title="Data Reliability" text="PostgreSQL、Redis、Kafka 與可回放的資料處理流程。" />
+          {skillCards.map((skill) => (
+            <SkillCard key={skill.title} {...skill} />
+          ))}
         </div>
       </section>
 
       <section id="principles" className="section-shell principles" aria-labelledby="principles-title">
         <div className="principle-copy">
-          <p className="eyebrow">Operating Principles</p>
-          <h2 id="principles-title">工作原則</h2>
+          <p className="eyebrow">Working Style</p>
+          <h2 id="principles-title">工作方式</h2>
           <p>
-            我喜歡把模糊需求拆成可驗證的技術決策，讓團隊看得見風險、進度與取捨。好的工程不只是跑得動，也要讓下一個接手的人讀得懂。
+            我把程式視為一種理解世界的工具：用物理與數學建立模型，用演算法與模擬驗證假設，再把結果整理成能被使用者操作的介面。
           </p>
         </div>
         <div className="principle-list">
-          <Principle icon={<Network />} title="系統先畫邊界" text="先確認資料流、責任歸屬與失敗模式，再談工具與實作。" />
-          <Principle icon={<Layers3 />} title="設計可替換的核心" text="把變動快的需求放在外層，讓核心邏輯維持穩定且容易測試。" />
-          <Principle icon={<BriefcaseBusiness />} title="交付能被理解" text="文件、儀表板、告警與 release note 都是產品的一部分。" />
+          {principleCards.map((principle) => (
+            <Principle key={principle.title} {...principle} />
+          ))}
         </div>
       </section>
 
       <section id="contact" className="section-shell contact" aria-labelledby="contact-title">
         <div>
-          <p className="eyebrow">Available for thoughtful teams</p>
-          <h2 id="contact-title">聯絡我</h2>
-          <p>如果你正在打造需要可靠架構、細膩產品工程和清楚技術判斷的團隊，我很樂意聊聊。</p>
+          <p className="eyebrow">Profile Links</p>
+          <h2 id="contact-title">聯絡與履歷</h2>
+          <p>目前先建立繁體中文版本。可透過 Cake 履歷、GitHub 或 LinkedIn 查看完整經歷與作品。</p>
         </div>
         <div className="contact-actions">
-          <button className="button button-primary" type="button" onClick={handleCopyEmail}>
-            {copied ? "Email 已複製" : "複製 Email"}
-            {copied ? <Check size={20} aria-hidden="true" /> : <Clipboard size={20} aria-hidden="true" />}
+          <button className="button button-primary" type="button" onClick={handleCopyProfile}>
+            {copied ? "已複製履歷資訊" : "複製履歷資訊"}
+            <Check size={20} aria-hidden="true" />
           </button>
-          <a className="button button-secondary" href={profile.socialLinks[0].url} target="_blank" rel="noreferrer">
-            GitHub
-            <Github size={20} aria-hidden="true" />
+          <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
+            Cake 履歷
+            <ExternalLink size={20} aria-hidden="true" />
           </a>
         </div>
       </section>
@@ -277,59 +326,83 @@ function App() {
   );
 }
 
-function DashboardPreview() {
-  const deploys = ["api-gateway", "user-service", "billing-service"];
+function SocialLinks({ links }: { links: SocialLink[] }) {
+  return (
+    <div className="social-links" aria-label="個人連結">
+      {links.map((link) => (
+        <a key={link.label} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
+          {link.label === "GitHub" ? <Github size={22} /> : link.label === "LinkedIn" ? <Linkedin size={22} /> : <ExternalLink size={22} />}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function ProjectConsole({
+  selectedProject,
+  onSelect,
+}: {
+  selectedProject: Project;
+  onSelect: (project: Project) => void;
+}) {
+  const projectIcon = (title: string) => {
+    if (title.includes("Mapping")) return <Map size={19} aria-hidden="true" />;
+    if (title.includes("Hex")) return <Gamepad2 size={19} aria-hidden="true" />;
+    return <Train size={19} aria-hidden="true" />;
+  };
 
   return (
-    <div className="dashboard">
-      <aside>
+    <div className="project-console">
+      <div className="console-sidebar">
         <div className="dashboard-logo">
-          <span>A</span>
-          <strong>Atlas</strong>
+          <Compass size={22} aria-hidden="true" />
+          <strong>Works</strong>
         </div>
-        {["概覽", "服務", "指標", "日誌", "部署", "設定"].map((item, index) => (
-          <span key={item} className={index === 0 ? "active" : ""}>
-            <Sparkles size={15} aria-hidden="true" />
-            {item}
-          </span>
+        {projects.map((project) => (
+          <button
+            key={project.title}
+            className={selectedProject.title === project.title ? "active" : ""}
+            type="button"
+            onClick={() => onSelect(project)}
+          >
+            {projectIcon(project.title)}
+            <span>{project.title}</span>
+          </button>
         ))}
-      </aside>
-      <div className="dashboard-main">
+      </div>
+      <div className="console-main">
         <div className="dashboard-top">
-          <strong>概覽</strong>
-          <span className="avatar">Y</span>
+          <strong>作品摘要</strong>
+          <span className="avatar">WL</span>
         </div>
         <div className="metric-grid">
-          <Metric label="服務指數" value="128" delta="+12%" />
-          <Metric label="成功請求率" value="99.95%" delta="+0.21%" />
-          <Metric label="平均延遲" value="120ms" delta="-8%" />
+          <Metric label="公開作品" value={`${projects.length}`} delta="GitHub Pages" />
+          <Metric label="主軸" value="AI" delta="Algorithm" />
+          <Metric label="語言" value="C++" delta="Python / JS" />
         </div>
         <div className="chart-card">
           <div className="chart-head">
-            <strong>請求數趨勢</strong>
-            <span>成功請求</span>
+            <strong>{selectedProject.title}</strong>
+            <span>{selectedProject.category}</span>
           </div>
-          <div className="chart-lines" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <svg viewBox="0 0 420 170" role="img" aria-label="A rising line chart">
-              <polyline points="0,125 34,94 68,112 102,70 136,78 170,55 204,85 238,58 272,77 306,49 340,72 374,63 420,32" />
-              <polyline className="coral" points="0,148 34,138 68,143 102,132 136,140 170,127 204,139 238,135 272,125 306,139 340,132 374,144 420,136" />
-            </svg>
+          <p className="console-summary">{selectedProject.summary}</p>
+          <div className="console-focus">
+            {selectedProject.tags.slice(0, 5).map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
           </div>
         </div>
       </div>
       <div className="deploy-panel">
-        <strong>近期部署</strong>
-        {deploys.map((deploy, index) => (
-          <span key={deploy}>
+        <strong>履歷重點</strong>
+        {["演算法工程", "深度學習", "訊號處理"].map((item) => (
+          <span key={item}>
             <i />
             <span>
-              {deploy}
-              <small>v{index + 1}.{index + 8}.{index + 1}</small>
+              {item}
+              <small>{profile.role}</small>
             </span>
-            <small>{index + 1}h ago</small>
+            <small>Taipei</small>
           </span>
         ))}
       </div>
@@ -360,8 +433,10 @@ function ProjectCard({
 }) {
   return (
     <article className={isSelected ? "project-card selected" : "project-card"}>
-      <button type="button" onClick={onSelect} aria-label={`Select ${project.title}`}>
-        <span className={`project-icon icon-${index + 1}`}>{project.title.slice(0, 1)}</span>
+      <button type="button" onClick={onSelect} aria-label={`選取 ${project.title}`}>
+        <span className={`project-icon icon-${index + 1}`}>
+          {project.title.includes("Mapping") ? <Map size={32} /> : project.title.includes("Hex") ? <Gamepad2 size={32} /> : <Train size={32} />}
+        </span>
         <ExternalLink size={19} aria-hidden="true" />
       </button>
       <h3>{project.title}</h3>

@@ -1,16 +1,21 @@
 {
   "profile": {
-    "name": "Chang Wei Lin",
-    "role": "Software Engineer",
+    "name": "張維麟",
+    "englishName": "Chang Wei-Lin",
+    "role": "演算法工程師 / AI 與軟體工程師",
     "location": "Taipei, Taiwan",
-    "email": "changweilin@example.com",
-    "intro": "專注於後端系統、分散式架構與開發者體驗，打造可擴展、可靠且易於維護的產品與平台。",
+    "resumeUrl": "https://www.cake.me/wei-lin-chang",
+    "intro": "宜蘭羅東人，物理系所畢業，目前專注於演算法工程、深度學習與互動式軟體作品。擅長以 C/C++、Python 與 JavaScript 把數學模型、訊號處理與使用者體驗整合成可操作的產品。",
     "quote": {
       "zh": "我愛星空至深，無懼黑夜。",
       "en": "We have loved the stars too fondly to fear the dark.",
       "source": "<The Old Astronomer> Sarah Williams"
     },
     "socialLinks": [
+      {
+        "label": "履歷",
+        "url": "https://www.cake.me/wei-lin-chang"
+      },
       {
         "label": "GitHub",
         "url": "https://github.com/changweilin"
@@ -23,87 +28,45 @@
   },
   "projects": [
     {
-      "title": "Atlas 觀測與部署平台",
-      "summary": "整合服務指標、日誌與告警的可觀測性平台，支援多雲與 Kubernetes 部署。",
-      "description": "以事件流和服務拓撲為核心，協助團隊從異常偵測、根因定位到部署回滾形成可追蹤的產品流程。",
-      "tags": ["Go", "TypeScript", "React", "PostgreSQL", "Kafka", "Kubernetes"],
-      "category": "Platform",
+      "title": "Mapping Elf",
+      "summary": "GPX 軌跡生成器與戶外地圖工具，整合路線規劃、高度剖面、離線地圖與沿途天氣資訊。",
+      "description": "Mapping Elf 是為戶外活動設計的互動式地圖應用。作品支援步行、健行、越野跑、自行車與駕車等路線模式，可匯入/匯出 GPX、KML，並以高度剖面、距離統計、體能參數與天氣時間軸輔助行前規劃。",
+      "tags": ["JavaScript", "Leaflet", "Chart.js", "Vite", "PWA", "Capacitor", "GPX/KML"],
+      "category": "戶外地圖",
       "year": "2026",
       "featured": true,
       "links": {
-        "demo": "https://example.com/atlas",
-        "repo": "https://github.com/changweilin",
-        "caseStudy": "https://example.com/atlas-case-study"
+        "demo": "https://changweilin.github.io/mapping_elf/",
+        "repo": "https://github.com/changweilin/mapping_elf",
+        "caseStudy": ""
       }
     },
     {
-      "title": "PayFlow 支付編排服務",
-      "summary": "高可用支付編排與對帳平台，支援多通道與風控整合。",
-      "description": "將交易狀態、重試策略和對帳流程模組化，讓跨團隊能穩定接入不同金流供應商。",
-      "tags": ["Kotlin", "Spring Boot", "PostgreSQL", "Redis", "OpenTelemetry"],
-      "category": "Backend",
-      "year": "2025",
+      "title": "Hex Snake",
+      "summary": "六角格貪食蛇對戰遊戲，玩家與 AI 在棋盤上搶奪資源並使用角色技能對抗。",
+      "description": "Hex Snake 是單頁瀏覽器遊戲，核心包含六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬。遊戲資料與平衡參數獨立於 data 目錄，並搭配 tools 進行模擬、策略調校與回歸測試。",
+      "tags": ["HTML", "CSS", "JavaScript", "AI 對弈", "遊戲平衡", "Simulation"],
+      "category": "遊戲與 AI",
+      "year": "2026",
       "featured": true,
       "links": {
-        "demo": "https://example.com/payflow",
-        "repo": "https://github.com/changweilin",
+        "demo": "https://changweilin.github.io/hex_snake/",
+        "repo": "https://github.com/changweilin/hex_snake",
         "caseStudy": ""
       }
     },
     {
-      "title": "CoreKit 開發者工具集",
-      "summary": "內部 CLI 與 SDK 工具組，提升團隊開發、測試與發版效率。",
-      "description": "提供專案樣板、環境檢查、API client 生成和 release automation，降低重複工作與上線摩擦。",
-      "tags": ["TypeScript", "Node.js", "Go", "GitHub Actions", "DX"],
-      "category": "Tooling",
-      "year": "2025",
+      "title": "Railway Elf",
+      "summary": "鐵路主題互動網頁作品，以 GitHub Pages 發布並保留公開程式碼連結。",
+      "description": "Railway Elf 目前先作為鐵路主題互動作品收錄，首頁提供 Demo 與 GitHub 入口。由於公開 README 內容目前無法解析，繁中版先保留保守描述，後續可依專案文件補上更完整的功能、技術棧與設計細節。",
+      "tags": ["JavaScript", "GitHub Pages", "Interactive Web"],
+      "category": "互動網頁",
+      "year": "2026",
       "featured": true,
       "links": {
-        "demo": "",
-        "repo": "https://github.com/changweilin",
-        "caseStudy": "https://example.com/corekit"
-      }
-    },
-    {
-      "title": "Nimbus 訂閱事件中台",
-      "summary": "支援產品訂閱、通知與生命週期事件的事件中台。",
-      "description": "用一致的事件合約串接 billing、notification 和 CRM，讓產品團隊能快速擴展 subscription flow。",
-      "tags": ["Java", "Kafka", "MongoDB", "Terraform", "AWS"],
-      "category": "Backend",
-      "year": "2024",
-      "featured": false,
-      "links": {
-        "demo": "https://example.com/nimbus",
-        "repo": "https://github.com/changweilin",
+        "demo": "https://changweilin.github.io/railway_elf/",
+        "repo": "https://github.com/changweilin/railway_elf",
         "caseStudy": ""
-      }
-    },
-    {
-      "title": "Lumen Design Ops",
-      "summary": "設計系統 token、文件與元件檢查流程，讓設計與工程同步演進。",
-      "description": "將 design token、visual regression 和元件文件串接到 CI，提升大型產品 UI 一致性。",
-      "tags": ["React", "Storybook", "Playwright", "Design Tokens"],
-      "category": "Frontend",
-      "year": "2024",
-      "featured": false,
-      "links": {
-        "demo": "https://example.com/lumen",
-        "repo": "https://github.com/changweilin",
-        "caseStudy": ""
-      }
-    },
-    {
-      "title": "Orbit Release Console",
-      "summary": "面向工程團隊的 release dashboard，集中查看部署、風險與 owner。",
-      "description": "把部署批次、feature flag 和事件時間線整合成一個決策介面，幫助團隊安全發布。",
-      "tags": ["Next.js", "GraphQL", "PostgreSQL", "CI/CD"],
-      "category": "Platform",
-      "year": "2023",
-      "featured": false,
-      "links": {
-        "demo": "https://example.com/orbit",
-        "repo": "",
-        "caseStudy": "https://example.com/orbit-release-console"
       }
     }
   ]
