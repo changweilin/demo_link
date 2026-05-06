@@ -6,6 +6,8 @@ Vite + React + TypeScript 建置的個人作品集首頁。繁體中文內容集
 - Hex Snake: https://changweilin.github.io/hex_snake/
 - Railway Elf: https://changweilin.github.io/railway_elf/
 
+修正紀錄請見：`docs/correction-notes.zh-TW.md`
+
 ## 本機開發
 
 ```bash
