@@ -1,11 +1,9 @@
 import {
-  Activity,
   ArrowRight,
   BrainCircuit,
   Check,
   ChevronRight,
   Code2,
-  Compass,
   ExternalLink,
   Gamepad2,
   Github,
@@ -15,12 +13,11 @@ import {
   Mountain,
   Radar,
   Route,
-  Sparkles,
   Telescope,
   Train,
   Waves,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import portfolio from "./data/portfolio.json";
 
 type LinkSet = {
@@ -36,7 +33,6 @@ type Project = {
   tags: string[];
   category: string;
   year: string;
-  featured: boolean;
   links: LinkSet;
 };
 
@@ -69,6 +65,24 @@ const linkLabels: Record<keyof LinkSet, string> = {
   repo: "GitHub",
   caseStudy: "專案筆記",
 };
+
+const resumeHighlights = [
+  {
+    label: "主軸",
+    value: "演算法工程",
+    text: "深度學習、訊號處理與 AI 輔助開發流程。",
+  },
+  {
+    label: "語言",
+    value: "C++ / Python / JS",
+    text: "從數學模型、工具開發到瀏覽器互動介面。",
+  },
+  {
+    label: "地點",
+    value: profile.location,
+    text: "完整經歷可由 Cake、GitHub 與 LinkedIn 延伸查看。",
+  },
+];
 
 const skillCards = [
   {
@@ -152,10 +166,8 @@ function App() {
           <span>{profile.name}</span>
         </a>
         <nav>
-          <a href="#works">作品集</a>
-          <a href="#featured">精選作品</a>
-          <a href="#skills">技能</a>
-          <a href="#principles">工作方式</a>
+          <a href="#works">作品</a>
+          <a href="#resume">履歷</a>
           <a href="#contact">聯絡</a>
         </nav>
       </header>
@@ -180,57 +192,16 @@ function App() {
               <ArrowRight size={20} aria-hidden="true" />
             </a>
             <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
-              查看履歷
+              Cake 履歷
               <ExternalLink size={19} aria-hidden="true" />
             </a>
           </div>
           <SocialLinks links={profile.socialLinks} />
         </div>
 
-        <div className="hero-panel" aria-label={`${heroProject.title} 專案摘要`}>
-          <ProjectConsole selectedProject={selectedProject} onSelect={setSelectedProject} />
-          <article className="hero-project">
-            <span className="pill">精選作品</span>
-            <div>
-              <h2>{selectedProject.title}</h2>
-              <p>{selectedProject.summary}</p>
-            </div>
-            <div className="tag-row">
-              {selectedProject.tags.slice(0, 6).map((tag) => (
-                <span key={tag}>{tag}</span>
-              ))}
-            </div>
-            <a href={selectedProject.links.demo || selectedProject.links.repo} target="_blank" rel="noreferrer">
-              開啟作品
-              <ExternalLink size={17} aria-hidden="true" />
-            </a>
-          </article>
-        </div>
-      </section>
-
-      <section id="featured" className="section-shell featured" aria-labelledby="featured-title">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Selected Work</p>
-            <h2 id="featured-title">精選作品</h2>
-          </div>
-          <a className="text-link" href="#works">
-            查看全部作品
-            <ArrowRight size={18} aria-hidden="true" />
-          </a>
-        </div>
-        <div className="featured-grid">
-          {projects
-            .filter((project) => project.featured)
-            .map((project, index) => (
-              <ProjectCard
-                key={project.title}
-                project={project}
-                index={index}
-                isSelected={selectedProject.title === project.title}
-                onSelect={() => setSelectedProject(project)}
-              />
-            ))}
+        <div className="hero-stack" aria-label="作品與履歷快速入口">
+          <ProjectQuickPanel selectedProject={selectedProject} onSelect={setSelectedProject} />
+          <ResumePanel />
         </div>
       </section>
 
@@ -238,7 +209,7 @@ function App() {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Portfolio Index</p>
-            <h2 id="works-title">作品集</h2>
+            <h2 id="works-title">作品</h2>
           </div>
           <div className="filter-group" aria-label="依作品類型篩選">
             {categories.map((category) => (
@@ -276,36 +247,28 @@ function App() {
         </div>
       </section>
 
-      <section id="skills" className="section-shell skills" aria-labelledby="skills-title">
+      <section id="resume" className="section-shell resume" aria-labelledby="resume-title">
         <div className="section-heading compact">
           <div>
-            <p className="eyebrow">Skill Set</p>
-            <h2 id="skills-title">技能</h2>
+            <p className="eyebrow">Resume Focus</p>
+            <h2 id="resume-title">履歷重點</h2>
           </div>
           <p>
             履歷以演算法、深度學習、訊號處理、物理背景與 AI 工具實作能力為主軸；作品則把這些能力落到地圖工具、AI
             遊戲與互動網頁。
           </p>
         </div>
-        <div className="skill-grid">
-          {skillCards.map((skill) => (
-            <SkillCard key={skill.title} {...skill} />
-          ))}
-        </div>
-      </section>
-
-      <section id="principles" className="section-shell principles" aria-labelledby="principles-title">
-        <div className="principle-copy">
-          <p className="eyebrow">Working Style</p>
-          <h2 id="principles-title">工作方式</h2>
-          <p>
-            我把程式視為一種理解世界的工具：用物理與數學建立模型，用演算法與模擬驗證假設，再把結果整理成能被使用者操作的介面。
-          </p>
-        </div>
-        <div className="principle-list">
-          {principleCards.map((principle) => (
-            <Principle key={principle.title} {...principle} />
-          ))}
+        <div className="resume-layout">
+          <div className="skill-grid">
+            {skillCards.map((skill) => (
+              <SkillCard key={skill.title} {...skill} />
+            ))}
+          </div>
+          <div className="principle-list" aria-label="工作方式">
+            {principleCards.map((principle) => (
+              <Principle key={principle.title} {...principle} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -342,125 +305,99 @@ function SocialLinks({ links }: { links: SocialLink[] }) {
   );
 }
 
-function ProjectConsole({
+function ProjectQuickPanel({
   selectedProject,
   onSelect,
 }: {
   selectedProject: Project;
   onSelect: (project: Project) => void;
 }) {
-  const projectIcon = (title: string) => {
-    if (title.includes("Mapping")) return <Map size={19} aria-hidden="true" />;
-    if (title.includes("Hex")) return <Gamepad2 size={19} aria-hidden="true" />;
-    if (title.includes("TSP")) return <Route size={19} aria-hidden="true" />;
-    return <Train size={19} aria-hidden="true" />;
-  };
+  const selectedUrl = selectedProject.links.demo || selectedProject.links.repo;
 
   return (
-    <div className="project-console">
-      <div className="console-sidebar">
-        <div className="dashboard-logo">
-          <Compass size={22} aria-hidden="true" />
-          <strong>Works</strong>
+    <section className="quick-panel" aria-labelledby="quick-projects-title">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Quick Portfolio</p>
+          <h2 id="quick-projects-title">作品快速入口</h2>
         </div>
+        <span>{projects.length} 件公開作品</span>
+      </div>
+      <div className="quick-project-list">
         {projects.map((project) => (
           <button
             key={project.title}
-            className={selectedProject.title === project.title ? "active" : ""}
+            className={project.title === selectedProject.title ? "quick-project active" : "quick-project"}
             type="button"
             onClick={() => onSelect(project)}
           >
-            {projectIcon(project.title)}
-            <span>{project.title}</span>
+            <span className="project-mini-icon">{getProjectIcon(project.title, 19)}</span>
+            <span>
+              <strong>{project.title}</strong>
+              <small>
+                {project.category} / {project.year}
+              </small>
+            </span>
+            <ChevronRight size={18} aria-hidden="true" />
           </button>
         ))}
       </div>
-      <div className="console-main">
-        <div className="dashboard-top">
-          <strong>作品摘要</strong>
-          <span className="avatar">WL</span>
+      <article className="quick-detail" aria-live="polite">
+        <div className="detail-meta">
+          <span>目前選取</span>
+          <span>{selectedProject.year}</span>
         </div>
-        <div className="metric-grid">
-          <Metric label="公開作品" value={`${projects.length}`} delta="GitHub Pages" />
-          <Metric label="主軸" value="AI" delta="Algorithm" />
-          <Metric label="語言" value="C++" delta="Python / JS" />
+        <h3>{selectedProject.title}</h3>
+        <p>{selectedProject.summary}</p>
+        <div className="tag-row">
+          {selectedProject.tags.slice(0, 5).map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
         </div>
-        <div className="chart-card">
-          <div className="chart-head">
-            <strong>{selectedProject.title}</strong>
-            <span>{selectedProject.category}</span>
-          </div>
-          <p className="console-summary">{selectedProject.summary}</p>
-          <div className="console-focus">
-            {selectedProject.tags.slice(0, 5).map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="deploy-panel">
-        <strong>履歷重點</strong>
-        {["演算法工程", "深度學習", "訊號處理"].map((item) => (
-          <span key={item}>
-            <i />
-            <span>
-              {item}
-              <small>{profile.role}</small>
-            </span>
-            <small>Taipei</small>
-          </span>
-        ))}
-      </div>
-    </div>
+        <a className="text-link" href={selectedUrl} target="_blank" rel="noreferrer">
+          開啟作品
+          <ExternalLink size={17} aria-hidden="true" />
+        </a>
+      </article>
+    </section>
   );
 }
 
-function Metric({ label, value, delta }: { label: string; value: string; delta: string }) {
+function ResumePanel() {
   return (
-    <div className="metric">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{delta}</small>
-    </div>
+    <section className="resume-panel" aria-labelledby="quick-resume-title">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Resume Snapshot</p>
+          <h2 id="quick-resume-title">履歷重點</h2>
+        </div>
+      </div>
+      <div className="resume-highlight-grid">
+        {resumeHighlights.map((item) => (
+          <article key={item.label} className="resume-highlight">
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+      <div className="resume-links">
+        {profile.socialLinks.map((link) => (
+          <a key={link.label} href={link.url} target="_blank" rel="noreferrer">
+            {link.label}
+            <ExternalLink size={15} aria-hidden="true" />
+          </a>
+        ))}
+      </div>
+    </section>
   );
 }
 
-function ProjectCard({
-  project,
-  index,
-  isSelected,
-  onSelect,
-}: {
-  project: Project;
-  index: number;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <article className={isSelected ? "project-card selected" : "project-card"}>
-      <button type="button" onClick={onSelect} aria-label={`選取 ${project.title}`}>
-        <span className={`project-icon icon-${index + 1}`}>
-          {project.title.includes("Mapping") ? (
-            <Map size={32} />
-          ) : project.title.includes("Hex") ? (
-            <Gamepad2 size={32} />
-          ) : project.title.includes("TSP") ? (
-            <Route size={32} />
-          ) : (
-            <Train size={32} />
-          )}
-        </span>
-        <ExternalLink size={19} aria-hidden="true" />
-      </button>
-      <h3>{project.title}</h3>
-      <p>{project.summary}</p>
-      <div className="slash-tags">
-        {project.tags.slice(0, 4).map((tag) => (
-          <span key={tag}>{tag}</span>
-        ))}
-      </div>
-    </article>
-  );
+function getProjectIcon(title: string, size: number) {
+  if (title.includes("Mapping")) return <Map size={size} aria-hidden="true" />;
+  if (title.includes("Hex")) return <Gamepad2 size={size} aria-hidden="true" />;
+  if (title.includes("TSP")) return <Route size={size} aria-hidden="true" />;
+  return <Train size={size} aria-hidden="true" />;
 }
 
 function ProjectDetail({ project }: { project: Project }) {
@@ -491,7 +428,7 @@ function ProjectDetail({ project }: { project: Project }) {
   );
 }
 
-function SkillCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+function SkillCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
     <article className="skill-card">
       <span>{icon}</span>
@@ -501,7 +438,7 @@ function SkillCard({ icon, title, text }: { icon: React.ReactNode; title: string
   );
 }
 
-function Principle({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+function Principle({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
     <article className="principle">
       <span>{icon}</span>

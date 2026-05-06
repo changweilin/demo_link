@@ -34,7 +34,6 @@
       "tags": ["JavaScript", "Leaflet", "Chart.js", "Vite", "PWA", "Capacitor", "GPX/KML"],
       "category": "戶外地圖",
       "year": "2026",
-      "featured": true,
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
         "repo": "https://github.com/changweilin/mapping_elf",
@@ -48,7 +47,6 @@
       "tags": ["HTML", "CSS", "JavaScript", "AI 對弈", "遊戲平衡", "Simulation"],
       "category": "遊戲與 AI",
       "year": "2026",
-      "featured": true,
       "links": {
         "demo": "https://changweilin.github.io/hex_snake/",
         "repo": "https://github.com/changweilin/hex_snake",
@@ -62,7 +60,6 @@
       "tags": ["JavaScript", "GitHub Pages", "Interactive Web"],
       "category": "互動網頁",
       "year": "2026",
-      "featured": true,
       "links": {
         "demo": "https://changweilin.github.io/railway_elf/",
         "repo": "https://github.com/changweilin/railway_elf",
@@ -76,7 +73,6 @@
       "tags": ["JavaScript", "TSP", "Optimization", "Visualization", "GitHub Pages"],
       "category": "演算法視覺化",
       "year": "2026",
-      "featured": true,
       "links": {
         "demo": "https://changweilin.github.io/web_tsp_app/",
         "repo": "https://github.com/changweilin/web_tsp_app",
