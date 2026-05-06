@@ -78,6 +78,19 @@
         "repo": "https://github.com/changweilin/web_tsp_app",
         "caseStudy": ""
       }
+    },
+    {
+      "title": "IIR Filter Tool",
+      "summary": "IIR 數位濾波器互動工具，用於展示濾波器參數調整、頻率響應與訊號處理視覺化。",
+      "description": "IIR Filter Tool 是以數位訊號處理為主題的互動式網頁作品，透過瀏覽器介面呈現 IIR 濾波器設計、參數調整與響應觀察流程，適合展示 DSP、濾波器理論、演算法實作與工程介面的整合能力。",
+      "tags": ["JavaScript", "DSP", "IIR Filter", "Signal Processing", "Visualization", "GitHub Pages"],
+      "category": "訊號處理",
+      "year": "2026",
+      "links": {
+        "demo": "https://changweilin.github.io/iir_filter_tool/",
+        "repo": "https://github.com/changweilin/iir_filter_tool",
+        "caseStudy": ""
+      }
     }
   ]
 }

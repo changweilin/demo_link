@@ -1,4 +1,5 @@
 import {
+  Activity,
   ArrowRight,
   BrainCircuit,
   Check,
@@ -397,6 +398,7 @@ function getProjectIcon(title: string, size: number) {
   if (title.includes("Mapping")) return <Map size={size} aria-hidden="true" />;
   if (title.includes("Hex")) return <Gamepad2 size={size} aria-hidden="true" />;
   if (title.includes("TSP")) return <Route size={size} aria-hidden="true" />;
+  if (title.includes("IIR")) return <Activity size={size} aria-hidden="true" />;
   return <Train size={size} aria-hidden="true" />;
 }
 
