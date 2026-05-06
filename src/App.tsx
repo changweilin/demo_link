@@ -14,6 +14,7 @@ import {
   Microscope,
   Mountain,
   Radar,
+  Route,
   Sparkles,
   Telescope,
   Train,
@@ -351,6 +352,7 @@ function ProjectConsole({
   const projectIcon = (title: string) => {
     if (title.includes("Mapping")) return <Map size={19} aria-hidden="true" />;
     if (title.includes("Hex")) return <Gamepad2 size={19} aria-hidden="true" />;
+    if (title.includes("TSP")) return <Route size={19} aria-hidden="true" />;
     return <Train size={19} aria-hidden="true" />;
   };
 
@@ -438,7 +440,15 @@ function ProjectCard({
     <article className={isSelected ? "project-card selected" : "project-card"}>
       <button type="button" onClick={onSelect} aria-label={`選取 ${project.title}`}>
         <span className={`project-icon icon-${index + 1}`}>
-          {project.title.includes("Mapping") ? <Map size={32} /> : project.title.includes("Hex") ? <Gamepad2 size={32} /> : <Train size={32} />}
+          {project.title.includes("Mapping") ? (
+            <Map size={32} />
+          ) : project.title.includes("Hex") ? (
+            <Gamepad2 size={32} />
+          ) : project.title.includes("TSP") ? (
+            <Route size={32} />
+          ) : (
+            <Train size={32} />
+          )}
         </span>
         <ExternalLink size={19} aria-hidden="true" />
       </button>

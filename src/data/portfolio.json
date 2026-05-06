@@ -68,6 +68,20 @@
         "repo": "https://github.com/changweilin/railway_elf",
         "caseStudy": ""
       }
+    },
+    {
+      "title": "Web TSP App",
+      "summary": "旅行推銷員問題的互動式網頁 Demo，用於展示路徑最佳化與演算法視覺化。",
+      "description": "Web TSP App 是以旅行推銷員問題為主題的互動式網頁作品，透過瀏覽器介面展示節點、路徑與最佳化過程，適合用來呈現組合最佳化、啟發式搜尋與演算法視覺化的實作能力。",
+      "tags": ["JavaScript", "TSP", "Optimization", "Visualization", "GitHub Pages"],
+      "category": "演算法視覺化",
+      "year": "2026",
+      "featured": true,
+      "links": {
+        "demo": "https://changweilin.github.io/web_tsp_app/",
+        "repo": "https://github.com/changweilin/web_tsp_app",
+        "caseStudy": ""
+      }
     }
   ]
 }

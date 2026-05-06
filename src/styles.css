@@ -683,6 +683,10 @@ button {
   background: linear-gradient(135deg, #101820, #3c4352);
 }
 
+.icon-4 {
+  background: linear-gradient(135deg, #5a6f2c, #0f6d78);
+}
+
 .project-card h3 {
   margin: 24px 0 8px;
   font-size: 1.24rem;
