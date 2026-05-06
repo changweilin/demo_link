@@ -61,6 +61,7 @@ const projects = portfolio.projects as Project[];
 const profile = portfolio.profile as Profile;
 const categories = ["全部", ...Array.from(new Set(projects.map((project) => project.category)))];
 const heroProject = projects[0];
+const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
 const linkLabels: Record<keyof LinkSet, string> = {
   demo: "開啟作品",
   repo: "GitHub",
@@ -176,7 +177,10 @@ function App() {
       <section id="top" className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
           <p className="eyebrow">&lt; Algorithm Engineer / AI Software /&gt;</p>
-          <h1 id="hero-title">{profile.name}</h1>
+          <div className="hero-identity">
+            <img className="profile-avatar" src={profileAvatarImage} alt={`${profile.name} 真人照片`} />
+            <h1 id="hero-title">{profile.name}</h1>
+          </div>
           <p className="role">{profile.role}</p>
           <span className="title-rule" aria-hidden="true" />
           <p className="intro">{profile.intro}</p>
@@ -299,7 +303,13 @@ function SocialLinks({ links }: { links: SocialLink[] }) {
     <div className="social-links" aria-label="個人連結">
       {links.map((link) => (
         <a key={link.label} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
-          {link.label === "GitHub" ? <Github size={22} /> : link.label === "LinkedIn" ? <Linkedin size={22} /> : <ExternalLink size={22} />}
+          {link.label === "GitHub" ? (
+            <Github size={22} />
+          ) : link.label === "LinkedIn" ? (
+            <Linkedin size={22} />
+          ) : (
+            <ExternalLink size={22} />
+          )}
         </a>
       ))}
     </div>
