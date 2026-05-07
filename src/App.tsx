@@ -2,6 +2,7 @@ import {
   Activity,
   ArrowRight,
   BrainCircuit,
+  Calculator,
   CalendarClock,
   CalendarPlus,
   Check,
@@ -555,6 +556,7 @@ function ResumePanel() {
 }
 
 function getProjectIcon(title: string, size: number) {
+  if (title.includes("Win Rate")) return <Calculator size={size} aria-hidden="true" />;
   if (title.includes("Mapping")) return <Map size={size} aria-hidden="true" />;
   if (title.includes("Hex")) return <Gamepad2 size={size} aria-hidden="true" />;
   if (title.includes("TSP")) return <Route size={size} aria-hidden="true" />;

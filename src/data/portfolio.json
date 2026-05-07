@@ -28,6 +28,21 @@
   },
   "projects": [
     {
+      "title": "Win Rate Calculator",
+      "summary": "互動式勝率計算器，用於快速試算對戰、抽卡或決策情境中的機率與期望結果。",
+      "description": "Win Rate Calculator 是以勝率與機率估算為主題的瀏覽器工具，透過簡潔表單讓使用者輸入成功率、嘗試次數或情境參數，快速得到累積勝率、期望值與比較結果，適合展示機率模型、互動表單與實用型工具設計。",
+      "tags": ["JavaScript", "Probability", "Calculator", "Statistics", "Interactive Web", "GitHub Pages"],
+      "category": "機率計算",
+      "year": "2026",
+      "createdAt": "2026-05-07T13:54:34Z",
+      "updatedAt": "2026-05-07T13:54:34Z",
+      "links": {
+        "demo": "https://changweilin.github.io/win_rate_calculator/",
+        "repo": "https://github.com/changweilin/win_rate_calculator",
+        "caseStudy": ""
+      }
+    },
+    {
       "title": "Mapping Elf",
       "summary": "GPX 軌跡生成器與戶外地圖工具，整合路線規劃、高度剖面、離線地圖與沿途天氣資訊。",
       "description": "Mapping Elf 是為戶外活動設計的互動式地圖應用。作品支援步行、健行、越野跑、自行車與駕車等路線模式，可匯入/匯出 GPX、KML，並以高度剖面、距離統計、體能參數與天氣時間軸輔助行前規劃。",
