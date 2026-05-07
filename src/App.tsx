@@ -250,6 +250,15 @@ function App() {
     }
   };
 
+  const handleProjectSelect = (project: Project) => {
+    if (project.title === selectedProject.title && project.links.demo) {
+      window.location.assign(project.links.demo);
+      return;
+    }
+
+    setSelectedProject(project);
+  };
+
   return (
     <main>
       <header className="site-header" aria-label="主選單">
@@ -311,7 +320,7 @@ function App() {
         </div>
 
         <div className="hero-stack" aria-label="作品與履歷快速入口">
-          <ProjectQuickPanel selectedProject={selectedProject} onSelect={setSelectedProject} />
+          <ProjectQuickPanel selectedProject={selectedProject} onSelect={handleProjectSelect} />
           <ResumePanel />
         </div>
       </section>
@@ -363,7 +372,12 @@ function App() {
                 key={project.title}
                 className={project.title === selectedProject.title ? "project-row selected" : "project-row"}
                 type="button"
-                onClick={() => setSelectedProject(project)}
+                aria-label={
+                  project.title === selectedProject.title && project.links.demo
+                    ? `${project.title}，再次點擊開啟 Demo`
+                    : project.title
+                }
+                onClick={() => handleProjectSelect(project)}
               >
                 <span>
                   <strong>{project.title}</strong>
@@ -470,6 +484,11 @@ function ProjectQuickPanel({
             key={project.title}
             className={project.title === selectedProject.title ? "quick-project active" : "quick-project"}
             type="button"
+            aria-label={
+              project.title === selectedProject.title && project.links.demo
+                ? `${project.title}，再次點擊開啟 Demo`
+                : project.title
+            }
             onClick={() => onSelect(project)}
           >
             <span className="project-mini-icon">{getProjectIcon(project.title, 19)}</span>
