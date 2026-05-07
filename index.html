@@ -37,6 +37,31 @@
       content="演算法工程、AI 輔助開發、互動網頁、地圖工具與訊號處理作品。"
     />
     <meta name="twitter:image" content="https://changweilin.github.io/demo_link/link-preview.png" />
+    <script>
+      (() => {
+        const storageKey = "portfolio-theme-mode";
+        let theme = "day";
+
+        try {
+          const storedTheme = window.localStorage.getItem(storageKey);
+          if (storedTheme === "day" || storedTheme === "night") {
+            theme = storedTheme;
+          } else if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+            theme = "night";
+          }
+        } catch {
+          if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+            theme = "night";
+          }
+        }
+
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme === "night" ? "dark" : "light";
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute("content", theme === "night" ? "#111512" : "#0f6d78");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

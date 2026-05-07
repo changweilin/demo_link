@@ -34,6 +34,8 @@
       "tags": ["JavaScript", "Leaflet", "Chart.js", "Vite", "PWA", "Capacitor", "GPX/KML"],
       "category": "戶外地圖",
       "year": "2026",
+      "createdAt": "2026-04-08T13:54:34Z",
+      "updatedAt": "2026-04-30T11:34:28Z",
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
         "repo": "https://github.com/changweilin/mapping_elf",
@@ -47,6 +49,8 @@
       "tags": ["HTML", "CSS", "JavaScript", "AI 對弈", "遊戲平衡", "Simulation"],
       "category": "遊戲與 AI",
       "year": "2026",
+      "createdAt": "2026-04-27T14:19:02Z",
+      "updatedAt": "2026-05-06T17:11:34Z",
       "links": {
         "demo": "https://changweilin.github.io/hex_snake/",
         "repo": "https://github.com/changweilin/hex_snake",
@@ -60,6 +64,8 @@
       "tags": ["JavaScript", "GitHub Pages", "Interactive Web"],
       "category": "互動網頁",
       "year": "2026",
+      "createdAt": "2026-04-29T12:55:45Z",
+      "updatedAt": "2026-05-06T17:04:14Z",
       "links": {
         "demo": "https://changweilin.github.io/railway_elf/",
         "repo": "https://github.com/changweilin/railway_elf",
@@ -73,6 +79,8 @@
       "tags": ["JavaScript", "TSP", "Optimization", "Visualization", "GitHub Pages"],
       "category": "演算法視覺化",
       "year": "2026",
+      "createdAt": "2026-02-27T03:12:58Z",
+      "updatedAt": "2026-05-06T17:10:26Z",
       "links": {
         "demo": "https://changweilin.github.io/web_tsp_app/",
         "repo": "https://github.com/changweilin/web_tsp_app",
@@ -86,6 +94,8 @@
       "tags": ["JavaScript", "DSP", "IIR Filter", "Signal Processing", "Visualization", "GitHub Pages"],
       "category": "訊號處理",
       "year": "2026",
+      "createdAt": "2025-04-15T13:23:21Z",
+      "updatedAt": "2026-05-07T01:20:03Z",
       "links": {
         "demo": "https://changweilin.github.io/iir_filter_tool/",
         "repo": "https://github.com/changweilin/iir_filter_tool",

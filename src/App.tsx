@@ -2,6 +2,8 @@ import {
   Activity,
   ArrowRight,
   BrainCircuit,
+  CalendarClock,
+  CalendarPlus,
   Check,
   ChevronRight,
   Code2,
@@ -11,14 +13,16 @@ import {
   Linkedin,
   Map,
   Microscope,
+  Moon,
   Mountain,
   Radar,
   Route,
+  Sun,
   Telescope,
   Train,
   Waves,
 } from "lucide-react";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import portfolio from "./data/portfolio.json";
 
 type LinkSet = {
@@ -34,6 +38,8 @@ type Project = {
   tags: string[];
   category: string;
   year: string;
+  createdAt: string;
+  updatedAt: string;
   links: LinkSet;
 };
 
@@ -57,16 +63,32 @@ type Profile = {
   socialLinks: SocialLink[];
 };
 
+type ThemeMode = "day" | "night";
+type ProjectSortMode = "updatedAt" | "createdAt";
+
+const themeStorageKey = "portfolio-theme-mode";
+const defaultProjectSort: ProjectSortMode = "updatedAt";
 const projects = portfolio.projects as Project[];
 const profile = portfolio.profile as Profile;
 const categories = ["全部", ...Array.from(new Set(projects.map((project) => project.category)))];
-const heroProject = projects[0];
+const defaultSortedProjects = sortProjects(projects, defaultProjectSort);
+const heroProject = defaultSortedProjects[0] ?? projects[0];
 const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
 const linkLabels: Record<keyof LinkSet, string> = {
   demo: "開啟作品",
   repo: "GitHub",
   caseStudy: "專案筆記",
 };
+const projectSortOptions: { value: ProjectSortMode; label: string; metaLabel: string }[] = [
+  { value: "updatedAt", label: "最後更新日期", metaLabel: "更新" },
+  { value: "createdAt", label: "建立日期", metaLabel: "建立" },
+];
+const projectDateFormatter = new Intl.DateTimeFormat("zh-TW", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "Asia/Taipei",
+});
 
 const resumeHighlights = [
   {
@@ -127,15 +149,68 @@ const principleCards = [
   },
 ];
 
+function getInitialTheme(): ThemeMode {
+  if (typeof window === "undefined") return "day";
+
+  try {
+    const storedTheme = window.localStorage.getItem(themeStorageKey);
+    if (storedTheme === "day" || storedTheme === "night") return storedTheme;
+  } catch {
+    // Keep rendering even when storage is unavailable.
+  }
+
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "night" : "day";
+}
+
+function getProjectDateValue(project: Project, sortMode: ProjectSortMode) {
+  const timestamp = Date.parse(project[sortMode]);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function sortProjects(projectList: Project[], sortMode: ProjectSortMode) {
+  return [...projectList].sort((projectA, projectB) => {
+    const dateDelta = getProjectDateValue(projectB, sortMode) - getProjectDateValue(projectA, sortMode);
+    if (dateDelta !== 0) return dateDelta;
+    return projectA.title.localeCompare(projectB.title, "zh-TW");
+  });
+}
+
+function formatProjectDate(timestamp: string) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "未設定";
+  return projectDateFormatter.format(date);
+}
+
 function App() {
   const [activeCategory, setActiveCategory] = useState("全部");
+  const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>(defaultProjectSort);
   const [selectedProject, setSelectedProject] = useState<Project>(heroProject);
   const [copied, setCopied] = useState(false);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
+  const isNightMode = themeMode === "night";
+  const activeSortOption =
+    projectSortOptions.find((option) => option.value === projectSortMode) ?? projectSortOptions[0];
 
   const visibleProjects = useMemo(() => {
-    if (activeCategory === "全部") return projects;
-    return projects.filter((project) => project.category === activeCategory);
-  }, [activeCategory]);
+    const categoryProjects =
+      activeCategory === "全部" ? projects : projects.filter((project) => project.category === activeCategory);
+    return sortProjects(categoryProjects, projectSortMode);
+  }, [activeCategory, projectSortMode]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const themeColor = isNightMode ? "#111512" : "#0f6d78";
+
+    root.dataset.theme = themeMode;
+    root.style.colorScheme = isNightMode ? "dark" : "light";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColor);
+
+    try {
+      window.localStorage.setItem(themeStorageKey, themeMode);
+    } catch {
+      // Theme still works for the current session when storage is unavailable.
+    }
+  }, [isNightMode, themeMode]);
 
   const handleCopyProfile = async () => {
     const text = `${profile.name} / ${profile.role}\n${profile.resumeUrl}`;
@@ -158,6 +233,23 @@ function App() {
     window.setTimeout(() => setCopied(false), 4200);
   };
 
+  const handleThemeToggle = () => {
+    setThemeMode((currentTheme) => (currentTheme === "day" ? "night" : "day"));
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setActiveCategory(category);
+
+    const categoryProjects =
+      category === "全部" ? projects : projects.filter((project) => project.category === category);
+    const sortedCategoryProjects = sortProjects(categoryProjects, projectSortMode);
+    const selectedProjectIsVisible = sortedCategoryProjects.some((project) => project.title === selectedProject.title);
+
+    if (!selectedProjectIsVisible && sortedCategoryProjects[0]) {
+      setSelectedProject(sortedCategoryProjects[0]);
+    }
+  };
+
   return (
     <main>
       <header className="site-header" aria-label="主選單">
@@ -167,11 +259,25 @@ function App() {
           </span>
           <span>{profile.name}</span>
         </a>
-        <nav>
-          <a href="#works">作品</a>
-          <a href="#resume">履歷</a>
-          <a href="#contact">聯絡</a>
-        </nav>
+        <div className="header-actions">
+          <nav>
+            <a href="#works">作品</a>
+            <a href="#resume">履歷</a>
+            <a href="#contact">聯絡</a>
+          </nav>
+          <button
+            className="theme-toggle"
+            type="button"
+            aria-label={isNightMode ? "目前晚上模式，切換為白天模式" : "目前白天模式，切換為晚上模式"}
+            aria-pressed={isNightMode}
+            onClick={handleThemeToggle}
+          >
+            <span className="theme-toggle-icon" aria-hidden="true">
+              {isNightMode ? <Moon size={17} /> : <Sun size={17} />}
+            </span>
+            <span>{isNightMode ? "晚上" : "白天"}</span>
+          </button>
+        </div>
       </header>
 
       <section id="top" className="hero section-shell" aria-labelledby="hero-title">
@@ -216,17 +322,38 @@ function App() {
             <p className="eyebrow">Portfolio Index</p>
             <h2 id="works-title">作品</h2>
           </div>
-          <div className="filter-group" aria-label="依作品類型篩選">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={category === activeCategory ? "active" : ""}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="project-controls">
+            <div className="sort-group" role="radiogroup" aria-label="專案排序">
+              {projectSortOptions.map((option) => {
+                const isActive = option.value === projectSortMode;
+                const SortIcon = option.value === "updatedAt" ? CalendarClock : CalendarPlus;
+
+                return (
+                  <button
+                    key={option.value}
+                    className={isActive ? "active" : ""}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => setProjectSortMode(option.value)}
+                  >
+                    <SortIcon size={16} aria-hidden="true" />
+                    <span>{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="filter-group" aria-label="依作品類型篩選">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={category === activeCategory ? "active" : ""}
+                  type="button"
+                  onClick={() => handleCategorySelect(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <div className="work-layout">
@@ -242,6 +369,9 @@ function App() {
                   <strong>{project.title}</strong>
                   <small>
                     {project.category} / {project.year}
+                  </small>
+                  <small>
+                    {activeSortOption.metaLabel} {formatProjectDate(project[projectSortMode])}
                   </small>
                 </span>
                 <ChevronRight size={18} aria-hidden="true" />
@@ -335,7 +465,7 @@ function ProjectQuickPanel({
         <span>{projects.length} 件公開作品</span>
       </div>
       <div className="quick-project-list">
-        {projects.map((project) => (
+        {defaultSortedProjects.map((project) => (
           <button
             key={project.title}
             className={project.title === selectedProject.title ? "quick-project active" : "quick-project"}
@@ -348,6 +478,7 @@ function ProjectQuickPanel({
               <small>
                 {project.category} / {project.year}
               </small>
+              <small>更新 {formatProjectDate(project.updatedAt)}</small>
             </span>
             <ChevronRight size={18} aria-hidden="true" />
           </button>
@@ -356,7 +487,7 @@ function ProjectQuickPanel({
       <article className="quick-detail" aria-live="polite">
         <div className="detail-meta">
           <span>目前選取</span>
-          <span>{selectedProject.year}</span>
+          <span>更新 {formatProjectDate(selectedProject.updatedAt)}</span>
         </div>
         <h3>{selectedProject.title}</h3>
         <p>{selectedProject.summary}</p>
@@ -418,6 +549,8 @@ function ProjectDetail({ project }: { project: Project }) {
       <div className="detail-meta">
         <span>{project.category}</span>
         <span>{project.year}</span>
+        <span>建立 {formatProjectDate(project.createdAt)}</span>
+        <span>更新 {formatProjectDate(project.updatedAt)}</span>
       </div>
       <h3>{project.title}</h3>
       <p>{project.description}</p>
