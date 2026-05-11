@@ -66,13 +66,15 @@ type Profile = {
 
 type ThemeMode = "day" | "night";
 type ProjectSortMode = "updatedAt" | "createdAt";
+type ProjectSortDirection = "desc" | "asc";
 
 const themeStorageKey = "portfolio-theme-mode";
 const defaultProjectSort: ProjectSortMode = "updatedAt";
+const defaultProjectSortDirection: ProjectSortDirection = "desc";
 const projects = portfolio.projects as Project[];
 const profile = portfolio.profile as Profile;
 const categories = ["全部", ...Array.from(new Set(projects.map((project) => project.category)))];
-const defaultSortedProjects = sortProjects(projects, defaultProjectSort);
+const defaultSortedProjects = sortProjects(projects, defaultProjectSort, defaultProjectSortDirection);
 const heroProject = defaultSortedProjects[0] ?? projects[0];
 const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
 const linkLabels: Record<keyof LinkSet, string> = {
@@ -168,10 +170,11 @@ function getProjectDateValue(project: Project, sortMode: ProjectSortMode) {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
-function sortProjects(projectList: Project[], sortMode: ProjectSortMode) {
+function sortProjects(projectList: Project[], sortMode: ProjectSortMode, direction: ProjectSortDirection) {
   return [...projectList].sort((projectA, projectB) => {
     const dateDelta = getProjectDateValue(projectB, sortMode) - getProjectDateValue(projectA, sortMode);
-    if (dateDelta !== 0) return dateDelta;
+    const sortedByDirection = direction === "asc" ? -dateDelta : dateDelta;
+    if (sortedByDirection !== 0) return sortedByDirection;
     return projectA.title.localeCompare(projectB.title, "zh-TW");
   });
 }
@@ -185,6 +188,8 @@ function formatProjectDate(timestamp: string) {
 function App() {
   const [activeCategory, setActiveCategory] = useState("全部");
   const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>(defaultProjectSort);
+  const [projectSortDirection, setProjectSortDirection] =
+    useState<ProjectSortDirection>(defaultProjectSortDirection);
   const [selectedProject, setSelectedProject] = useState<Project>(heroProject);
   const [copied, setCopied] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
@@ -195,8 +200,8 @@ function App() {
   const visibleProjects = useMemo(() => {
     const categoryProjects =
       activeCategory === "全部" ? projects : projects.filter((project) => project.category === activeCategory);
-    return sortProjects(categoryProjects, projectSortMode);
-  }, [activeCategory, projectSortMode]);
+    return sortProjects(categoryProjects, projectSortMode, projectSortDirection);
+  }, [activeCategory, projectSortMode, projectSortDirection]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -243,7 +248,7 @@ function App() {
 
     const categoryProjects =
       category === "全部" ? projects : projects.filter((project) => project.category === category);
-    const sortedCategoryProjects = sortProjects(categoryProjects, projectSortMode);
+    const sortedCategoryProjects = sortProjects(categoryProjects, projectSortMode, projectSortDirection);
     const selectedProjectIsVisible = sortedCategoryProjects.some((project) => project.title === selectedProject.title);
 
     if (!selectedProjectIsVisible && sortedCategoryProjects[0]) {
@@ -317,8 +322,8 @@ function App() {
               <ExternalLink size={19} aria-hidden="true" />
             </a>
           </div>
-          <SocialLinks links={profile.socialLinks} />
-        </div>
+            <SocialLinks links={profile.socialLinks.filter((link) => link.label !== "履歷")} />
+          </div>
 
         <div className="hero-stack" aria-label="作品與履歷快速入口">
           <ProjectQuickPanel selectedProject={selectedProject} onSelect={handleProjectSelect} />
@@ -337,6 +342,11 @@ function App() {
               {projectSortOptions.map((option) => {
                 const isActive = option.value === projectSortMode;
                 const SortIcon = option.value === "updatedAt" ? CalendarClock : CalendarPlus;
+                const directionSuffix = isActive
+                  ? projectSortDirection === "desc"
+                    ? "（由新到舊）"
+                    : "（由舊到新）"
+                  : "";
 
                 return (
                   <button
@@ -344,10 +354,20 @@ function App() {
                     className={isActive ? "active" : ""}
                     type="button"
                     aria-pressed={isActive}
-                    onClick={() => setProjectSortMode(option.value)}
+                    onClick={() => {
+                      if (projectSortMode === option.value) {
+                        setProjectSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
+                      } else {
+                        setProjectSortMode(option.value);
+                        setProjectSortDirection("desc");
+                      }
+                    }}
                   >
                     <SortIcon size={16} aria-hidden="true" />
-                    <span>{option.label}</span>
+                    <span>
+                      {option.label}
+                      {directionSuffix}
+                    </span>
                   </button>
                 );
               })}
@@ -541,14 +561,6 @@ function ResumePanel() {
             <strong>{item.value}</strong>
             <p>{item.text}</p>
           </article>
-        ))}
-      </div>
-      <div className="resume-links">
-        {profile.socialLinks.map((link) => (
-          <a key={link.label} href={link.url} target="_blank" rel="noreferrer">
-            {link.label}
-            <ExternalLink size={15} aria-hidden="true" />
-          </a>
         ))}
       </div>
     </section>
