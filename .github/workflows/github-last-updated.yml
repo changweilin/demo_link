@@ -1,0 +1,43 @@
+name: Track GitHub project last updated date
+
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch and record repository updated_at
+        env:
+          TRACK_REPOS: ${{ github.repository }}
+          TRACK_OUTPUT_PATH: docs/github-last-updated.json
+          TRACK_MARKDOWN_PATH: docs/github-last-updated.md
+          TRACK_MAX_HISTORY: 30
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/github-last-updated.js
+
+      - name: Save history
+        run: |
+          if git diff --quiet -- docs/github-last-updated.json docs/github-last-updated.md; then
+            echo "No update."
+            exit 0
+          fi
+
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add docs/github-last-updated.json docs/github-last-updated.md
+          git commit -m "chore: update github project last updated snapshot"
+          git push
