@@ -2,34 +2,48 @@ import {
   Activity,
   ArrowRight,
   BrainCircuit,
-  Calculator,
   CalendarClock,
-  CalendarPlus,
-  Check,
-  ChevronRight,
+  CheckCircle2,
   Code2,
+  Download,
   ExternalLink,
   Gamepad2,
   Github,
+  Languages,
   Linkedin,
   Map,
   Microscope,
   Moon,
   Mountain,
+  Printer,
   Radar,
   Route,
+  Signal,
+  Sparkles,
   Sun,
   Telescope,
-  Train,
   Waves,
 } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import portfolio from "./data/portfolio.json";
 
-type LinkSet = {
-  demo?: string;
-  repo?: string;
-  caseStudy?: string;
+type ThemeMode = "day" | "night";
+
+type ProfileLink = {
+  label: string;
+  url: string;
+  icon: ReactNode;
+};
+
+type ResumeHighlight = {
+  label: string;
+  value: string;
+  text: string;
+};
+
+type SkillCard = {
+  icon: ReactNode;
+  title: string;
+  text: string;
 };
 
 type Project = {
@@ -41,59 +55,50 @@ type Project = {
   year: string;
   createdAt: string;
   updatedAt: string;
-  links: LinkSet;
-};
-
-type SocialLink = {
-  label: string;
-  url: string;
-};
-
-type Profile = {
-  name: string;
-  englishName: string;
-  role: string;
-  location: string;
-  resumeUrl: string;
-  intro: string;
-  quote: {
-    zh: string;
-    en: string;
-    source: string;
+  links: {
+    demo: string;
+    repo: string;
   };
-  socialLinks: SocialLink[];
 };
-
-type ThemeMode = "day" | "night";
-type ProjectSortMode = "updatedAt" | "createdAt";
-type ProjectSortDirection = "desc" | "asc";
 
 const themeStorageKey = "portfolio-theme-mode";
-const defaultProjectSort: ProjectSortMode = "updatedAt";
-const defaultProjectSortDirection: ProjectSortDirection = "desc";
-const projects = portfolio.projects as Project[];
-const profile = portfolio.profile as Profile;
-const categories = ["全部", ...Array.from(new Set(projects.map((project) => project.category)))];
-const defaultSortedProjects = sortProjects(projects, defaultProjectSort, defaultProjectSortDirection);
-const heroProject = defaultSortedProjects[0] ?? projects[0];
 const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
-const linkLabels: Record<keyof LinkSet, string> = {
-  demo: "開啟作品",
-  repo: "GitHub",
-  caseStudy: "專案筆記",
-};
-const projectSortOptions: { value: ProjectSortMode; label: string; metaLabel: string }[] = [
-  { value: "updatedAt", label: "最後更新日期", metaLabel: "更新" },
-  { value: "createdAt", label: "建立日期", metaLabel: "建立" },
-];
-const projectDateFormatter = new Intl.DateTimeFormat("zh-TW", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  timeZone: "Asia/Taipei",
-});
 
-const resumeHighlights = [
+const profile = {
+  name: "張維麟",
+  englishName: "Chang Wei-Lin",
+  role: "演算法工程師 / AI 與軟體工程師",
+  location: "Taipei, Taiwan",
+  hometown: "宜蘭羅東",
+  resumeUrl: "https://www.cake.me/wei-lin-chang",
+  intro:
+    "宜蘭羅東人，物理系所畢業，目前專注於演算法工程、深度學習與 AI 輔助開發流程。熟悉運用 Claude Code、ChatGPT Codex、Antigravity 等 AI 工具協助需求拆解、原型開發、程式重構與測試驗證，並以 C/C++、Python 與 JavaScript 把數學模型、訊號處理與使用者體驗整合成可操作的產品。",
+  quote: {
+    zh: "我愛星空至深，無懼黑夜。",
+    en: "We have loved the stars too fondly to fear the dark.",
+    source: "The Old Astronomer, Sarah Williams",
+  },
+};
+
+const profileLinks: ProfileLink[] = [
+  {
+    label: "Cake 履歷",
+    url: profile.resumeUrl,
+    icon: <ExternalLink size={18} aria-hidden="true" />,
+  },
+  {
+    label: "GitHub",
+    url: "https://github.com/changweilin",
+    icon: <Github size={18} aria-hidden="true" />,
+  },
+  {
+    label: "LinkedIn",
+    url: "https://www.linkedin.com/in/wei-lin-chang-ba38049a/",
+    icon: <Linkedin size={18} aria-hidden="true" />,
+  },
+];
+
+const resumeHighlights: ResumeHighlight[] = [
   {
     label: "主軸",
     value: "演算法工程",
@@ -101,7 +106,7 @@ const resumeHighlights = [
   },
   {
     label: "語言",
-    value: "C++ / Python / JS",
+    value: "C++ / Python / JavaScript",
     text: "從數學模型、工具開發到瀏覽器互動介面。",
   },
   {
@@ -111,7 +116,7 @@ const resumeHighlights = [
   },
 ];
 
-const skillCards = [
+const skillCards: SkillCard[] = [
   {
     icon: <BrainCircuit />,
     title: "演算法與深度學習",
@@ -129,12 +134,12 @@ const skillCards = [
   },
   {
     icon: <Code2 />,
-    title: "AI 工具輔助開發",
+    title: "工具輔助開發",
     text: "善用 Claude Code、ChatGPT Codex、Antigravity 等工具加速需求拆解、原型實作、重構、測試與文件整理，並維持可驗證的工程品質。",
   },
 ];
 
-const principleCards = [
+const workPrinciples: SkillCard[] = [
   {
     icon: <Telescope />,
     title: "從現象回到模型",
@@ -152,6 +157,115 @@ const principleCards = [
   },
 ];
 
+const projects: Project[] = [
+  {
+    title: "Win Rate Calculator",
+    summary: "互動式勝率計算器，用於快速試算對戰、抽卡或決策情境中的機率與期望結果。",
+    description:
+      "是以勝率與機率估算為主題的瀏覽器工具，透過簡潔表單讓使用者輸入成功率、嘗試次數或情境參數，快速得到累積勝率、期望值與比較結果，適合展示機率模型、互動表單與實用型工具設計。",
+    tags: ["JavaScript", "Probability", "Calculator", "Statistics", "Interactive Web", "GitHub Pages"],
+    category: "機率計算",
+    year: "2026",
+    createdAt: "2026-05-07T13:54:34Z",
+    updatedAt: "2026-05-07T13:54:34Z",
+    links: {
+      demo: "https://changweilin.github.io/win_rate_calculator/",
+      repo: "https://github.com/changweilin/win_rate_calculator",
+    },
+  },
+  {
+    title: "Mapping Elf",
+    summary: "軌跡生成器與戶外地圖工具，整合路線規劃、高度剖面、離線地圖與沿途天氣資訊。",
+    description:
+      "是為戶外活動設計的互動式地圖應用。作品支援步行、健行、越野跑、自行車與駕車等路線模式，可匯入/匯出 GPX、KML，並以高度剖面、距離統計、體能參數與天氣時間軸輔助行前規劃。",
+    tags: ["JavaScript", "Leaflet", "Chart.js", "Vite", "PWA", "Capacitor", "GPX/KML"],
+    category: "戶外地圖",
+    year: "2026",
+    createdAt: "2026-04-08T13:54:34Z",
+    updatedAt: "2026-04-30T11:34:28Z",
+    links: {
+      demo: "https://changweilin.github.io/mapping_elf/",
+      repo: "https://github.com/changweilin/mapping_elf",
+    },
+  },
+  {
+    title: "Hex Snake",
+    summary: "六角格貪食蛇對戰遊戲，玩家與 AI 在棋盤上搶奪資源並使用角色技能對抗。",
+    description:
+      "是單頁瀏覽器遊戲，核心包含六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬。遊戲資料與平衡參數獨立於 data 目錄，並搭配 tools 進行模擬、策略調校與回歸測試。",
+    tags: ["HTML", "CSS", "JavaScript", "AI 對弈", "遊戲平衡", "Simulation"],
+    category: "遊戲與 AI",
+    year: "2026",
+    createdAt: "2026-04-27T14:19:02Z",
+    updatedAt: "2026-05-06T17:11:34Z",
+    links: {
+      demo: "https://changweilin.github.io/hex_snake/",
+      repo: "https://github.com/changweilin/hex_snake",
+    },
+  },
+  {
+    title: "Railway Elf",
+    summary: "鐵路主題互動網頁作品，以 GitHub Pages 發布並保留公開程式碼連結。",
+    description:
+      "目前先作為鐵路主題互動作品收錄，首頁提供 Demo 與 GitHub 入口。由於公開 README 內容目前無法解析，繁中版先保留保守描述，後續可依專案文件補上更完整的功能、技術棧與設計細節。",
+    tags: ["JavaScript", "GitHub Pages", "Interactive Web"],
+    category: "互動網頁",
+    year: "2026",
+    createdAt: "2026-04-29T12:55:45Z",
+    updatedAt: "2026-05-06T17:04:14Z",
+    links: {
+      demo: "https://changweilin.github.io/railway_elf/",
+      repo: "https://github.com/changweilin/railway_elf",
+    },
+  },
+  {
+    title: "Web TSP App",
+    summary: "旅行推銷員問題的互動式網頁 Demo，用於展示路徑最佳化與演算法視覺化。",
+    description:
+      "是以旅行推銷員問題為主題的互動式網頁作品，透過瀏覽器介面展示節點、路徑與最佳化過程，適合用來呈現組合最佳化、啟發式搜尋與演算法視覺化的實作能力。",
+    tags: ["JavaScript", "TSP", "Optimization", "Visualization", "GitHub Pages"],
+    category: "演算法視覺化",
+    year: "2026",
+    createdAt: "2026-02-27T03:12:58Z",
+    updatedAt: "2026-05-06T17:10:26Z",
+    links: {
+      demo: "https://changweilin.github.io/web_tsp_app/",
+      repo: "https://github.com/changweilin/web_tsp_app",
+    },
+  },
+  {
+    title: "IIR Filter Tool",
+    summary: "數位濾波器互動工具，用於展示濾波器參數調整、頻率響應與訊號處理視覺化。",
+    description:
+      "是以數位訊號處理為主題的互動式網頁作品，透過瀏覽器介面呈現 IIR 濾波器設計、參數調整與響應觀察流程，適合展示 DSP、濾波器理論、演算法實作與工程介面的整合能力。",
+    tags: ["JavaScript", "DSP", "IIR Filter", "Signal Processing", "Visualization", "GitHub Pages"],
+    category: "訊號處理",
+    year: "2026",
+    createdAt: "2025-04-15T13:23:21Z",
+    updatedAt: "2026-05-07T01:20:03Z",
+    links: {
+      demo: "https://changweilin.github.io/iir_filter_tool/",
+      repo: "https://github.com/changweilin/iir_filter_tool",
+    },
+  },
+];
+
+const categoryIconMap: Record<string, ReactNode> = {
+  機率計算: <Activity size={18} aria-hidden="true" />,
+  戶外地圖: <Map size={18} aria-hidden="true" />,
+  "遊戲與 AI": <Gamepad2 size={18} aria-hidden="true" />,
+  互動網頁: <Sparkles size={18} aria-hidden="true" />,
+  演算法視覺化: <Route size={18} aria-hidden="true" />,
+  訊號處理: <Signal size={18} aria-hidden="true" />,
+};
+
+const dateFormatter = new Intl.DateTimeFormat("zh-TW", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "Asia/Taipei",
+});
+
 function getInitialTheme(): ThemeMode {
   if (typeof window === "undefined") return "day";
 
@@ -159,67 +273,57 @@ function getInitialTheme(): ThemeMode {
     const storedTheme = window.localStorage.getItem(themeStorageKey);
     if (storedTheme === "day" || storedTheme === "night") return storedTheme;
   } catch {
-    // Keep rendering even when storage is unavailable.
+    return "day";
   }
 
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "night" : "day";
 }
 
-function getProjectDateValue(project: Project, sortMode: ProjectSortMode) {
-  const timestamp = Date.parse(project[sortMode]);
-  return Number.isNaN(timestamp) ? 0 : timestamp;
-}
-
-function sortProjects(projectList: Project[], sortMode: ProjectSortMode, direction: ProjectSortDirection) {
-  return [...projectList].sort((projectA, projectB) => {
-    const dateDelta = getProjectDateValue(projectB, sortMode) - getProjectDateValue(projectA, sortMode);
-    const sortedByDirection = direction === "asc" ? -dateDelta : dateDelta;
-    if (sortedByDirection !== 0) return sortedByDirection;
-    return projectA.title.localeCompare(projectB.title, "zh-TW");
-  });
-}
-
 function formatProjectDate(timestamp: string) {
   const date = new Date(timestamp);
-  if (Number.isNaN(date.getTime())) return "未設定";
-  return projectDateFormatter.format(date);
+  return Number.isNaN(date.getTime()) ? "未設定" : dateFormatter.format(date);
 }
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState("全部");
-  const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>(defaultProjectSort);
-  const [projectSortDirection, setProjectSortDirection] =
-    useState<ProjectSortDirection>(defaultProjectSortDirection);
-  const [selectedProject, setSelectedProject] = useState<Project>(heroProject);
-  const [copied, setCopied] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
+  const [copied, setCopied] = useState(false);
   const isNightMode = themeMode === "night";
-  const activeSortOption =
-    projectSortOptions.find((option) => option.value === projectSortMode) ?? projectSortOptions[0];
 
-  const visibleProjects = useMemo(() => {
-    const categoryProjects =
-      activeCategory === "全部" ? projects : projects.filter((project) => project.category === activeCategory);
-    return sortProjects(categoryProjects, projectSortMode, projectSortDirection);
-  }, [activeCategory, projectSortMode, projectSortDirection]);
+  const sortedProjects = useMemo(
+    () =>
+      [...projects].sort((projectA, projectB) => {
+        const updatedDelta = Date.parse(projectB.updatedAt) - Date.parse(projectA.updatedAt);
+        if (updatedDelta !== 0) return updatedDelta;
+        return projectA.title.localeCompare(projectB.title, "zh-TW");
+      }),
+    [],
+  );
 
   useEffect(() => {
     const root = document.documentElement;
-    const themeColor = isNightMode ? "#111512" : "#0f6d78";
-
     root.dataset.theme = themeMode;
     root.style.colorScheme = isNightMode ? "dark" : "light";
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColor);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", isNightMode ? "#111512" : "#0f6d78");
 
     try {
       window.localStorage.setItem(themeStorageKey, themeMode);
     } catch {
-      // Theme still works for the current session when storage is unavailable.
+      // Theme still works for this session when storage is unavailable.
     }
   }, [isNightMode, themeMode]);
 
+  const handleThemeToggle = () => {
+    setThemeMode((currentTheme) => (currentTheme === "day" ? "night" : "day"));
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleCopyProfile = async () => {
-    const text = `${profile.name} / ${profile.role}\n${profile.resumeUrl}`;
+    const text = `${profile.name} / ${profile.role}\n${profile.resumeUrl}\nhttps://github.com/changweilin\nhttps://www.linkedin.com/in/wei-lin-chang-ba38049a/`;
 
     try {
       await navigator.clipboard?.writeText(text);
@@ -236,38 +340,12 @@ function App() {
     }
 
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 4200);
-  };
-
-  const handleThemeToggle = () => {
-    setThemeMode((currentTheme) => (currentTheme === "day" ? "night" : "day"));
-  };
-
-  const handleCategorySelect = (category: string) => {
-    setActiveCategory(category);
-
-    const categoryProjects =
-      category === "全部" ? projects : projects.filter((project) => project.category === category);
-    const sortedCategoryProjects = sortProjects(categoryProjects, projectSortMode, projectSortDirection);
-    const selectedProjectIsVisible = sortedCategoryProjects.some((project) => project.title === selectedProject.title);
-
-    if (!selectedProjectIsVisible && sortedCategoryProjects[0]) {
-      setSelectedProject(sortedCategoryProjects[0]);
-    }
-  };
-
-  const handleProjectSelect = (project: Project) => {
-    if (project.title === selectedProject.title && project.links.demo) {
-      window.location.assign(project.links.demo);
-      return;
-    }
-
-    setSelectedProject(project);
+    window.setTimeout(() => setCopied(false), 3200);
   };
 
   return (
-    <main>
-      <header className="site-header" aria-label="主選單">
+    <main className="resume-app">
+      <header className="site-header no-print" aria-label="主選單">
         <a className="brand" href="#top" aria-label={`${profile.name} 首頁`}>
           <span className="brand-mark" aria-hidden="true">
             &gt;_
@@ -276,8 +354,9 @@ function App() {
         </a>
         <div className="header-actions">
           <nav>
-            <a href="#works">作品</a>
             <a href="#resume">履歷</a>
+            <a href="#skills">能力</a>
+            <a href="#works">作品</a>
             <a href="#contact">聯絡</a>
           </nav>
           <button
@@ -300,7 +379,10 @@ function App() {
           <p className="eyebrow">&lt; Algorithm Engineer / AI Software /&gt;</p>
           <div className="hero-identity">
             <img className="profile-avatar" src={profileAvatarImage} alt={`${profile.name} 真人照片`} />
-            <h1 id="hero-title">{profile.name}</h1>
+            <div>
+              <h1 id="hero-title">{profile.name}</h1>
+              <p className="english-name">{profile.englishName}</p>
+            </div>
           </div>
           <p className="role">{profile.role}</p>
           <span className="title-rule" aria-hidden="true" />
@@ -312,22 +394,144 @@ function App() {
             </blockquote>
             <figcaption>- {profile.quote.source}</figcaption>
           </figure>
-          <div className="hero-actions">
+          <div className="hero-actions no-print">
             <a className="button button-primary" href="#works">
               查看作品
               <ArrowRight size={20} aria-hidden="true" />
             </a>
-            <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
-              Cake 履歷
-              <ExternalLink size={19} aria-hidden="true" />
-            </a>
+            <button className="button button-secondary" type="button" onClick={handlePrint}>
+              輸出 PDF
+              <Download size={20} aria-hidden="true" />
+            </button>
           </div>
-            <SocialLinks links={profile.socialLinks.filter((link) => link.label !== "履歷")} />
+        </div>
+
+        <aside className="resume-panel hero-panel" aria-labelledby="resume-panel-title">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Resume Snapshot</p>
+              <h2 id="resume-panel-title">履歷重點</h2>
+            </div>
+            <Printer size={24} aria-hidden="true" />
+          </div>
+          <div className="resume-highlight-grid">
+            {resumeHighlights.map((item) => (
+              <ResumeHighlightCard key={item.label} {...item} />
+            ))}
+          </div>
+          <div className="resume-links no-print">
+            {profileLinks.map((link) => (
+              <a key={link.label} href={link.url} target="_blank" rel="noreferrer">
+                {link.icon}
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </aside>
+      </section>
+
+      <article id="resume" className="print-resume section-shell" aria-labelledby="resume-title">
+        <div className="resume-title-block">
+          <div>
+            <p className="eyebrow">Full Resume</p>
+            <h2 id="resume-title">完整版履歷</h2>
+          </div>
+          <button className="button button-primary no-print" type="button" onClick={handlePrint}>
+            輸出 PDF
+            <Download size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <section className="resume-sheet" aria-label="可列印履歷">
+          <div className="sheet-header">
+            <div>
+              <p className="sheet-kicker">Algorithm Engineer / AI Software</p>
+              <h2>{profile.name}</h2>
+              <p>{profile.englishName}</p>
+            </div>
+            <div className="sheet-contact">
+              <span>{profile.role}</span>
+              <span>{profile.location}</span>
+              <span>{profile.hometown}</span>
+            </div>
           </div>
 
-        <div className="hero-stack" aria-label="作品與履歷快速入口">
-          <ProjectQuickPanel selectedProject={selectedProject} onSelect={handleProjectSelect} />
-          <ResumePanel />
+          <div className="sheet-grid">
+            <section className="sheet-main" aria-labelledby="summary-title">
+              <ResumeSection title="關於" id="summary-title">
+                <p>{profile.intro}</p>
+              </ResumeSection>
+
+              <ResumeSection title="能力與技術" id="skills-title">
+                <div className="compact-card-grid">
+                  {skillCards.map((skill) => (
+                    <CompactCard key={skill.title} {...skill} />
+                  ))}
+                </div>
+              </ResumeSection>
+
+              <ResumeSection title="作品經歷" id="project-title">
+                <div className="project-timeline">
+                  {sortedProjects.map((project) => (
+                    <ProjectResumeItem key={project.title} project={project} />
+                  ))}
+                </div>
+              </ResumeSection>
+            </section>
+
+            <aside className="sheet-side" aria-label="履歷側欄">
+              <ResumeSection title="履歷重點" id="highlight-title">
+                <div className="side-stack">
+                  {resumeHighlights.map((item) => (
+                    <ResumeHighlightCard key={item.label} {...item} />
+                  ))}
+                </div>
+              </ResumeSection>
+
+              <ResumeSection title="工作方式" id="principles-title">
+                <div className="side-stack">
+                  {workPrinciples.map((principle) => (
+                    <PrincipleCard key={principle.title} {...principle} />
+                  ))}
+                </div>
+              </ResumeSection>
+
+              <ResumeSection title="個人連結" id="links-title">
+                <div className="sheet-link-list">
+                  {profileLinks.map((link) => (
+                    <a key={link.label} href={link.url} target="_blank" rel="noreferrer">
+                      {link.icon}
+                      <span>{link.label}</span>
+                    </a>
+                  ))}
+                </div>
+              </ResumeSection>
+            </aside>
+          </div>
+        </section>
+      </article>
+
+      <section id="skills" className="section-shell skills-section" aria-labelledby="skills-heading">
+        <div className="section-heading compact">
+          <div>
+            <p className="eyebrow">Resume Focus</p>
+            <h2 id="skills-heading">履歷重點</h2>
+          </div>
+          <p>
+            履歷以演算法、深度學習、訊號處理、物理背景與 AI 工具實作能力為主軸；作品則把這些能力落到地圖工具、AI 遊戲與互動網頁。
+          </p>
+        </div>
+        <div className="resume-layout">
+          <div className="skill-grid">
+            {skillCards.map((skill) => (
+              <SkillCardView key={skill.title} {...skill} />
+            ))}
+          </div>
+          <div className="principle-list" aria-label="工作方式">
+            {workPrinciples.map((principle) => (
+              <Principle key={principle.title} {...principle} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -337,108 +541,15 @@ function App() {
             <p className="eyebrow">Portfolio Index</p>
             <h2 id="works-title">作品</h2>
           </div>
-          <div className="project-controls">
-            <div className="sort-group" role="radiogroup" aria-label="專案排序">
-              {projectSortOptions.map((option) => {
-                const isActive = option.value === projectSortMode;
-                const SortIcon = option.value === "updatedAt" ? CalendarClock : CalendarPlus;
-                const directionSuffix = isActive
-                  ? projectSortDirection === "desc"
-                    ? "（由新到舊）"
-                    : "（由舊到新）"
-                  : "";
-
-                return (
-                  <button
-                    key={option.value}
-                    className={isActive ? "active" : ""}
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => {
-                      if (projectSortMode === option.value) {
-                        setProjectSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
-                      } else {
-                        setProjectSortMode(option.value);
-                        setProjectSortDirection("desc");
-                      }
-                    }}
-                  >
-                    <SortIcon size={16} aria-hidden="true" />
-                    <span>
-                      {option.label}
-                      {directionSuffix}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="filter-group" aria-label="依作品類型篩選">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  className={category === activeCategory ? "active" : ""}
-                  type="button"
-                  onClick={() => handleCategorySelect(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+          <div className="sort-pill no-print">
+            <CalendarClock size={16} aria-hidden="true" />
+            最後更新日期，由新到舊
           </div>
         </div>
-        <div className="work-layout">
-          <div className="project-list" aria-label="作品列表">
-            {visibleProjects.map((project) => (
-              <button
-                key={project.title}
-                className={project.title === selectedProject.title ? "project-row selected" : "project-row"}
-                type="button"
-                aria-label={
-                  project.title === selectedProject.title && project.links.demo
-                    ? `${project.title}，再次點擊開啟 Demo`
-                    : project.title
-                }
-                onClick={() => handleProjectSelect(project)}
-              >
-                <span>
-                  <strong>{project.title}</strong>
-                  <small>
-                    {project.category} / {project.year}
-                  </small>
-                  <small>
-                    {activeSortOption.metaLabel} {formatProjectDate(project[projectSortMode])}
-                  </small>
-                </span>
-                <ChevronRight size={18} aria-hidden="true" />
-              </button>
-            ))}
-          </div>
-          <ProjectDetail project={selectedProject} />
-        </div>
-      </section>
-
-      <section id="resume" className="section-shell resume" aria-labelledby="resume-title">
-        <div className="section-heading compact">
-          <div>
-            <p className="eyebrow">Resume Focus</p>
-            <h2 id="resume-title">履歷重點</h2>
-          </div>
-          <p>
-            履歷以演算法、深度學習、訊號處理、物理背景與 AI 工具實作能力為主軸；作品則把這些能力落到地圖工具、AI
-            遊戲與互動網頁。
-          </p>
-        </div>
-        <div className="resume-layout">
-          <div className="skill-grid">
-            {skillCards.map((skill) => (
-              <SkillCard key={skill.title} {...skill} />
-            ))}
-          </div>
-          <div className="principle-list" aria-label="工作方式">
-            {principleCards.map((principle) => (
-              <Principle key={principle.title} {...principle} />
-            ))}
-          </div>
+        <div className="project-grid" aria-label="作品列表">
+          {sortedProjects.map((project) => (
+            <ProjectCard key={project.title} project={project} />
+          ))}
         </div>
       </section>
 
@@ -448,165 +559,95 @@ function App() {
           <h2 id="contact-title">聯絡與履歷</h2>
           <p>目前先建立繁體中文版本。可透過 Cake 履歷、GitHub 或 LinkedIn 查看完整經歷與作品。</p>
         </div>
-        <div className="contact-actions">
+        <div className="contact-actions no-print">
           <button className="button button-primary" type="button" onClick={handleCopyProfile}>
             {copied ? "已複製履歷資訊" : "複製履歷資訊"}
-            <Check size={20} aria-hidden="true" />
+            <CheckCircle2 size={20} aria-hidden="true" />
           </button>
-          <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
-            Cake 履歷
-            <ExternalLink size={20} aria-hidden="true" />
-          </a>
+          <button className="button button-secondary" type="button" onClick={handlePrint}>
+            輸出 PDF
+            <Download size={20} aria-hidden="true" />
+          </button>
         </div>
       </section>
     </main>
   );
 }
 
-function SocialLinks({ links }: { links: SocialLink[] }) {
+function ResumeHighlightCard({ label, value, text }: ResumeHighlight) {
   return (
-    <div className="social-links" aria-label="個人連結">
-      {links.map((link) => (
-        <a key={link.label} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
-          {link.label === "GitHub" ? (
-            <Github size={22} />
-          ) : link.label === "LinkedIn" ? (
-            <Linkedin size={22} />
-          ) : (
-            <ExternalLink size={22} />
-          )}
-        </a>
-      ))}
-    </div>
+    <article className="resume-highlight">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{text}</p>
+    </article>
   );
 }
 
-function ProjectQuickPanel({
-  selectedProject,
-  onSelect,
+function ResumeSection({
+  title,
+  id,
+  children,
 }: {
-  selectedProject: Project;
-  onSelect: (project: Project) => void;
+  title: string;
+  id: string;
+  children: ReactNode;
 }) {
-  const selectedUrl = selectedProject.links.demo || selectedProject.links.repo;
-
   return (
-    <section className="quick-panel" aria-labelledby="quick-projects-title">
-      <div className="panel-heading">
-        <div>
-          <p className="eyebrow">Quick Portfolio</p>
-          <h2 id="quick-projects-title">作品快速入口</h2>
-        </div>
-        <span>{projects.length} 件公開作品</span>
-      </div>
-      <div className="quick-project-list">
-        {defaultSortedProjects.map((project) => (
-          <button
-            key={project.title}
-            className={project.title === selectedProject.title ? "quick-project active" : "quick-project"}
-            type="button"
-            aria-label={
-              project.title === selectedProject.title && project.links.demo
-                ? `${project.title}，再次點擊開啟 Demo`
-                : project.title
-            }
-            onClick={() => onSelect(project)}
-          >
-            <span className="project-mini-icon">{getProjectIcon(project.title, 19)}</span>
-            <span>
-              <strong>{project.title}</strong>
-              <small>
-                {project.category} / {project.year}
-              </small>
-              <small>更新 {formatProjectDate(project.updatedAt)}</small>
-            </span>
-            <ChevronRight size={18} aria-hidden="true" />
-          </button>
-        ))}
-      </div>
-      <article className="quick-detail" aria-live="polite">
-        <div className="detail-meta">
-          <span>目前選取</span>
-          <span>更新 {formatProjectDate(selectedProject.updatedAt)}</span>
-        </div>
-        <h3>{selectedProject.title}</h3>
-        <p>{selectedProject.summary}</p>
-        <div className="tag-row">
-          {selectedProject.tags.slice(0, 5).map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-        <a className="text-link" href={selectedUrl} target="_blank" rel="noreferrer">
-          開啟作品
-          <ExternalLink size={17} aria-hidden="true" />
-        </a>
-      </article>
+    <section className="resume-section" aria-labelledby={id}>
+      <h3 id={id}>{title}</h3>
+      {children}
     </section>
   );
 }
 
-function ResumePanel() {
+function CompactCard({ icon, title, text }: SkillCard) {
   return (
-    <section className="resume-panel" aria-labelledby="quick-resume-title">
-      <div className="panel-heading">
-        <div>
-          <p className="eyebrow">Resume Snapshot</p>
-          <h2 id="quick-resume-title">履歷重點</h2>
-        </div>
-      </div>
-      <div className="resume-highlight-grid">
-        {resumeHighlights.map((item) => (
-          <article key={item.label} className="resume-highlight">
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-            <p>{item.text}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function getProjectIcon(title: string, size: number) {
-  if (title.includes("Win Rate")) return <Calculator size={size} aria-hidden="true" />;
-  if (title.includes("Mapping")) return <Map size={size} aria-hidden="true" />;
-  if (title.includes("Hex")) return <Gamepad2 size={size} aria-hidden="true" />;
-  if (title.includes("TSP")) return <Route size={size} aria-hidden="true" />;
-  if (title.includes("IIR")) return <Activity size={size} aria-hidden="true" />;
-  return <Train size={size} aria-hidden="true" />;
-}
-
-function ProjectDetail({ project }: { project: Project }) {
-  return (
-    <article className="project-detail" aria-live="polite">
-      <div className="detail-meta">
-        <span>{project.category}</span>
-        <span>{project.year}</span>
-        <span>建立 {formatProjectDate(project.createdAt)}</span>
-        <span>更新 {formatProjectDate(project.updatedAt)}</span>
-      </div>
-      <h3>{project.title}</h3>
-      <p>{project.description}</p>
-      <div className="tag-row">
-        {project.tags.map((tag) => (
-          <span key={tag}>{tag}</span>
-        ))}
-      </div>
-      <div className="detail-links">
-        {(Object.entries(project.links) as [keyof LinkSet, string][])
-          .filter(([, url]) => Boolean(url))
-          .map(([key, url]) => (
-            <a key={key} href={url} target="_blank" rel="noreferrer">
-              {linkLabels[key]}
-              <ExternalLink size={17} aria-hidden="true" />
-            </a>
-          ))}
+    <article className="compact-card">
+      <span>{icon}</span>
+      <div>
+        <h4>{title}</h4>
+        <p>{text}</p>
       </div>
     </article>
   );
 }
 
-function SkillCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+function PrincipleCard({ icon, title, text }: SkillCard) {
+  return (
+    <article className="principle-card">
+      <span>{icon}</span>
+      <h4>{title}</h4>
+      <p>{text}</p>
+    </article>
+  );
+}
+
+function ProjectResumeItem({ project }: { project: Project }) {
+  return (
+    <article className="project-resume-item">
+      <div className="project-resume-head">
+        <div>
+          <span>{project.category}</span>
+          <h4>{project.title}</h4>
+        </div>
+        <time>{project.year}</time>
+      </div>
+      <p>{project.description}</p>
+      <div className="meta-row">
+        <span>建立 {formatProjectDate(project.createdAt)}</span>
+        <span>更新 {formatProjectDate(project.updatedAt)}</span>
+      </div>
+      <div className="tag-row">
+        {project.tags.map((tag) => (
+          <span key={tag}>{tag}</span>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function SkillCardView({ icon, title, text }: SkillCard) {
   return (
     <article className="skill-card">
       <span>{icon}</span>
@@ -616,13 +657,47 @@ function SkillCard({ icon, title, text }: { icon: ReactNode; title: string; text
   );
 }
 
-function Principle({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+function Principle({ icon, title, text }: SkillCard) {
   return (
     <article className="principle">
       <span>{icon}</span>
       <div>
         <h3>{title}</h3>
         <p>{text}</p>
+      </div>
+    </article>
+  );
+}
+
+function ProjectCard({ project }: { project: Project }) {
+  return (
+    <article className="project-card">
+      <div className="project-card-top">
+        <span className="project-mini-icon">{categoryIconMap[project.category] ?? <Languages size={18} />}</span>
+        <div>
+          <p>{project.category}</p>
+          <h3>{project.title}</h3>
+        </div>
+      </div>
+      <p>{project.summary}</p>
+      <div className="meta-row">
+        <span>建立 {formatProjectDate(project.createdAt)}</span>
+        <span>更新 {formatProjectDate(project.updatedAt)}</span>
+      </div>
+      <div className="tag-row">
+        {project.tags.slice(0, 6).map((tag) => (
+          <span key={tag}>{tag}</span>
+        ))}
+      </div>
+      <div className="detail-links no-print">
+        <a href={project.links.demo} target="_blank" rel="noreferrer">
+          開啟作品
+          <ExternalLink size={17} aria-hidden="true" />
+        </a>
+        <a href={project.links.repo} target="_blank" rel="noreferrer">
+          GitHub
+          <Github size={17} aria-hidden="true" />
+        </a>
       </div>
     </article>
   );
