@@ -25,8 +25,10 @@ import {
   Waves,
 } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import CakeResumePage from "./CakeResumePage";
 
 type ThemeMode = "day" | "night";
+type PageMode = "home" | "cake-resume";
 
 type ProfileLink = {
   label: string;
@@ -279,6 +281,11 @@ function getInitialTheme(): ThemeMode {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "night" : "day";
 }
 
+function getInitialPageMode(): PageMode {
+  if (typeof window === "undefined") return "home";
+  return window.location.hash === "#cake-resume" ? "cake-resume" : "home";
+}
+
 function formatProjectDate(timestamp: string) {
   const date = new Date(timestamp);
   return Number.isNaN(date.getTime()) ? "未設定" : dateFormatter.format(date);
@@ -287,6 +294,7 @@ function formatProjectDate(timestamp: string) {
 function App() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
   const [copied, setCopied] = useState(false);
+  const [pageMode, setPageMode] = useState<PageMode>(getInitialPageMode);
   const isNightMode = themeMode === "night";
 
   const sortedProjects = useMemo(
@@ -314,12 +322,35 @@ function App() {
     }
   }, [isNightMode, themeMode]);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      setPageMode(window.location.hash === "#cake-resume" ? "cake-resume" : "home");
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    handleHashChange();
+
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
   const handleThemeToggle = () => {
     setThemeMode((currentTheme) => (currentTheme === "day" ? "night" : "day"));
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleOpenCakeResume = () => {
+    setPageMode("cake-resume");
+    window.location.hash = "cake-resume";
+    window.scrollTo({ top: 0 });
+  };
+
+  const handleBackHome = () => {
+    setPageMode("home");
+    window.history.pushState(null, "", `${window.location.pathname}${window.location.search}`);
+    window.scrollTo({ top: 0 });
   };
 
   const handleCopyProfile = async () => {
@@ -343,6 +374,10 @@ function App() {
     window.setTimeout(() => setCopied(false), 3200);
   };
 
+  if (pageMode === "cake-resume") {
+    return <CakeResumePage onBackHome={handleBackHome} />;
+  }
+
   return (
     <main className="resume-app">
       <header className="site-header no-print" aria-label="主選單">
@@ -355,6 +390,9 @@ function App() {
         <div className="header-actions">
           <nav>
             <a href="#resume">履歷</a>
+            <a href="#cake-resume" onClick={handleOpenCakeResume}>
+              完整版履歷
+            </a>
             <a href="#skills">能力</a>
             <a href="#works">作品</a>
             <a href="#contact">聯絡</a>
