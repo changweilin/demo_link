@@ -144,35 +144,39 @@ const workHighlights: ResumeSummaryItem[] = [
     title: "演算法工程師",
     period: "2022 - 現在",
     summary:
-      "開發語音控制 IC 與 MCU 端演算法，涵蓋音訊編碼、音高追蹤、變速變調、迴授抑制與資源最佳化。",
+      "開發語音控制 IC 與 MCU 端演算法，負責音訊編碼、音高追蹤、變速變調、迴授抑制與圖像處理等函式庫。工作橫跨 Python 模擬、C 語言實作與資源受限環境最佳化。",
     tags: ["DSP", "C", "Python", "MCU"],
   },
   {
     organization: "亞迪電子",
     title: "演算法工程師",
     period: "2020 - 2022",
-    summary: "結合熱像與微波雷達資料，完成非接觸式生理監測、姿態/跌倒辨識與模型訓練流程。",
+    summary:
+      "結合熱像鏡頭與微波雷達資料，開發非接觸式呼吸心跳監測、熱影像姿態/跌倒辨識與病徵模型。也建立 GUI、資料收集與自動化腳本支援實驗流程。",
     tags: ["Python", "C++", "OpenCV", "YOLO"],
   },
   {
     organization: "元鼎音訊",
     title: "軟體工程師",
     period: "2016 - 2020",
-    summary: "在藍牙晶片上實作聽力健康與語音增強演算法，包含降噪、VAD、DRC 與 DSP 最佳化。",
+    summary:
+      "投入藍牙耳機與輔聽器相關演算法，在 CSR/AB 晶片上實作語音增強、VAD、降噪、DRC 與雙耳拍音。重點是把 DSP 模型壓進有限算力並維持聲音品質。",
     tags: ["Audio DSP", "C", "Assembly"],
   },
   {
     organization: "廣達電腦",
     title: "射頻工程師",
     period: "2014 - 2016",
-    summary: "負責射頻元件測試、自動化儀器控制、數據分析與良率改善。",
+    summary:
+      "負責射頻元件測試與客戶專案支援，撰寫自動化測試程式進行儀器控制、數據分析與良率追蹤。也參與試產、問題定位與改善報告整理。",
     tags: ["RF", "Automation", "Data Analysis"],
   },
   {
     organization: "中央研究院",
     title: "研究助理",
     period: "2013 - 2014",
-    summary: "建立 iSCAT 顯微影像與高幀率粒子追蹤流程，研究成果發表於 Optics Express。",
+    summary:
+      "在原分所實驗室設計干涉式散射光學顯微鏡，建立高幀率奈米粒子定位與追蹤流程。研究聚焦細胞膜物理特性，成果發表於 Optics Express。",
     tags: ["Optics", "Microscopy", "Research"],
   },
 ];
@@ -182,14 +186,16 @@ const educationHighlights: ResumeSummaryItem[] = [
     organization: "國立台灣大學",
     title: "物理研究所 碩士",
     period: "2009 - 2012",
-    summary: "生醫光學實驗室背景，研究非線性光學、超解析顯微與非侵入式 3D 生醫影像。",
+    summary:
+      "碩士期間加入生醫光學實驗室，研究非線性光學、飛秒雷射與超解析顯微技術。也參與跨校合作計畫，將光學工具應用於非侵入式 3D 生醫影像。",
     tags: ["Physics", "Bio-Optics", "Microscopy"],
   },
   {
     organization: "國立成功大學",
     title: "物理學系 學士",
     period: "2005 - 2009",
-    summary: "投入電漿與太空科學、天線/傳輸線模擬，也廣泛修習天文、相對論與音樂文化課程。",
+    summary:
+      "大學主修物理，參與電漿與太空科學中心的探測計畫，透過軟體模擬天線、傳輸線與探測器頻譜。課程與社團經驗養成跨領域探索習慣。",
     tags: ["Physics", "Plasma", "Simulation"],
   },
 ];

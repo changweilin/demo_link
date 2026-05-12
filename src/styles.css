@@ -823,7 +823,11 @@ button {
 }
 
 .experience-item p {
+  display: -webkit-box;
+  overflow: hidden;
   margin: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .experience-item .tag-row {
