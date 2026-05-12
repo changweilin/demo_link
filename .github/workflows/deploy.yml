@@ -34,6 +34,11 @@ jobs:
       - name: Build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+          VITE_RESUME_EDITOR_ALLOWED_EMAILS: ${{ vars.VITE_RESUME_EDITOR_ALLOWED_EMAILS }}
+          VITE_GITHUB_OWNER: ${{ github.repository_owner }}
+          VITE_GITHUB_REPO: ${{ github.event.repository.name }}
+          VITE_GITHUB_BRANCH: main
         run: npm run build
 
       - name: Upload Pages artifact

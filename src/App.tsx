@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Github,
   Linkedin,
+  LockKeyhole,
   Microscope,
   Moon,
   Mountain,
@@ -20,6 +21,7 @@ import {
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import CakeResumePage from "./CakeResumePage";
 import portfolio from "./data/portfolio.json";
+import ResumeEditorPage from "./ResumeEditorPage";
 
 type LinkSet = {
   demo?: string;
@@ -69,7 +71,7 @@ type ResumeSummaryItem = {
 };
 
 type ThemeMode = "day" | "night";
-type PageMode = "home" | "full-resume";
+type PageMode = "home" | "full-resume" | "resume-editor";
 type ProjectSortMode = "updatedAt" | "createdAt";
 type ProjectSortDirection = "desc" | "asc";
 
@@ -224,6 +226,12 @@ function getInitialTheme(): ThemeMode {
 
 function getInitialPageMode(): PageMode {
   if (typeof window === "undefined") return "home";
+  return getPageModeFromHash();
+}
+
+function getPageModeFromHash(): PageMode {
+  if (typeof window === "undefined") return "home";
+  if (window.location.hash === "#resume-editor") return "resume-editor";
   return window.location.hash === "#full-resume" ? "full-resume" : "home";
 }
 
@@ -282,8 +290,8 @@ function App() {
   }, [isNightMode, themeMode]);
 
   useEffect(() => {
-  const handleHashChange = () => {
-      setPageMode(window.location.hash === "#full-resume" ? "full-resume" : "home");
+    const handleHashChange = () => {
+      setPageMode(getPageModeFromHash());
     };
 
     window.addEventListener("hashchange", handleHashChange);
@@ -317,10 +325,18 @@ function App() {
     setThemeMode((currentTheme) => (currentTheme === "day" ? "night" : "day"));
   };
 
-  const handleOpenCakeResume = () => {
-    setPageMode("full-resume");
-    window.location.hash = "full-resume";
+  const handleOpenPage = (nextPageMode: PageMode, hash: string) => {
+    setPageMode(nextPageMode);
+    window.location.hash = hash;
     window.scrollTo({ top: 0 });
+  };
+
+  const handleOpenCakeResume = () => {
+    handleOpenPage("full-resume", "full-resume");
+  };
+
+  const handleOpenResumeEditor = () => {
+    handleOpenPage("resume-editor", "resume-editor");
   };
 
   const handleBackHome = () => {
@@ -352,7 +368,11 @@ function App() {
   };
 
   if (pageMode === "full-resume") {
-    return <CakeResumePage onBackHome={handleBackHome} />;
+    return <CakeResumePage onBackHome={handleBackHome} onOpenEditor={handleOpenResumeEditor} />;
+  }
+
+  if (pageMode === "resume-editor") {
+    return <ResumeEditorPage onBackHome={handleBackHome} onOpenResume={handleOpenCakeResume} />;
   }
 
   return (
@@ -370,6 +390,9 @@ function App() {
             <a href="#resume">履歷</a>
             <a href="#full-resume" onClick={handleOpenCakeResume}>
               完整版履歷
+            </a>
+            <a href="#resume-editor" onClick={handleOpenResumeEditor}>
+              編輯履歷
             </a>
             <a href="#contact">聯絡</a>
           </nav>
@@ -537,6 +560,10 @@ function App() {
             <a className="inline-link" href="#full-resume" onClick={handleOpenCakeResume}>
               查看完整版履歷
               <ExternalLink size={17} aria-hidden="true" />
+            </a>
+            <a className="inline-link" href="#resume-editor" onClick={handleOpenResumeEditor}>
+              管理履歷
+              <LockKeyhole size={17} aria-hidden="true" />
             </a>
           </div>
           <div className="experience-columns">
