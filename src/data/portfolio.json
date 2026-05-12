@@ -31,11 +31,18 @@
       "title": "Win Rate Calculator",
       "summary": "互動式勝率計算器，用於快速試算對戰、抽卡或決策情境中的機率與期望結果。",
       "description": "Win Rate Calculator 是以勝率與機率估算為主題的瀏覽器工具，透過簡潔表單讓使用者輸入成功率、嘗試次數或情境參數，快速得到累積勝率、期望值與比較結果，適合展示機率模型、互動表單與實用型工具設計。",
-      "tags": ["JavaScript", "Probability", "Calculator", "Statistics", "Interactive Web", "GitHub Pages"],
+      "tags": [
+        "JavaScript",
+        "Probability",
+        "Calculator",
+        "Statistics",
+        "Interactive Web",
+        "GitHub Pages"
+      ],
       "category": "機率計算",
       "year": "2026",
       "createdAt": "2026-05-07T13:54:34Z",
-      "updatedAt": "2026-05-07T13:54:34Z",
+      "updatedAt": "2026-05-07T15:19:55Z",
       "links": {
         "demo": "https://changweilin.github.io/win_rate_calculator/",
         "repo": "https://github.com/changweilin/win_rate_calculator",
@@ -46,11 +53,19 @@
       "title": "Mapping Elf",
       "summary": "GPX 軌跡生成器與戶外地圖工具，整合路線規劃、高度剖面、離線地圖與沿途天氣資訊。",
       "description": "Mapping Elf 是為戶外活動設計的互動式地圖應用。作品支援步行、健行、越野跑、自行車與駕車等路線模式，可匯入/匯出 GPX、KML，並以高度剖面、距離統計、體能參數與天氣時間軸輔助行前規劃。",
-      "tags": ["JavaScript", "Leaflet", "Chart.js", "Vite", "PWA", "Capacitor", "GPX/KML"],
+      "tags": [
+        "JavaScript",
+        "Leaflet",
+        "Chart.js",
+        "Vite",
+        "PWA",
+        "Capacitor",
+        "GPX/KML"
+      ],
       "category": "戶外地圖",
       "year": "2026",
       "createdAt": "2026-04-08T13:54:34Z",
-      "updatedAt": "2026-04-30T11:34:28Z",
+      "updatedAt": "2026-05-11T08:03:46Z",
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
         "repo": "https://github.com/changweilin/mapping_elf",
@@ -61,11 +76,18 @@
       "title": "Hex Snake",
       "summary": "六角格貪食蛇對戰遊戲，玩家與 AI 在棋盤上搶奪資源並使用角色技能對抗。",
       "description": "Hex Snake 是單頁瀏覽器遊戲，核心包含六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬。遊戲資料與平衡參數獨立於 data 目錄，並搭配 tools 進行模擬、策略調校與回歸測試。",
-      "tags": ["HTML", "CSS", "JavaScript", "AI 對弈", "遊戲平衡", "Simulation"],
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "AI 對弈",
+        "遊戲平衡",
+        "Simulation"
+      ],
       "category": "遊戲與 AI",
       "year": "2026",
       "createdAt": "2026-04-27T14:19:02Z",
-      "updatedAt": "2026-05-06T17:11:34Z",
+      "updatedAt": "2026-05-12T01:17:48Z",
       "links": {
         "demo": "https://changweilin.github.io/hex_snake/",
         "repo": "https://github.com/changweilin/hex_snake",
@@ -76,11 +98,15 @@
       "title": "Railway Elf",
       "summary": "鐵路主題互動網頁作品，以 GitHub Pages 發布並保留公開程式碼連結。",
       "description": "Railway Elf 目前先作為鐵路主題互動作品收錄，首頁提供 Demo 與 GitHub 入口。由於公開 README 內容目前無法解析，繁中版先保留保守描述，後續可依專案文件補上更完整的功能、技術棧與設計細節。",
-      "tags": ["JavaScript", "GitHub Pages", "Interactive Web"],
+      "tags": [
+        "JavaScript",
+        "GitHub Pages",
+        "Interactive Web"
+      ],
       "category": "互動網頁",
       "year": "2026",
       "createdAt": "2026-04-29T12:55:45Z",
-      "updatedAt": "2026-05-06T17:04:14Z",
+      "updatedAt": "2026-05-11T13:44:18Z",
       "links": {
         "demo": "https://changweilin.github.io/railway_elf/",
         "repo": "https://github.com/changweilin/railway_elf",
@@ -91,11 +117,17 @@
       "title": "Web TSP App",
       "summary": "旅行推銷員問題的互動式網頁 Demo，用於展示路徑最佳化與演算法視覺化。",
       "description": "Web TSP App 是以旅行推銷員問題為主題的互動式網頁作品，透過瀏覽器介面展示節點、路徑與最佳化過程，適合用來呈現組合最佳化、啟發式搜尋與演算法視覺化的實作能力。",
-      "tags": ["JavaScript", "TSP", "Optimization", "Visualization", "GitHub Pages"],
+      "tags": [
+        "JavaScript",
+        "TSP",
+        "Optimization",
+        "Visualization",
+        "GitHub Pages"
+      ],
       "category": "演算法視覺化",
       "year": "2026",
       "createdAt": "2026-02-27T03:12:58Z",
-      "updatedAt": "2026-05-06T17:10:26Z",
+      "updatedAt": "2026-05-07T05:14:54Z",
       "links": {
         "demo": "https://changweilin.github.io/web_tsp_app/",
         "repo": "https://github.com/changweilin/web_tsp_app",
@@ -106,11 +138,18 @@
       "title": "IIR Filter Tool",
       "summary": "IIR 數位濾波器互動工具，用於展示濾波器參數調整、頻率響應與訊號處理視覺化。",
       "description": "IIR Filter Tool 是以數位訊號處理為主題的互動式網頁作品，透過瀏覽器介面呈現 IIR 濾波器設計、參數調整與響應觀察流程，適合展示 DSP、濾波器理論、演算法實作與工程介面的整合能力。",
-      "tags": ["JavaScript", "DSP", "IIR Filter", "Signal Processing", "Visualization", "GitHub Pages"],
+      "tags": [
+        "JavaScript",
+        "DSP",
+        "IIR Filter",
+        "Signal Processing",
+        "Visualization",
+        "GitHub Pages"
+      ],
       "category": "訊號處理",
       "year": "2026",
       "createdAt": "2025-04-15T13:23:21Z",
-      "updatedAt": "2026-05-07T01:20:03Z",
+      "updatedAt": "2026-05-07T01:54:21Z",
       "links": {
         "demo": "https://changweilin.github.io/iir_filter_tool/",
         "repo": "https://github.com/changweilin/iir_filter_tool",

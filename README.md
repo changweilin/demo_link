@@ -63,11 +63,13 @@ http://<your-tailscale-ip>:5173/
 npm run dev
 npm run build
 npm run preview
+npm run track:github-updates
 ```
 
 - `npm run dev`：啟動本機開發伺服器。
 - `npm run build`：執行 TypeScript 檢查並建立正式輸出。
 - `npm run preview`：預覽 `dist/` build 結果，同樣綁定 `0.0.0.0`。
+- `npm run track:github-updates`：讀取作品集中的 GitHub repository 連結，將每個 project 的 `updatedAt` 同步成 GitHub 的最後 push 時間，並輸出追蹤快照到 `docs/github-last-updated.*`。
 
 ## 資料維護
 
@@ -77,6 +79,16 @@ npm run preview
 - `projects`：作品標題、摘要、完整描述、標籤、分類、年份、建立日期、最後更新日期與外部連結。
 
 更新作品時，通常只需要修改 `src/data/portfolio.json`。若新增公開圖片或 icon，請放在 `public/`；若要調整 SEO、Open Graph 或 favicon，請修改 `index.html`。
+
+### GitHub 最後更新日期追蹤
+
+`.github/workflows/github-last-updated.yml` 會每天自動執行一次，也可以在 GitHub Actions 手動觸發。流程會從 `src/data/portfolio.json` 的 `projects[].links.repo` 收集 repository，因此新增作品時只要填入 GitHub repo URL，就會被納入追蹤。
+
+同步後會更新：
+
+- `src/data/portfolio.json`：回寫每個 project 的 `updatedAt`。
+- `docs/github-last-updated.json`：保留最近 30 次檢查快照。
+- `docs/github-last-updated.md`：產生方便閱讀的表格摘要。
 
 ## 部署
 

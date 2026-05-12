@@ -1,26 +1,20 @@
 import {
-  Activity,
   ArrowRight,
   BrainCircuit,
-  Calculator,
   CalendarClock,
   CalendarPlus,
   Check,
   ChevronRight,
   Code2,
   ExternalLink,
-  Gamepad2,
   Github,
   Linkedin,
-  Map,
   Microscope,
   Moon,
   Mountain,
   Radar,
-  Route,
   Sun,
   Telescope,
-  Train,
   Waves,
 } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
@@ -66,7 +60,7 @@ type Profile = {
 };
 
 type ThemeMode = "day" | "night";
-type PageMode = "home" | "cake-resume";
+type PageMode = "home" | "full-resume";
 type ProjectSortMode = "updatedAt" | "createdAt";
 type ProjectSortDirection = "desc" | "asc";
 
@@ -94,24 +88,6 @@ const projectDateFormatter = new Intl.DateTimeFormat("zh-TW", {
   day: "numeric",
   timeZone: "Asia/Taipei",
 });
-
-const resumeHighlights = [
-  {
-    label: "主軸",
-    value: "演算法工程",
-    text: "深度學習、訊號處理與 AI 輔助開發流程。",
-  },
-  {
-    label: "語言",
-    value: "C++ / Python / JS",
-    text: "從數學模型、工具開發到瀏覽器互動介面。",
-  },
-  {
-    label: "地點",
-    value: profile.location,
-    text: "完整經歷可由 Cake、GitHub 與 LinkedIn 延伸查看。",
-  },
-];
 
 const skillCards = [
   {
@@ -169,7 +145,7 @@ function getInitialTheme(): ThemeMode {
 
 function getInitialPageMode(): PageMode {
   if (typeof window === "undefined") return "home";
-  return window.location.hash === "#cake-resume" ? "cake-resume" : "home";
+  return window.location.hash === "#full-resume" ? "full-resume" : "home";
 }
 
 function getProjectDateValue(project: Project, sortMode: ProjectSortMode) {
@@ -227,8 +203,8 @@ function App() {
   }, [isNightMode, themeMode]);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setPageMode(window.location.hash === "#cake-resume" ? "cake-resume" : "home");
+  const handleHashChange = () => {
+      setPageMode(window.location.hash === "#full-resume" ? "full-resume" : "home");
     };
 
     window.addEventListener("hashchange", handleHashChange);
@@ -263,8 +239,8 @@ function App() {
   };
 
   const handleOpenCakeResume = () => {
-    setPageMode("cake-resume");
-    window.location.hash = "cake-resume";
+    setPageMode("full-resume");
+    window.location.hash = "full-resume";
     window.scrollTo({ top: 0 });
   };
 
@@ -296,7 +272,7 @@ function App() {
     setSelectedProject(project);
   };
 
-  if (pageMode === "cake-resume") {
+  if (pageMode === "full-resume") {
     return <CakeResumePage onBackHome={handleBackHome} />;
   }
 
@@ -313,7 +289,7 @@ function App() {
           <nav>
             <a href="#works">作品</a>
             <a href="#resume">履歷</a>
-            <a href="#cake-resume" onClick={handleOpenCakeResume}>
+            <a href="#full-resume" onClick={handleOpenCakeResume}>
               完整版履歷
             </a>
             <a href="#contact">聯絡</a>
@@ -360,12 +336,7 @@ function App() {
               <ExternalLink size={19} aria-hidden="true" />
             </a>
           </div>
-            <SocialLinks links={profile.socialLinks.filter((link) => link.label !== "履歷")} />
-          </div>
-
-        <div className="hero-stack" aria-label="作品與履歷快速入口">
-          <ProjectQuickPanel selectedProject={selectedProject} onSelect={handleProjectSelect} />
-          <ResumePanel />
+          <SocialLinks links={profile.socialLinks.filter((link) => link.label !== "履歷")} />
         </div>
       </section>
 
@@ -517,101 +488,6 @@ function SocialLinks({ links }: { links: SocialLink[] }) {
       ))}
     </div>
   );
-}
-
-function ProjectQuickPanel({
-  selectedProject,
-  onSelect,
-}: {
-  selectedProject: Project;
-  onSelect: (project: Project) => void;
-}) {
-  const selectedUrl = selectedProject.links.demo || selectedProject.links.repo;
-
-  return (
-    <section className="quick-panel" aria-labelledby="quick-projects-title">
-      <div className="panel-heading">
-        <div>
-          <p className="eyebrow">Quick Portfolio</p>
-          <h2 id="quick-projects-title">作品快速入口</h2>
-        </div>
-        <span>{projects.length} 件公開作品</span>
-      </div>
-      <div className="quick-project-list">
-        {defaultSortedProjects.map((project) => (
-          <button
-            key={project.title}
-            className={project.title === selectedProject.title ? "quick-project active" : "quick-project"}
-            type="button"
-            aria-label={
-              project.title === selectedProject.title && project.links.demo
-                ? `${project.title}，再次點擊開啟 Demo`
-                : project.title
-            }
-            onClick={() => onSelect(project)}
-          >
-            <span className="project-mini-icon">{getProjectIcon(project.title, 19)}</span>
-            <span>
-              <strong>{project.title}</strong>
-              <small>
-                {project.category} / {project.year}
-              </small>
-              <small>更新 {formatProjectDate(project.updatedAt)}</small>
-            </span>
-            <ChevronRight size={18} aria-hidden="true" />
-          </button>
-        ))}
-      </div>
-      <article className="quick-detail" aria-live="polite">
-        <div className="detail-meta">
-          <span>目前選取</span>
-          <span>更新 {formatProjectDate(selectedProject.updatedAt)}</span>
-        </div>
-        <h3>{selectedProject.title}</h3>
-        <p>{selectedProject.summary}</p>
-        <div className="tag-row">
-          {selectedProject.tags.slice(0, 5).map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-        <a className="text-link" href={selectedUrl} target="_blank" rel="noreferrer">
-          開啟作品
-          <ExternalLink size={17} aria-hidden="true" />
-        </a>
-      </article>
-    </section>
-  );
-}
-
-function ResumePanel() {
-  return (
-    <section className="resume-panel" aria-labelledby="quick-resume-title">
-      <div className="panel-heading">
-        <div>
-          <p className="eyebrow">Resume Snapshot</p>
-          <h2 id="quick-resume-title">履歷重點</h2>
-        </div>
-      </div>
-      <div className="resume-highlight-grid">
-        {resumeHighlights.map((item) => (
-          <article key={item.label} className="resume-highlight">
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-            <p>{item.text}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function getProjectIcon(title: string, size: number) {
-  if (title.includes("Win Rate")) return <Calculator size={size} aria-hidden="true" />;
-  if (title.includes("Mapping")) return <Map size={size} aria-hidden="true" />;
-  if (title.includes("Hex")) return <Gamepad2 size={size} aria-hidden="true" />;
-  if (title.includes("TSP")) return <Route size={size} aria-hidden="true" />;
-  if (title.includes("IIR")) return <Activity size={size} aria-hidden="true" />;
-  return <Train size={size} aria-hidden="true" />;
 }
 
 function ProjectDetail({ project }: { project: Project }) {

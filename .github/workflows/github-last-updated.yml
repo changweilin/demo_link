@@ -20,24 +20,25 @@ jobs:
         with:
           node-version: 22
 
-      - name: Fetch and record repository updated_at
+      - name: Sync portfolio project updatedAt from GitHub
         env:
-          TRACK_REPOS: ${{ github.repository }}
+          TRACK_PORTFOLIO_PATH: src/data/portfolio.json
+          TRACK_PORTFOLIO_DATE_FIELD: pushed_at
           TRACK_OUTPUT_PATH: docs/github-last-updated.json
           TRACK_MARKDOWN_PATH: docs/github-last-updated.md
           TRACK_MAX_HISTORY: 30
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/github-last-updated.js
+        run: npm run track:github-updates
 
-      - name: Save history
+      - name: Save synced dates
         run: |
-          if git diff --quiet -- docs/github-last-updated.json docs/github-last-updated.md; then
+          if git diff --quiet -- src/data/portfolio.json docs/github-last-updated.json docs/github-last-updated.md; then
             echo "No update."
             exit 0
           fi
 
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
-          git add docs/github-last-updated.json docs/github-last-updated.md
-          git commit -m "chore: update github project last updated snapshot"
+          git add src/data/portfolio.json docs/github-last-updated.json docs/github-last-updated.md
+          git commit -m "chore: sync github project updated dates"
           git push
