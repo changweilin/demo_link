@@ -37,6 +37,7 @@ const cakeResumeUrl =
 
 const profileImage =
   "https://images.cakeresume.com/Y6vOX/wei-lin-chang/90b9d5fb-d154-4bb5-a793-d283cab9f463.png";
+const resumeIconPath = (fileName: string) => `${import.meta.env.BASE_URL}resume-icons/${fileName}`;
 
 const profileSummary = [
   "我是宜蘭羅東人，物理系所畢業，是一名演算法工程師，擅長C/C++/Python。興趣是登山與桌遊。",
@@ -104,8 +105,7 @@ const skills: SkillColumn[] = [
 const workExperience: TimelineItem[] = [
   {
     title: "九齊科技, 演算法工程師, Nov 2022 ~",
-    image:
-      "https://images.cakeresume.com/Y6vOX/wei-lin-chang/0e23bbbd-65a8-4f31-b74e-3e6b51ed472d.png",
+    image: resumeIconPath("nyquest.png"),
     imageAlt: "九齊科技",
     imageHref: "https://www.nyquest.com.tw/tw",
     bullets: [
@@ -129,8 +129,7 @@ const workExperience: TimelineItem[] = [
   },
   {
     title: "亞迪電子, 演算法工程師, Jul 2020 ~ Oct 2022",
-    image:
-      "https://images.cakeresume.com/Y6vOX/wei-lin-chang/bee18f9b-190b-4a8d-81a0-75554eb516f8.png",
+    image: resumeIconPath("adi.png"),
     imageAlt: "亞迪電子",
     bullets: [
       {
@@ -159,8 +158,7 @@ const workExperience: TimelineItem[] = [
   },
   {
     title: "元鼎音訊, 軟體工程師, May 2016 ~ Jun 2020",
-    image:
-      "https://images.cakeresume.com/wei-lin-chang/51fa6a74-fe6a-4581-8341-3f09f5f75510.png",
+    image: resumeIconPath("avantree.png"),
     imageAlt: "元鼎音訊",
     bullets: [
       {
@@ -199,8 +197,7 @@ const workExperience: TimelineItem[] = [
   },
   {
     title: "廣達電腦, 射頻工程師, Nov 2014 ~ May 2016",
-    image:
-      "https://images.cakeresume.com/wei-lin-chang/e22b8480-e768-4f41-8174-bcf833e2fe9a.png",
+    image: resumeIconPath("quanta.png"),
     imageAlt: "廣達電腦",
     imageHref: "https://www.quantatw.com/Quanta/chinese/Default.aspx",
     bullets: [
@@ -212,8 +209,7 @@ const workExperience: TimelineItem[] = [
   },
   {
     title: "中央研究院, 研究助理, Jul 2013 ~ Apr 2014",
-    image:
-      "https://images.cakeresume.com/wei-lin-chang/b1a72bd6-632a-457f-95ab-dd64259bc4ad.png",
+    image: resumeIconPath("academia-sinica.png"),
     imageAlt: "中央研究院",
     imageHref: "https://www.iams.sinica.edu.tw/tw/",
     bullets: [
@@ -237,8 +233,7 @@ const workExperience: TimelineItem[] = [
 const education: TimelineItem[] = [
   {
     title: "國立台灣大學, 碩士學位, 物理研究所, 2009 ~ 2012",
-    image:
-      "https://images.cakeresume.com/Y6vOX/wei-lin-chang/9747e837-834c-4609-9125-8d08df613412.png",
+    image: resumeIconPath("ntu.png"),
     imageAlt: "國立台灣大學",
     imageHref: "https://phys.ntu.edu.tw/Default.html",
     bullets: [
@@ -251,8 +246,7 @@ const education: TimelineItem[] = [
   },
   {
     title: "國立成功大學, 學士學位, 物理學系, 2005 ~ 2009",
-    image:
-      "https://images.cakeresume.com/wei-lin-chang/623a1def-915f-49f2-9043-fd90d4909721.png",
+    image: resumeIconPath("ncku.png"),
     imageAlt: "國立成功大學",
     imageHref: "https://www.phys.ncku.edu.tw/en/",
     bullets: [

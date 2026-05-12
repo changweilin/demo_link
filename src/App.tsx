@@ -65,6 +65,7 @@ type ResumeSummaryItem = {
   period: string;
   summary: string;
   tags: string[];
+  icon: string;
 };
 
 type ThemeMode = "day" | "night";
@@ -81,6 +82,7 @@ const categories = ["全部", ...Array.from(new Set(projects.map((project) => pr
 const defaultSortedProjects = sortProjects(projects, defaultProjectSort, defaultProjectSortDirection);
 const heroProject = defaultSortedProjects[0] ?? projects[0];
 const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
+const resumeIconPath = (fileName: string) => `${import.meta.env.BASE_URL}resume-icons/${fileName}`;
 const linkLabels: Record<keyof LinkSet, string> = {
   demo: "開啟作品",
   repo: "GitHub",
@@ -146,6 +148,7 @@ const workHighlights: ResumeSummaryItem[] = [
     summary:
       "開發語音控制 IC 與 MCU 端演算法，負責音訊編碼、音高追蹤、變速變調、迴授抑制與圖像處理等函式庫。工作橫跨 Python 模擬、C 語言實作與資源受限環境最佳化。",
     tags: ["DSP", "C", "Python", "MCU"],
+    icon: resumeIconPath("nyquest.png"),
   },
   {
     organization: "亞迪電子",
@@ -154,6 +157,7 @@ const workHighlights: ResumeSummaryItem[] = [
     summary:
       "結合熱像鏡頭與微波雷達資料，開發非接觸式呼吸心跳監測、熱影像姿態/跌倒辨識與病徵模型。也建立 GUI、資料收集與自動化腳本支援實驗流程。",
     tags: ["Python", "C++", "OpenCV", "YOLO"],
+    icon: resumeIconPath("adi.png"),
   },
   {
     organization: "元鼎音訊",
@@ -162,6 +166,7 @@ const workHighlights: ResumeSummaryItem[] = [
     summary:
       "投入藍牙耳機與輔聽器相關演算法，在 CSR/AB 晶片上實作語音增強、VAD、降噪、DRC 與雙耳拍音。重點是把 DSP 模型壓進有限算力並維持聲音品質。",
     tags: ["Audio DSP", "C", "Assembly"],
+    icon: resumeIconPath("avantree.png"),
   },
   {
     organization: "廣達電腦",
@@ -170,6 +175,7 @@ const workHighlights: ResumeSummaryItem[] = [
     summary:
       "負責射頻元件測試與客戶專案支援，撰寫自動化測試程式進行儀器控制、數據分析與良率追蹤。也參與試產、問題定位與改善報告整理。",
     tags: ["RF", "Automation", "Data Analysis"],
+    icon: resumeIconPath("quanta.png"),
   },
   {
     organization: "中央研究院",
@@ -178,6 +184,7 @@ const workHighlights: ResumeSummaryItem[] = [
     summary:
       "在原分所實驗室設計干涉式散射光學顯微鏡，建立高幀率奈米粒子定位與追蹤流程。研究聚焦細胞膜物理特性，成果發表於 Optics Express。",
     tags: ["Optics", "Microscopy", "Research"],
+    icon: resumeIconPath("academia-sinica.png"),
   },
 ];
 
@@ -189,6 +196,7 @@ const educationHighlights: ResumeSummaryItem[] = [
     summary:
       "碩士期間加入生醫光學實驗室，研究非線性光學、飛秒雷射與超解析顯微技術。也參與跨校合作計畫，將光學工具應用於非侵入式 3D 生醫影像。",
     tags: ["Physics", "Bio-Optics", "Microscopy"],
+    icon: resumeIconPath("ntu.png"),
   },
   {
     organization: "國立成功大學",
@@ -197,6 +205,7 @@ const educationHighlights: ResumeSummaryItem[] = [
     summary:
       "大學主修物理，參與電漿與太空科學中心的探測計畫，透過軟體模擬天線、傳輸線與探測器頻譜。課程與社團經驗養成跨領域探索習慣。",
     tags: ["Physics", "Plasma", "Simulation"],
+    icon: resumeIconPath("ncku.png"),
   },
 ];
 
@@ -643,11 +652,16 @@ function ResumeSummaryGroup({
       <div className="experience-items">
         {items.map((item) => (
           <article className="experience-item" key={`${item.organization}-${item.period}`}>
-            <div className="experience-meta">
-              <span>{item.period}</span>
-              <span>{item.organization}</span>
+            <div className="experience-card-header">
+              <img className="experience-logo" src={item.icon} alt={`${item.organization} 圖示`} loading="lazy" />
+              <div>
+                <div className="experience-meta">
+                  <span>{item.period}</span>
+                  <span>{item.organization}</span>
+                </div>
+                <h5>{item.title}</h5>
+              </div>
             </div>
-            <h5>{item.title}</h5>
             <p>{item.summary}</p>
             <div className="tag-row">
               {item.tags.map((tag) => (
