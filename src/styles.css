@@ -46,8 +46,8 @@
 
 [data-theme="night"] {
   color-scheme: dark;
-  --paper: #101310;
-  --paper-strong: #191f1a;
+  --paper: #070a08;
+  --paper-strong: #0d120f;
   --ink: #f3f0e8;
   --muted: #aeb9b2;
   --line: rgba(243, 240, 232, 0.14);
@@ -59,15 +59,15 @@
   --lavender-gray: #36313d;
   --charcoal: #f3f0e8;
   --page-bg:
-    linear-gradient(120deg, rgba(104, 211, 200, 0.14), transparent 32rem),
-    linear-gradient(180deg, #171210 0%, var(--paper) 44%, #0b0e0b 100%);
-  --scanline: rgba(243, 240, 232, 0.048);
+    linear-gradient(120deg, rgba(104, 211, 200, 0.1), transparent 32rem),
+    linear-gradient(180deg, #0b0807 0%, var(--paper) 44%, #030503 100%);
+  --scanline: rgba(243, 240, 232, 0.036);
   --focus-ring: rgba(104, 211, 200, 0.34);
-  --header-bg: rgba(16, 19, 16, 0.86);
-  --surface: rgba(28, 34, 29, 0.74);
-  --surface-soft: rgba(243, 240, 232, 0.07);
-  --surface-faint: rgba(243, 240, 232, 0.06);
-  --surface-strong: rgba(243, 240, 232, 0.09);
+  --header-bg: rgba(7, 9, 8, 0.9);
+  --surface: rgba(13, 18, 15, 0.82);
+  --surface-soft: rgba(243, 240, 232, 0.055);
+  --surface-faint: rgba(243, 240, 232, 0.045);
+  --surface-strong: rgba(243, 240, 232, 0.075);
   --text-strong: #e8eee8;
   --text-detail: #d8e1da;
   --tag-ink: #dbe7df;
