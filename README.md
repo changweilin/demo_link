@@ -7,7 +7,7 @@ Vite + React + TypeScript 建置的個人作品集首頁，展示張維麟的履
 ## 專案特色
 
 - 個人首頁：姓名、角色定位、簡介、引言、Cake 履歷、GitHub 與 LinkedIn。
-- 作品索引：支援作品分類篩選、依建立日期 / 最後更新日期排序、快速切換與外部 Demo / repository 連結。
+- 作品索引：支援作品分類篩選、依建立日期 / 最後更新日期排序、Demo 截圖預覽與外部 Demo / repository 連結。
 - 響應式版面：桌面與手機皆可閱讀，適合用 Tailscale 在手機上測試。
 - 主題切換：支援 day / night 模式，並記住使用者選擇。
 - GitHub Pages 部署：已包含 GitHub Actions workflow，會依 repository name 設定 Vite base path。
@@ -49,13 +49,19 @@ npm install
 npm run dev
 ```
 
-`npm run dev` 會將 Vite 綁定到 `0.0.0.0`，同一個 Tailscale network 內的手機可以直接打開：
+`npm run dev` 會將 Vite 綁定到 `0.0.0.0`，同一個 Tailscale network 內的手機可以直接打開。先在電腦查 Tailscale IPv4：
+
+```powershell
+tailscale ip -4
+```
+
+再用手機開啟：
 
 ```text
 http://<your-tailscale-ip>:5173/
 ```
 
-如果 5173 被占用，Vite 會在終端機顯示實際 port，手機改用該 port 即可。
+如果 5173 被占用，Vite 會在終端機顯示實際 port，手機改用該 port 即可。若手機無法連線，請確認手機與電腦都已連上 Tailscale，並允許 Windows 防火牆讓 Node.js / Vite 接受私人網路連線。
 
 ## 常用指令
 
@@ -76,9 +82,9 @@ npm run track:github-updates
 主要內容來源是 `src/data/portfolio.json`：
 
 - `profile`：姓名、英文名、角色、地點、履歷連結、簡介、引言與社群連結。
-- `projects`：作品標題、摘要、完整描述、標籤、分類、年份、建立日期、最後更新日期與外部連結。
+- `projects`：作品標題、摘要、完整描述、標籤、分類、年份、建立日期、最後更新日期、Demo 截圖與外部連結。
 
-更新作品時，通常只需要修改 `src/data/portfolio.json`。若新增公開圖片或 icon，請放在 `public/`；若要調整 SEO、Open Graph 或 favicon，請修改 `index.html`。
+更新作品時，通常只需要修改 `src/data/portfolio.json`。Demo 截圖放在 `public/project-screenshots/`，其他公開圖片或 icon 請放在 `public/`；若要調整 SEO、Open Graph 或 favicon，請修改 `index.html`。
 
 ### GitHub 最後更新日期追蹤
 

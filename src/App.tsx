@@ -29,6 +29,11 @@ type LinkSet = {
   caseStudy?: string;
 };
 
+type ProjectScreenshot = {
+  src: string;
+  alt: string;
+};
+
 type Project = {
   title: string;
   summary: string;
@@ -38,6 +43,7 @@ type Project = {
   year: string;
   createdAt: string;
   updatedAt: string;
+  screenshot?: ProjectScreenshot;
   links: LinkSet;
 };
 
@@ -253,6 +259,11 @@ function formatProjectDate(timestamp: string) {
   const date = new Date(timestamp);
   if (Number.isNaN(date.getTime())) return "未設定";
   return projectDateFormatter.format(date);
+}
+
+function resolvePublicAssetPath(path: string) {
+  if (/^(https?:|data:)/.test(path)) return path;
+  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
 }
 
 function App() {
@@ -613,6 +624,12 @@ function SocialLinks({ links }: { links: SocialLink[] }) {
 }
 
 function ProjectDetail({ project }: { project: Project }) {
+  const screenshotSrc = project.screenshot?.src ? resolvePublicAssetPath(project.screenshot.src) : "";
+  const screenshotAlt = project.screenshot?.alt || `${project.title} demo 截圖`;
+  const screenshot = screenshotSrc ? (
+    <img src={screenshotSrc} alt={screenshotAlt} loading="lazy" decoding="async" />
+  ) : null;
+
   return (
     <article className="project-detail" aria-live="polite">
       <div className="detail-meta">
@@ -622,6 +639,15 @@ function ProjectDetail({ project }: { project: Project }) {
         <span>更新 {formatProjectDate(project.updatedAt)}</span>
       </div>
       <h3>{project.title}</h3>
+      {screenshot ? (
+        project.links.demo ? (
+          <a className="project-screenshot" href={project.links.demo} target="_blank" rel="noreferrer">
+            {screenshot}
+          </a>
+        ) : (
+          <figure className="project-screenshot">{screenshot}</figure>
+        )
+      ) : null}
       <p>{project.description}</p>
       <div className="tag-row">
         {project.tags.map((tag) => (

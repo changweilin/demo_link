@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.config.js --host 0.0.0.0 --port 5173 --strictPort",
-    "build": "tsc --noEmit -p tsconfig.json && vite build",
-    "preview": "vite preview --config vite.config.js --host 0.0.0.0 --port 5173 --strictPort",
+    "dev": "vite --config vite.config.ts",
+    "build": "tsc --noEmit -p tsconfig.json && vite build --config vite.config.ts",
+    "preview": "vite preview --config vite.config.ts",
     "track:github-updates": "node scripts/github-last-updated.js"
   },
   "dependencies": {

@@ -43,6 +43,10 @@
       "year": "2026",
       "createdAt": "2026-05-07T13:54:34Z",
       "updatedAt": "2026-05-07T15:19:55Z",
+      "screenshot": {
+        "src": "project-screenshots/win-rate-calculator.png",
+        "alt": "Win Rate Calculator 的互動式勝率計算 demo 截圖"
+      },
       "links": {
         "demo": "https://changweilin.github.io/win_rate_calculator/",
         "repo": "https://github.com/changweilin/win_rate_calculator",
@@ -66,6 +70,10 @@
       "year": "2026",
       "createdAt": "2026-04-08T13:54:34Z",
       "updatedAt": "2026-05-11T08:03:46Z",
+      "screenshot": {
+        "src": "project-screenshots/mapping-elf.png",
+        "alt": "Mapping Elf 的戶外地圖與路線規劃 demo 截圖"
+      },
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
         "repo": "https://github.com/changweilin/mapping_elf",
@@ -88,6 +96,10 @@
       "year": "2026",
       "createdAt": "2026-04-27T14:19:02Z",
       "updatedAt": "2026-05-12T01:17:48Z",
+      "screenshot": {
+        "src": "project-screenshots/hex-snake.png",
+        "alt": "Hex Snake 的六角格遊戲 demo 截圖"
+      },
       "links": {
         "demo": "https://changweilin.github.io/hex_snake/",
         "repo": "https://github.com/changweilin/hex_snake",
@@ -107,6 +119,10 @@
       "year": "2026",
       "createdAt": "2026-04-29T12:55:45Z",
       "updatedAt": "2026-05-11T13:44:18Z",
+      "screenshot": {
+        "src": "project-screenshots/railway-elf.png",
+        "alt": "Railway Elf 的鐵路地圖與列車預測 demo 截圖"
+      },
       "links": {
         "demo": "https://changweilin.github.io/railway_elf/",
         "repo": "https://github.com/changweilin/railway_elf",
@@ -128,6 +144,10 @@
       "year": "2026",
       "createdAt": "2026-02-27T03:12:58Z",
       "updatedAt": "2026-05-07T05:14:54Z",
+      "screenshot": {
+        "src": "project-screenshots/web-tsp-app.png",
+        "alt": "Web TSP App 的路線最佳化 demo 截圖"
+      },
       "links": {
         "demo": "https://changweilin.github.io/web_tsp_app/",
         "repo": "https://github.com/changweilin/web_tsp_app",
@@ -150,6 +170,10 @@
       "year": "2026",
       "createdAt": "2025-04-15T13:23:21Z",
       "updatedAt": "2026-05-07T01:54:21Z",
+      "screenshot": {
+        "src": "project-screenshots/iir-filter-tool.png",
+        "alt": "IIR Filter Tool 的濾波器參數與響應圖 demo 截圖"
+      },
       "links": {
         "demo": "https://changweilin.github.io/iir_filter_tool/",
         "repo": "https://github.com/changweilin/iir_filter_tool",
