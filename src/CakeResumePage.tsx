@@ -7,6 +7,7 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
+import "./cakeResume.css";
 
 type ResumeBullet = {
   text: string;
@@ -279,7 +280,7 @@ function CakeResumePage({ onBackHome }: CakeResumePageProps) {
           回首頁
         </button>
         <div>
-          <p>Cake Resume Clone</p>
+          <p>Full resume</p>
           <h1>張維麟完整中文履歷</h1>
         </div>
         <div className="cake-clone-actions">

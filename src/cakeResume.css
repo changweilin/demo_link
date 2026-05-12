@@ -1,0 +1,444 @@
+.cake-clone-page {
+  min-height: 100vh;
+  padding-bottom: 64px;
+  color: #222222;
+  background: #f0f2f1;
+}
+
+.cake-clone-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  width: min(100% - 48px, 1120px);
+  margin: 0 auto;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(34, 34, 34, 0.08);
+  background: rgba(240, 242, 241, 0.9);
+  backdrop-filter: blur(18px);
+  gap: 18px;
+}
+
+.cake-clone-toolbar p {
+  margin: 0 0 4px;
+  color: #0b663e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cake-clone-toolbar h1 {
+  margin: 0;
+  color: #1f1f1f;
+  font-size: clamp(1.2rem, 1rem + 1vw, 2rem);
+  line-height: 1.18;
+}
+
+.cake-clone-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cake-clone-actions a,
+.cake-clone-actions button,
+.cake-clone-secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 15px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  gap: 8px;
+}
+
+.cake-clone-actions a,
+.cake-clone-secondary-action {
+  border: 1px solid #e4e4e4;
+  color: #0b663e;
+  background: #ffffff;
+}
+
+.cake-clone-actions button {
+  border: 1px solid #0b663e;
+  color: #ffffff;
+  background: #0b663e;
+  cursor: pointer;
+}
+
+.cake-clone-secondary-action {
+  cursor: pointer;
+}
+
+.cake-clone-stage {
+  display: flex;
+  justify-content: center;
+  width: min(100% - 32px, 1120px);
+  margin: 36px auto 0;
+}
+
+.cake-clone-paper {
+  width: min(100%, 992px);
+  padding: 48px 54px 56px;
+  background: #ffffff;
+  box-shadow: 0 22px 70px rgba(27, 39, 34, 0.18);
+}
+
+.cake-clone-profile {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.cake-clone-photo-wrap {
+  padding-top: 4px;
+}
+
+.cake-clone-photo {
+  display: block;
+  width: 126px;
+  aspect-ratio: 252 / 256;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cake-clone-profile-content h2,
+.cake-clone-section h2 {
+  margin: 0;
+  color: #1f1f1f;
+  font-size: 2.35rem;
+  line-height: 1.16;
+}
+
+.cake-clone-profile-content h2 {
+  font-size: 2.55rem;
+  font-weight: 800;
+}
+
+.cake-clone-summary,
+.cake-clone-skill ul,
+.cake-clone-copy ul {
+  margin: 0;
+  padding-left: 1.35em;
+}
+
+.cake-clone-summary {
+  margin-top: 18px;
+}
+
+.cake-clone-summary li,
+.cake-clone-skill li,
+.cake-clone-copy li {
+  color: #222222;
+  font-size: 16px;
+  line-height: 1.66;
+}
+
+.cake-clone-summary li + li,
+.cake-clone-skill li + li,
+.cake-clone-copy li + li {
+  margin-top: 3px;
+}
+
+.cake-clone-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 18px;
+}
+
+.cake-clone-social a {
+  display: inline-flex;
+  align-items: center;
+  color: #0b663e;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  gap: 6px;
+}
+
+.cake-clone-role,
+.cake-clone-location {
+  margin: 16px 0 0;
+  color: #222222;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.cake-clone-location {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  color: #666666;
+  gap: 5px;
+}
+
+.cake-clone-section {
+  margin-top: 34px;
+}
+
+.cake-clone-section h2 {
+  margin-bottom: 18px;
+  font-weight: 800;
+}
+
+.cake-clone-skill-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.cake-clone-skill hr {
+  height: 1px;
+  margin: 0 0 16px;
+  border: 0;
+  background: #a9a9a9;
+}
+
+.cake-clone-skill h3 {
+  margin: 0 0 12px;
+  color: #222222;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.cake-clone-timeline {
+  display: grid;
+  gap: 24px;
+}
+
+.cake-clone-entry {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 104px;
+  gap: 20px;
+  align-items: start;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cake-clone-marker {
+  position: relative;
+  min-height: 100%;
+}
+
+.cake-clone-marker::before {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #0b663e;
+  border-radius: 50%;
+  content: "";
+  background: #ffffff;
+}
+
+.cake-clone-marker::after {
+  position: absolute;
+  top: 25px;
+  right: 16px;
+  bottom: -24px;
+  width: 1px;
+  content: "";
+  background: #e4e4e4;
+}
+
+.cake-clone-entry:last-child .cake-clone-marker::after {
+  display: none;
+}
+
+.cake-clone-copy h3 {
+  margin: 0 0 12px;
+  color: #222222;
+  font-size: 1.17rem;
+  line-height: 1.38;
+}
+
+.cake-clone-copy a {
+  color: #0b663e;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cake-clone-copy ul ul {
+  margin-top: 3px;
+}
+
+.cake-clone-image {
+  justify-self: end;
+  padding-top: 4px;
+}
+
+.cake-clone-image img {
+  display: block;
+  width: 84px;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 920px) {
+  .cake-clone-toolbar {
+    position: static;
+    grid-template-columns: 1fr;
+    width: min(100% - 28px, 1120px);
+  }
+
+  .cake-clone-actions {
+    justify-content: start;
+  }
+
+  .cake-clone-paper {
+    padding: 32px 24px 40px;
+  }
+
+  .cake-clone-profile,
+  .cake-clone-entry {
+    grid-template-columns: 1fr;
+  }
+
+  .cake-clone-photo {
+    width: 112px;
+  }
+
+  .cake-clone-skill-columns {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .cake-clone-marker {
+    display: none;
+  }
+
+  .cake-clone-image {
+    justify-self: start;
+    order: -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .cake-clone-stage {
+    width: min(100% - 16px, 1120px);
+    margin-top: 16px;
+  }
+
+  .cake-clone-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cake-clone-actions a,
+  .cake-clone-actions button,
+  .cake-clone-secondary-action {
+    width: 100%;
+  }
+
+  .cake-clone-paper {
+    padding: 24px 18px 32px;
+  }
+
+  .cake-clone-profile-content h2,
+  .cake-clone-section h2 {
+    font-size: 2rem;
+  }
+
+  .cake-clone-copy h3 {
+    font-size: 1.06rem;
+  }
+}
+
+@media print {
+  .cake-clone-page {
+    min-height: auto;
+    padding: 0;
+    color: #222222;
+    background: #ffffff !important;
+  }
+
+  .cake-clone-stage {
+    display: block;
+    width: auto;
+    margin: 0;
+  }
+
+  .cake-clone-paper {
+    width: auto;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .cake-clone-profile {
+    grid-template-columns: 28mm 1fr;
+    gap: 8mm;
+  }
+
+  .cake-clone-photo {
+    width: 26mm;
+  }
+
+  .cake-clone-profile-content h2 {
+    font-size: 24pt;
+  }
+
+  .cake-clone-section h2 {
+    margin-bottom: 4mm;
+    font-size: 20pt;
+  }
+
+  .cake-clone-summary {
+    margin-top: 4mm;
+  }
+
+  .cake-clone-summary li,
+  .cake-clone-skill li,
+  .cake-clone-copy li,
+  .cake-clone-role,
+  .cake-clone-location {
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+
+  .cake-clone-section {
+    margin-top: 8mm;
+  }
+
+  .cake-clone-skill-columns {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7mm;
+  }
+
+  .cake-clone-skill hr {
+    margin-bottom: 3mm;
+  }
+
+  .cake-clone-skill h3 {
+    font-size: 14pt;
+  }
+
+  .cake-clone-timeline {
+    gap: 6mm;
+  }
+
+  .cake-clone-entry {
+    grid-template-columns: 11mm 1fr 24mm;
+    gap: 5mm;
+  }
+
+  .cake-clone-copy h3 {
+    margin-bottom: 2.5mm;
+    font-size: 11.5pt;
+  }
+
+  .cake-clone-image img {
+    width: 21mm;
+  }
+}
