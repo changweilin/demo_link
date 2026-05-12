@@ -59,6 +59,14 @@ type Profile = {
   socialLinks: SocialLink[];
 };
 
+type ResumeSummaryItem = {
+  organization: string;
+  title: string;
+  period: string;
+  summary: string;
+  tags: string[];
+};
+
 type ThemeMode = "day" | "night";
 type PageMode = "home" | "full-resume";
 type ProjectSortMode = "updatedAt" | "createdAt";
@@ -127,6 +135,62 @@ const principleCards = [
     icon: <Mountain />,
     title: "把工具帶到真實場景",
     text: "從戶外路線規劃到瀏覽器遊戲，偏好能被實際使用、反覆測試與持續改善的作品。",
+  },
+];
+
+const workHighlights: ResumeSummaryItem[] = [
+  {
+    organization: "九齊科技",
+    title: "演算法工程師",
+    period: "2022 - 現在",
+    summary:
+      "開發語音控制 IC 與 MCU 端演算法，涵蓋音訊編碼、音高追蹤、變速變調、迴授抑制與資源最佳化。",
+    tags: ["DSP", "C", "Python", "MCU"],
+  },
+  {
+    organization: "亞迪電子",
+    title: "演算法工程師",
+    period: "2020 - 2022",
+    summary: "結合熱像與微波雷達資料，完成非接觸式生理監測、姿態/跌倒辨識與模型訓練流程。",
+    tags: ["Python", "C++", "OpenCV", "YOLO"],
+  },
+  {
+    organization: "元鼎音訊",
+    title: "軟體工程師",
+    period: "2016 - 2020",
+    summary: "在藍牙晶片上實作聽力健康與語音增強演算法，包含降噪、VAD、DRC 與 DSP 最佳化。",
+    tags: ["Audio DSP", "C", "Assembly"],
+  },
+  {
+    organization: "廣達電腦",
+    title: "射頻工程師",
+    period: "2014 - 2016",
+    summary: "負責射頻元件測試、自動化儀器控制、數據分析與良率改善。",
+    tags: ["RF", "Automation", "Data Analysis"],
+  },
+  {
+    organization: "中央研究院",
+    title: "研究助理",
+    period: "2013 - 2014",
+    summary: "建立 iSCAT 顯微影像與高幀率粒子追蹤流程，研究成果發表於 Optics Express。",
+    tags: ["Optics", "Microscopy", "Research"],
+  },
+];
+
+const educationHighlights: ResumeSummaryItem[] = [
+  {
+    organization: "國立台灣大學",
+    title: "物理研究所 碩士",
+    period: "2009 - 2012",
+    summary: "生醫光學實驗室背景，研究非線性光學、超解析顯微與非侵入式 3D 生醫影像。",
+    tags: ["Physics", "Bio-Optics", "Microscopy"],
+  },
+  {
+    organization: "國立成功大學",
+    title: "物理學系 學士",
+    period: "2005 - 2009",
+    summary: "投入電漿與太空科學、天線/傳輸線模擬，也廣泛修習天文、相對論與音樂文化課程。",
+    tags: ["Physics", "Plasma", "Simulation"],
   },
 ];
 
@@ -449,6 +513,22 @@ function App() {
             ))}
           </div>
         </div>
+        <div className="experience-preview" aria-labelledby="experience-preview-title">
+          <div className="experience-preview-heading">
+            <div>
+              <p className="eyebrow">Career Snapshot</p>
+              <h3 id="experience-preview-title">學經歷摘要</h3>
+            </div>
+            <a className="inline-link" href="#full-resume" onClick={handleOpenCakeResume}>
+              查看完整版履歷
+              <ExternalLink size={17} aria-hidden="true" />
+            </a>
+          </div>
+          <div className="experience-columns">
+            <ResumeSummaryGroup id="work-experience-summary" title="工作經歷" items={workHighlights} />
+            <ResumeSummaryGroup id="education-summary" title="學歷" items={educationHighlights} />
+          </div>
+        </div>
       </section>
 
       <section id="contact" className="section-shell contact" aria-labelledby="contact-title">
@@ -539,6 +619,39 @@ function Principle({ icon, title, text }: { icon: ReactNode; title: string; text
         <p>{text}</p>
       </div>
     </article>
+  );
+}
+
+function ResumeSummaryGroup({
+  id,
+  title,
+  items,
+}: {
+  id: string;
+  title: string;
+  items: ResumeSummaryItem[];
+}) {
+  return (
+    <section className="experience-list" aria-labelledby={id}>
+      <h4 id={id}>{title}</h4>
+      <div className="experience-items">
+        {items.map((item) => (
+          <article className="experience-item" key={`${item.organization}-${item.period}`}>
+            <div className="experience-meta">
+              <span>{item.period}</span>
+              <span>{item.organization}</span>
+            </div>
+            <h5>{item.title}</h5>
+            <p>{item.summary}</p>
+            <div className="tag-row">
+              {item.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 

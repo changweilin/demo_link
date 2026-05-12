@@ -415,6 +415,7 @@ button {
 .skill-card,
 .project-detail,
 .principle,
+.experience-item,
 .contact {
   min-width: 0;
   border: 1px solid var(--line);
@@ -475,6 +476,7 @@ button {
 .project-detail p,
 .skill-card p,
 .principle p,
+.experience-item p,
 .contact p,
 .section-heading.compact p {
   color: var(--muted);
@@ -737,6 +739,97 @@ button {
   margin-bottom: 7px;
 }
 
+.experience-preview {
+  margin-top: clamp(32px, 5vw, 54px);
+}
+
+.experience-preview-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 22px;
+  margin-bottom: 20px;
+}
+
+.experience-preview-heading h3 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2vw, 2.1rem);
+  line-height: 1.12;
+}
+
+.inline-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--teal-strong);
+  background: var(--surface-soft);
+  font-weight: 760;
+  white-space: nowrap;
+  gap: 8px;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.inline-link:hover {
+  border-color: var(--teal);
+  background: var(--link-hover-bg);
+  box-shadow: var(--soft-shadow);
+  transform: translateY(-1px);
+}
+
+.experience-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+  gap: 18px;
+}
+
+.experience-list h4 {
+  margin: 0 0 14px;
+  color: var(--teal-strong);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.experience-items {
+  display: grid;
+  gap: 12px;
+}
+
+.experience-item {
+  padding: 20px;
+}
+
+.experience-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.76rem;
+}
+
+.experience-item h5 {
+  margin: 0 0 8px;
+  font-size: 1.08rem;
+  line-height: 1.34;
+}
+
+.experience-item p {
+  margin: 0;
+}
+
+.experience-item .tag-row {
+  margin-top: 14px;
+}
+
 .contact {
   display: flex;
   align-items: center;
@@ -767,6 +860,10 @@ button {
   }
 
   .resume-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-columns {
     grid-template-columns: 1fr;
   }
 }
@@ -821,6 +918,7 @@ button {
   }
 
   .section-heading,
+  .experience-preview-heading,
   .contact {
     display: grid;
   }
@@ -1041,7 +1139,8 @@ button {
   }
 
   .project-detail,
-  .skill-card {
+  .skill-card,
+  .experience-item {
     padding: 20px;
   }
 
@@ -1071,6 +1170,10 @@ button {
 
   .principle {
     grid-template-columns: 1fr;
+  }
+
+  .inline-link {
+    width: 100%;
   }
 
   .contact {
