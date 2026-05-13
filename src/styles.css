@@ -540,6 +540,7 @@ button {
   border-radius: 6px;
   background: var(--paper-strong);
   box-shadow: var(--soft-shadow);
+  overscroll-behavior: contain;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }

@@ -19,7 +19,15 @@ import {
   Telescope,
   Waves,
 } from "lucide-react";
-import { type ReactNode, type TouchEvent as ReactTouchEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ReactNode,
+  type TouchEvent as ReactTouchEvent,
+  type WheelEvent as ReactWheelEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import CakeResumePage from "./CakeResumePage";
 import portfolio from "./data/portfolio.json";
 import ResumeEditorPage from "./ResumeEditorPage";
@@ -845,6 +853,7 @@ function ProjectDetail({
   onProjectSwipe: (direction: ProjectSwipeDirection) => void;
 }) {
   const galleryRef = useRef<HTMLDivElement>(null);
+  const galleryWheelRef = useRef({ delta: 0, lastSwitchAt: 0 });
   const projectSwipeRef = useRef<ProjectSwipeGesture>(null);
   const screenshots = getProjectScreenshots(project);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -872,6 +881,30 @@ function ProjectDetail({
 
     const nextIndex = Math.round(gallery.scrollLeft / Math.max(gallery.clientWidth, 1));
     setActiveImageIndex(Math.min(Math.max(nextIndex, 0), screenshots.length - 1));
+  };
+
+  const handleGalleryWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
+    if (!hasMultipleScreenshots || event.ctrlKey) return;
+
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    if (Math.abs(delta) < 2) return;
+
+    event.preventDefault();
+
+    const now = window.performance.now();
+    const wheelState = galleryWheelRef.current;
+    if (now - wheelState.lastSwitchAt > 420) wheelState.delta = 0;
+
+    wheelState.delta += delta;
+
+    if (Math.abs(wheelState.delta) < 42) return;
+
+    const direction = wheelState.delta > 0 ? 1 : -1;
+    const nextIndex = Math.min(Math.max(activeImageIndex + direction, 0), screenshots.length - 1);
+    wheelState.delta = 0;
+    wheelState.lastSwitchAt = now;
+
+    if (nextIndex !== activeImageIndex) handleImageSelect(nextIndex);
   };
 
   const handleProjectTouchStart = (event: ReactTouchEvent<HTMLElement>) => {
@@ -962,7 +995,12 @@ function ProjectDetail({
               </div>
             ) : null}
           </div>
-          <div className="project-gallery-viewport" ref={galleryRef} onScroll={handleGalleryScroll}>
+          <div
+            className="project-gallery-viewport"
+            ref={galleryRef}
+            onScroll={handleGalleryScroll}
+            onWheel={handleGalleryWheel}
+          >
             {screenshots.map((screenshot, index) => {
               const alt = screenshot.alt || `${project.title} 作品圖片 ${index + 1}`;
 
