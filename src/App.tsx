@@ -82,6 +82,7 @@ type ThemeMode = "day" | "night";
 type PageMode = "home" | "full-resume" | "resume-editor";
 type ProjectSortMode = "updatedAt" | "createdAt";
 type ProjectSortDirection = "desc" | "asc";
+type ProjectSwipeDirection = "previous" | "next";
 
 const themeStorageKey = "portfolio-theme-mode";
 const defaultProjectSort: ProjectSortMode = "updatedAt";
@@ -385,6 +386,17 @@ function App() {
     setSelectedProject(project);
   };
 
+  const handleProjectSwipe = (direction: ProjectSwipeDirection) => {
+    const currentIndex = visibleProjects.findIndex((project) => project.title === selectedProject.title);
+    if (currentIndex === -1) return;
+
+    const nextIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
+    const nextProject = visibleProjects[nextIndex];
+    if (!nextProject) return;
+
+    setSelectedProject(nextProject);
+  };
+
   if (pageMode === "full-resume") {
     return <CakeResumePage onBackHome={handleBackHome} onOpenEditor={handleOpenResumeEditor} />;
   }
@@ -542,7 +554,7 @@ function App() {
               </button>
             ))}
           </div>
-          <ProjectDetail project={selectedProject} />
+          <ProjectDetail project={selectedProject} onProjectSwipe={handleProjectSwipe} />
         </div>
       </section>
 
@@ -658,6 +670,11 @@ type ImageGesture =
 
 const defaultImageZoom: ImageZoomState = { scale: 1, x: 0, y: 0 };
 type ProjectTouchList = ReactTouchEvent<HTMLDivElement>["touches"];
+type ProjectSwipeGesture = {
+  startX: number;
+  startY: number;
+  ignore: boolean;
+} | null;
 
 function clampValue(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -813,8 +830,22 @@ function ZoomableProjectImage({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function ProjectDetail({ project }: { project: Project }) {
+function shouldIgnoreProjectSwipe(event: ReactTouchEvent<HTMLElement>) {
+  const target = event.target;
+  if (!(target instanceof Element)) return true;
+
+  return Boolean(target.closest(".project-gallery, .detail-links, a, button"));
+}
+
+function ProjectDetail({
+  project,
+  onProjectSwipe,
+}: {
+  project: Project;
+  onProjectSwipe: (direction: ProjectSwipeDirection) => void;
+}) {
   const galleryRef = useRef<HTMLDivElement>(null);
+  const projectSwipeRef = useRef<ProjectSwipeGesture>(null);
   const screenshots = getProjectScreenshots(project);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const hasMultipleScreenshots = screenshots.length > 1;
@@ -843,8 +874,58 @@ function ProjectDetail({ project }: { project: Project }) {
     setActiveImageIndex(Math.min(Math.max(nextIndex, 0), screenshots.length - 1));
   };
 
+  const handleProjectTouchStart = (event: ReactTouchEvent<HTMLElement>) => {
+    if (event.touches.length !== 1) {
+      projectSwipeRef.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    projectSwipeRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      ignore: shouldIgnoreProjectSwipe(event),
+    };
+  };
+
+  const handleProjectTouchMove = (event: ReactTouchEvent<HTMLElement>) => {
+    const gesture = projectSwipeRef.current;
+    if (!gesture || gesture.ignore || event.touches.length !== 1) return;
+
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - gesture.startX;
+    const deltaY = touch.clientY - gesture.startY;
+
+    if (Math.abs(deltaX) > 18 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+      event.preventDefault();
+    }
+  };
+
+  const handleProjectTouchEnd = (event: ReactTouchEvent<HTMLElement>) => {
+    const gesture = projectSwipeRef.current;
+    projectSwipeRef.current = null;
+    if (!gesture || gesture.ignore || event.changedTouches.length === 0) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - gesture.startX;
+    const deltaY = touch.clientY - gesture.startY;
+    const isProjectSwipe = Math.abs(deltaX) >= 64 && Math.abs(deltaX) > Math.abs(deltaY) * 1.45;
+
+    if (!isProjectSwipe) return;
+    onProjectSwipe(deltaX < 0 ? "next" : "previous");
+  };
+
   return (
-    <article className="project-detail" aria-live="polite">
+    <article
+      className="project-detail"
+      aria-live="polite"
+      onTouchStart={handleProjectTouchStart}
+      onTouchMove={handleProjectTouchMove}
+      onTouchEnd={handleProjectTouchEnd}
+      onTouchCancel={() => {
+        projectSwipeRef.current = null;
+      }}
+    >
       <div className="detail-meta">
         <span>{project.category}</span>
         <span>{project.year}</span>
