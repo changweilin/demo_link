@@ -7,15 +7,13 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
-import resumeData from "./data/resume.json";
 import "./cakeResume.css";
+import { loadResumeDraftFromStorage } from "./resumeDraft";
 import type { ResumeBullet, ResumeData, ResumeLink, ResumeLinkIcon, SkillColumn, TimelineItem } from "./types/resume";
 
 type CakeResumePageProps = {
   onBackHome: () => void;
 };
-
-const resume = resumeData as ResumeData;
 
 function resolveAssetPath(path?: string) {
   if (!path) return "";
@@ -33,6 +31,8 @@ function getLinkIcon(icon: ResumeLinkIcon) {
 }
 
 function CakeResumePage({ onBackHome }: CakeResumePageProps) {
+  const resume = loadResumeDraftFromStorage().draft;
+
   const handlePrint = () => {
     window.print();
   };

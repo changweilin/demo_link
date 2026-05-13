@@ -1,18 +1,38 @@
 import {
   AlertTriangle,
   ArrowLeft,
+  ClipboardCopy,
+  CloudUpload,
   Download,
   ExternalLink,
   FileJson,
+  Link2,
   Plus,
   RotateCcw,
   ShieldCheck,
   Trash2,
   Upload,
 } from "lucide-react";
-import { type ChangeEvent, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
-import resumeSeed from "./data/resume.json";
+import { type ChangeEvent, type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+  cloneResume,
+  getResumeJson,
+  initialResume,
+  isResumeData,
+  loadResumeDraftFromStorage,
+  localDraftStorageKey,
+  platformSyncStorageKey,
+} from "./resumeDraft";
 import "./resumeEditor.css";
+import {
+  buildResumePlatformSyncPackages,
+  getResumePlatformClipboardText,
+  getResumePlatformSyncJson,
+  getResumeSyncSectionText,
+  type ResumePlatformSyncPackage,
+  type ResumeSyncPlatformId,
+  type ResumeSyncSectionKey,
+} from "./resumePlatformSync";
 import type { ResumeBullet, ResumeData, ResumeLinkIcon, TimelineItem } from "./types/resume";
 
 type ResumeSectionKey = "workExperience" | "education";
@@ -28,12 +48,78 @@ type EditorInitialState = {
   status: AsyncStatus;
 };
 
-const initialResume = resumeSeed as ResumeData;
-const localDraftStorageKey = "resume-editor-local-draft-v1";
 const linkIconOptions: ResumeLinkIcon[] = ["external", "github", "linkedin", "mail"];
+const manualSyncTextsStorageKey = "resume-editor-platform-sync-manual-texts-v1";
+type ManualSyncTextKey = `${ResumeSyncPlatformId}:${ResumeSyncSectionKey}`;
+type ManualSyncTexts = Partial<Record<ManualSyncTextKey, string>>;
 
-function cloneResume(data: ResumeData) {
-  return JSON.parse(JSON.stringify(data)) as ResumeData;
+const defaultPlatformResumeUrls: Record<ResumeSyncPlatformId, string> = {
+  "104": "https://pda.104.com.tw/profile",
+  linkedin: "https://www.linkedin.com/in/",
+  cake: "https://www.cake.me/",
+};
+
+function getManualSyncTextKey(platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey): ManualSyncTextKey {
+  return `${platform}:${section}` as ManualSyncTextKey;
+}
+
+function applyManualSyncTexts(packages: ResumePlatformSyncPackage[], manualSyncTexts: ManualSyncTexts) {
+  return packages.map((syncPackage) => ({
+    ...syncPackage,
+    sections: syncPackage.sections.map((section) => {
+      const manualText = manualSyncTexts[getManualSyncTextKey(syncPackage.platform, section.key)];
+
+      if (manualText === undefined) return section;
+
+      return {
+        ...section,
+        manualText,
+        preview: manualText,
+      };
+    }),
+  }));
+}
+
+function isManualSyncTexts(value: unknown): value is ManualSyncTexts {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  return Object.entries(value).every(
+    ([key, entryValue]) =>
+      /^(104|linkedin|cake):(profile|summary|skills|workExperience|education|links)$/.test(key) &&
+      typeof entryValue === "string",
+  );
+}
+
+function getInitialManualSyncTexts(): ManualSyncTexts {
+  if (typeof window === "undefined") return {};
+
+  try {
+    const storedManualSyncTexts = window.localStorage.getItem(manualSyncTextsStorageKey);
+    if (!storedManualSyncTexts) return {};
+
+    const parsedManualSyncTexts = JSON.parse(storedManualSyncTexts) as unknown;
+    return isManualSyncTexts(parsedManualSyncTexts) ? parsedManualSyncTexts : {};
+  } catch {
+    return {};
+  }
+}
+
+function findProfileLink(draft: ResumeData, pattern: RegExp) {
+  return draft.profile.links.find((link) => pattern.test(link.href) || pattern.test(link.label))?.href;
+}
+
+function getPlatformResumeUrls(draft: ResumeData): Record<ResumeSyncPlatformId, string> {
+  const sourceUrl = draft.meta.sourceUrl.trim();
+  const cakeUrl = /cake\.me/i.test(sourceUrl) ? sourceUrl : findProfileLink(draft, /cake\.me/i);
+
+  return {
+    "104": import.meta.env.VITE_RESUME_SYNC_104_URL?.trim() || defaultPlatformResumeUrls["104"],
+    linkedin:
+      import.meta.env.VITE_RESUME_SYNC_LINKEDIN_URL?.trim() ||
+      findProfileLink(draft, /linkedin\.com/i) ||
+      defaultPlatformResumeUrls.linkedin,
+    cake: import.meta.env.VITE_RESUME_SYNC_CAKE_URL?.trim() || cakeUrl || defaultPlatformResumeUrls.cake,
+  };
 }
 
 function replaceAt<T>(items: T[], index: number, nextItem: T) {
@@ -268,53 +354,32 @@ function handleIndentedTextAreaKeyDown(
   updateTextAreaSelection(textarea, Math.max(blockStart, selectionStart + firstLineDelta), selectionEnd + totalDelta);
 }
 
-function isResumeData(value: unknown): value is ResumeData {
-  if (!value || typeof value !== "object") return false;
-
-  const resume = value as Partial<ResumeData>;
-  return Boolean(
-    resume.meta &&
-      resume.profile &&
-      Array.isArray(resume.skills) &&
-      Array.isArray(resume.workExperience) &&
-      Array.isArray(resume.education),
-  );
-}
-
-function getResumeJson(draft: ResumeData) {
-  return `${JSON.stringify(draft, null, 2)}\n`;
-}
-
 function getInitialEditorState(): EditorInitialState {
-  const fallbackDraft = cloneResume(initialResume);
   const fallbackStatus = { phase: "idle", message: "" } satisfies AsyncStatus;
 
-  if (typeof window === "undefined") {
-    return { draft: fallbackDraft, status: fallbackStatus };
+  const loadedDraft = loadResumeDraftFromStorage();
+  if (loadedDraft.source === "stored") {
+    return {
+      draft: loadedDraft.draft,
+      status: { phase: "success", message: "已載入瀏覽器保存的本機草稿。" },
+    };
   }
 
-  try {
-    const storedDraft = window.localStorage.getItem(localDraftStorageKey);
-    if (!storedDraft) return { draft: fallbackDraft, status: fallbackStatus };
-
-    const parsedDraft = JSON.parse(storedDraft) as unknown;
-    if (isResumeData(parsedDraft)) {
-      return {
-        draft: cloneResume(parsedDraft),
-        status: { phase: "success", message: "已載入瀏覽器保存的本機草稿。" },
-      };
-    }
-
+  if (loadedDraft.source === "invalid") {
     return {
-      draft: fallbackDraft,
+      draft: loadedDraft.draft,
       status: { phase: "error", message: "本機草稿格式不符合履歷資料，已改用內建履歷。" },
     };
-  } catch {
+  }
+
+  if (loadedDraft.source === "unreadable") {
     return {
-      draft: fallbackDraft,
+      draft: loadedDraft.draft,
       status: { phase: "error", message: "無法讀取本機草稿，已改用內建履歷。" },
     };
   }
+
+  return { draft: loadedDraft.draft, status: fallbackStatus };
 }
 
 function downloadTextFile(fileName: string, text: string) {
@@ -372,7 +437,21 @@ function ResumeEditorPage({
   const [initialState] = useState(getInitialEditorState);
   const [draft, setDraft] = useState<ResumeData>(() => initialState.draft);
   const [status, setStatus] = useState<AsyncStatus>(() => initialState.status);
+  const [platformSyncStatus, setPlatformSyncStatus] = useState<AsyncStatus>({ phase: "idle", message: "" });
+  const [selectedPlatformId, setSelectedPlatformId] = useState<ResumeSyncPlatformId>("104");
+  const [manualSyncTexts, setManualSyncTexts] = useState<ManualSyncTexts>(getInitialManualSyncTexts);
+  const [lastSyncDraftAt, setLastSyncDraftAt] = useState(() => new Date().toISOString());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const syncBridgeEndpoint = import.meta.env.VITE_RESUME_SYNC_ENDPOINT?.trim();
+  const platformResumeUrls = useMemo(() => getPlatformResumeUrls(draft), [draft]);
+  const baseSyncPackages = useMemo(
+    () => buildResumePlatformSyncPackages(draft, lastSyncDraftAt),
+    [draft, lastSyncDraftAt],
+  );
+  const syncPackages = useMemo(
+    () => applyManualSyncTexts(baseSyncPackages, manualSyncTexts),
+    [baseSyncPackages, manualSyncTexts],
+  );
 
   useEffect(() => {
     try {
@@ -381,6 +460,31 @@ function ResumeEditorPage({
       setStatus({ phase: "error", message: "無法保存本機草稿，請改用下載 JSON 備份。" });
     }
   }, [draft]);
+
+  useEffect(() => {
+    setLastSyncDraftAt(new Date().toISOString());
+  }, [draft]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(platformSyncStorageKey, getResumePlatformSyncJson(syncPackages));
+    } catch {
+      setPlatformSyncStatus({ phase: "error", message: "無法保存平台同步資料包，請改用複製或下載。" });
+    }
+  }, [syncPackages]);
+
+  useEffect(() => {
+    try {
+      if (Object.keys(manualSyncTexts).length === 0) {
+        window.localStorage.removeItem(manualSyncTextsStorageKey);
+        return;
+      }
+
+      window.localStorage.setItem(manualSyncTextsStorageKey, JSON.stringify(manualSyncTexts));
+    } catch {
+      setPlatformSyncStatus({ phase: "error", message: "無法儲存同步面板手動覆寫，請先同步或下載備份。" });
+    }
+  }, [manualSyncTexts]);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -395,6 +499,7 @@ function ResumeEditorPage({
     try {
       const importedResume = await readResumeFile(file);
       setDraft(cloneResume(importedResume));
+      setManualSyncTexts({});
       setStatus({ phase: "success", message: "已匯入本機履歷 JSON。" });
     } catch (error) {
       setStatus({
@@ -427,7 +532,109 @@ function ResumeEditorPage({
   const handleResetDraft = () => {
     const resetDraft = cloneResume(initialResume);
     setDraft(resetDraft);
+    setManualSyncTexts({});
     setStatus({ phase: "success", message: "已重設為專案內建履歷資料。" });
+  };
+
+  const updateManualSyncText = (
+    platform: ResumeSyncPlatformId,
+    section: ResumeSyncSectionKey,
+    value: string,
+  ) => {
+    setManualSyncTexts((current) => ({
+      ...current,
+      [getManualSyncTextKey(platform, section)]: value,
+    }));
+  };
+
+  const resetManualSyncText = (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey) => {
+    setManualSyncTexts((current) => {
+      const nextManualSyncTexts = { ...current };
+      delete nextManualSyncTexts[getManualSyncTextKey(platform, section)];
+      return nextManualSyncTexts;
+    });
+  };
+
+  const resetAllManualSyncTexts = () => {
+    setManualSyncTexts({});
+    setPlatformSyncStatus({ phase: "success", message: "已清除同步面板的手動覆寫。" });
+  };
+
+  const handleCopyPlatformSection = async (platformId: ResumeSyncPlatformId, sectionKey: ResumeSyncSectionKey) => {
+    const syncPackage = syncPackages.find((item) => item.platform === platformId);
+    const section = syncPackage?.sections.find((item) => item.key === sectionKey);
+    if (!syncPackage || !section) return;
+
+    try {
+      await writeClipboardText(getResumeSyncSectionText(section));
+      setPlatformSyncStatus({
+        phase: "success",
+        message: `已複製 ${syncPackage.platformLabel} / ${section.targetLabel} 區塊內容。`,
+      });
+    } catch {
+      setPlatformSyncStatus({ phase: "error", message: "無法複製此區塊，請改用文字框手動選取。" });
+    }
+  };
+
+  const handleCopySelectedPlatformSync = async () => {
+    const selectedPackage = syncPackages.find((syncPackage) => syncPackage.platform === selectedPlatformId);
+    if (!selectedPackage) return;
+
+    try {
+      await writeClipboardText(getResumePlatformClipboardText([selectedPackage]));
+      setPlatformSyncStatus({ phase: "success", message: `已複製 ${selectedPackage.platformLabel} 的履歷同步內容。` });
+    } catch {
+      setPlatformSyncStatus({ phase: "error", message: "無法複製平台同步內容，請改用下載 JSON。" });
+    }
+  };
+
+  const handleDownloadPlatformSync = () => {
+    try {
+      downloadTextFile("resume-platform-sync.json", getResumePlatformSyncJson(syncPackages));
+      setPlatformSyncStatus({ phase: "success", message: "已下載 104 / LinkedIn / Cake 同步資料包。" });
+    } catch {
+      setPlatformSyncStatus({ phase: "error", message: "無法下載同步資料包，請改用複製內容。" });
+    }
+  };
+
+  const handlePushPlatformSync = async () => {
+    const syncJson = getResumePlatformSyncJson(syncPackages);
+
+    if (!syncBridgeEndpoint) {
+      try {
+        await writeClipboardText(syncJson);
+        setPlatformSyncStatus({
+          phase: "success",
+          message: "尚未設定同步 API endpoint；已複製全平台同步資料包。",
+        });
+      } catch {
+        setPlatformSyncStatus({ phase: "error", message: "尚未設定同步 API endpoint，且無法複製同步資料包。" });
+      }
+      return;
+    }
+
+    setPlatformSyncStatus({ phase: "saving", message: "正在送出同步資料包。" });
+
+    try {
+      const response = await fetch(syncBridgeEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: syncJson,
+      });
+
+      if (!response.ok) {
+        throw new Error(`同步 API 回應 ${response.status}`);
+      }
+
+      setPlatformSyncStatus({ phase: "success", message: "已送出 104 / LinkedIn / Cake 同步資料包。" });
+    } catch (error) {
+      setPlatformSyncStatus({
+        phase: "error",
+        message: error instanceof Error ? error.message : "同步 API 送出失敗。",
+      });
+    }
   };
 
   const updateMeta = (field: keyof ResumeData["meta"], value: string) => {
@@ -584,6 +791,23 @@ function ResumeEditorPage({
           <StatusMessage status={status} />
         </section>
 
+        <PlatformSyncPanel
+          manualSyncTexts={manualSyncTexts}
+          platformResumeUrls={platformResumeUrls}
+          packages={syncPackages}
+          selectedPlatformId={selectedPlatformId}
+          status={platformSyncStatus}
+          syncBridgeEndpoint={syncBridgeEndpoint}
+          onCopySelected={handleCopySelectedPlatformSync}
+          onCopySection={handleCopyPlatformSection}
+          onDownloadAll={handleDownloadPlatformSync}
+          onPlatformChange={setSelectedPlatformId}
+          onPushAll={handlePushPlatformSync}
+          onResetAllManualTexts={resetAllManualSyncTexts}
+          onResetSectionText={resetManualSyncText}
+          onUpdateSectionText={updateManualSyncText}
+        />
+
         <section className="resume-editor-grid" aria-label="履歷編輯表單">
           <EditorCard title="頁面資訊">
             <TextField label="工具列標籤" value={draft.meta.eyebrow} onChange={(value) => updateMeta("eyebrow", value)} />
@@ -635,6 +859,173 @@ function StatusMessage({ status }: { status: AsyncStatus }) {
       {status.phase === "error" ? <AlertTriangle size={16} aria-hidden="true" /> : null}
       <span>{status.message}</span>
     </p>
+  );
+}
+
+function PlatformSyncPanel({
+  manualSyncTexts,
+  onCopySelected,
+  onCopySection,
+  onDownloadAll,
+  onPlatformChange,
+  onPushAll,
+  onResetAllManualTexts,
+  onResetSectionText,
+  onUpdateSectionText,
+  platformResumeUrls,
+  packages,
+  selectedPlatformId,
+  status,
+  syncBridgeEndpoint,
+}: {
+  manualSyncTexts: ManualSyncTexts;
+  onCopySelected: () => void;
+  onCopySection: (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey) => void;
+  onDownloadAll: () => void;
+  onPlatformChange: (platformId: ResumeSyncPlatformId) => void;
+  onPushAll: () => void;
+  onResetAllManualTexts: () => void;
+  onResetSectionText: (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey) => void;
+  onUpdateSectionText: (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey, value: string) => void;
+  platformResumeUrls: Record<ResumeSyncPlatformId, string>;
+  packages: ResumePlatformSyncPackage[];
+  selectedPlatformId: ResumeSyncPlatformId;
+  status: AsyncStatus;
+  syncBridgeEndpoint?: string;
+}) {
+  const selectedPackage = packages.find((syncPackage) => syncPackage.platform === selectedPlatformId) ?? packages[0];
+  const selectedPlatformResumeUrl = platformResumeUrls[selectedPackage.platform];
+  const isSaving = status.phase === "saving";
+  const hasManualSyncText = Object.keys(manualSyncTexts).length > 0;
+
+  return (
+    <section className="editor-local-panel platform-sync-panel" aria-label="104 LinkedIn Cake 履歷同步">
+      <div className="editor-local-copy">
+        <span className="editor-local-badge sync">
+          <Link2 size={18} aria-hidden="true" />
+          平台同步
+        </span>
+        <h2>104 / LinkedIn / Cake 區塊對應</h2>
+        <p>
+          每次編輯會即時重建三個平台的同步資料包；若設定 <code>VITE_RESUME_SYNC_ENDPOINT</code>
+          ，按同步會送到你的後端 API，否則會複製可貼上的 JSON。
+        </p>
+        <p className="sync-endpoint">
+          {syncBridgeEndpoint ? (
+            <>
+              Endpoint <code>{syncBridgeEndpoint}</code>
+            </>
+          ) : (
+            "尚未設定同步 API endpoint"
+          )}
+        </p>
+      </div>
+      <div className="editor-local-actions">
+        <button className="editor-primary-action" type="button" disabled={isSaving} onClick={onPushAll}>
+          <CloudUpload size={18} aria-hidden="true" />
+          {syncBridgeEndpoint ? "同步到平台" : "產生同步包"}
+        </button>
+        <button className="editor-secondary-action" type="button" onClick={onCopySelected}>
+          <ClipboardCopy size={18} aria-hidden="true" />
+          複製目前平台
+        </button>
+        <button className="editor-secondary-action" type="button" onClick={onDownloadAll}>
+          <Download size={18} aria-hidden="true" />
+          下載全平台 JSON
+        </button>
+        <button className="editor-secondary-action" type="button" disabled={!hasManualSyncText} onClick={onResetAllManualTexts}>
+          <RotateCcw size={18} aria-hidden="true" />
+          清除手動覆寫
+        </button>
+      </div>
+
+      <div className="platform-sync-body">
+        <div className="platform-tab-list" role="tablist" aria-label="同步平台">
+          {packages.map((syncPackage) => (
+            <button
+              className={syncPackage.platform === selectedPlatformId ? "active" : ""}
+              type="button"
+              role="tab"
+              aria-selected={syncPackage.platform === selectedPlatformId}
+              key={syncPackage.platform}
+              onClick={() => onPlatformChange(syncPackage.platform)}
+            >
+              {syncPackage.platformLabel}
+            </button>
+          ))}
+        </div>
+
+        <div className="platform-sync-summary">
+          <div className="platform-sync-heading">
+            <div className="platform-sync-title">
+              <strong>{selectedPackage.platformLabel}</strong>
+              <span>{selectedPackage.description}</span>
+            </div>
+            <a className="platform-resume-link" href={selectedPlatformResumeUrl} rel="noreferrer" target="_blank">
+              開啟履歷頁
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          </div>
+          <div className="sync-section-map">
+            {selectedPackage.sections.map((section) => {
+              const manualKey = getManualSyncTextKey(selectedPackage.platform, section.key);
+              const isManual = manualSyncTexts[manualKey] !== undefined;
+              const syncText = getResumeSyncSectionText(section);
+
+              return (
+                <article
+                  className={`sync-section-row${isManual ? " manual" : ""}`}
+                  key={`${selectedPackage.platform}-${section.key}`}
+                >
+                  <div className="sync-section-source">
+                    <span>{section.sourceLabel}</span>
+                    <small>{section.sourcePath}</small>
+                  </div>
+                  <strong aria-hidden="true">→</strong>
+                  <div className="sync-section-target">
+                    <span>{section.targetLabel}</span>
+                    <small>{section.itemCount} 項</small>
+                  </div>
+                  <label className="sync-section-editor">
+                    <span>{isManual ? "手動同步內容" : "同步內容"}</span>
+                    <textarea
+                      className="sync-section-textarea"
+                      rows={Math.max(4, Math.min(12, syncText.split(/\r?\n/).length + 1))}
+                      value={syncText}
+                      onChange={(event) => onUpdateSectionText(selectedPackage.platform, section.key, event.target.value)}
+                    />
+                  </label>
+                  <div className="sync-section-actions">
+                    <small className={isManual ? "manual" : ""}>
+                      {isManual ? "使用手動覆寫，會出現在複製、下載與同步資料包。" : "目前使用履歷來源自動產生內容。"}
+                    </small>
+                    <button
+                      className="editor-small-action"
+                      type="button"
+                      onClick={() => onCopySection(selectedPackage.platform, section.key)}
+                    >
+                      <ClipboardCopy size={15} aria-hidden="true" />
+                      複製區塊
+                    </button>
+                    <button
+                      className="editor-small-action"
+                      type="button"
+                      disabled={!isManual}
+                      onClick={() => onResetSectionText(selectedPackage.platform, section.key)}
+                    >
+                      <RotateCcw size={15} aria-hidden="true" />
+                      還原來源
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <StatusMessage status={status} />
+    </section>
   );
 }
 

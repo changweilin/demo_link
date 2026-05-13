@@ -6,7 +6,7 @@ Vite + React + TypeScript 建置的個人作品集與本地履歷 UI。內容以
 
 - 個人首頁：姓名、角色定位、簡介、引言、站內完整版履歷、GitHub 與 LinkedIn。
 - 履歷頁：以 `src/data/resume.json` 產生站內完整版履歷，支援列印輸出 PDF。
-- 本地履歷編輯器：不需要登入、不使用 GitHub token；透過本機 UI 匯入、複製、下載 `resume.json`。
+- 本地履歷編輯器：不需要登入、不使用 GitHub token；透過本機 UI 匯入、複製、下載 `resume.json`，並產生 104 / LinkedIn / Cake 的一對一區塊同步資料包。
 - 作品索引：支援作品分類篩選、依建立日期 / 最後更新日期排序、Demo 截圖預覽與外部 Demo / repository 連結。
 - 響應式版面：桌面與手機皆可閱讀，適合用 Tailscale 在手機上測試。
 - 主題切換：支援 day / night 模式，並記住使用者選擇。
@@ -95,6 +95,69 @@ npm run track:github-updates
 草稿會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub，也不會觸發 GitHub Actions。
 自我介紹和技能都改為單一文字區；技能用不縮排的行表示分類，用 Tab 或四個半形空格表示分類下的技能項目。
 工作經歷與學歷的重點條列會自動把 Tab 或四個半形空格解析成子條列；連結條列可寫成 `[文字](https://example.com)`。
+
+### 104 / LinkedIn / Cake 同步資料
+
+編輯器會在每次草稿更新時，同步產生三個平台的資料包並暫存在 `localStorage`：
+
+- 個人資料 → 104 基本資料 / LinkedIn Intro / Cake Profile
+- 自我介紹 → 104 自傳 / LinkedIn About / Cake Summary
+- 技能 → 104 專長技能 / LinkedIn Skills / Cake Skills
+- 工作經歷 → 104 工作經歷 / LinkedIn Experience / Cake Work Experience
+- 學歷 → 104 學歷 / LinkedIn Education / Cake Education
+- 個人連結 → 104 附件或作品連結 / LinkedIn Contact 或 Featured / Cake Social Links
+
+同步面板內每個平台區塊都可手動編輯，也可直接按 `複製區塊` 把該區塊內容放進剪貼簿。手動覆寫只影響同步包、複製內容與下載 JSON，不會反向修改主履歷草稿；可用 `還原來源` 或 `清除手動覆寫` 回到履歷來源自動產生的內容。
+
+若 `.env` 設定 `VITE_RESUME_SYNC_ENDPOINT`，按下編輯器的同步按鈕會將全平台 JSON `POST` 到該 endpoint，由後端負責 OAuth、API 憑證與平台寫回。未設定 endpoint 時，同步按鈕會改為複製全平台 JSON，適合貼到後端流程或平台履歷編輯頁。
+
+站內完整版履歷會優先讀取同一份本機草稿；在編輯器修改後點擊 `查看履歷`，可直接預覽最新 Cake 版履歷。
+
+本機開發可使用已建立的 `.env.local`：
+
+```env
+VITE_RESUME_SYNC_ENDPOINT=/api/resume-sync
+VITE_RESUME_SYNC_104_URL=https://pda.104.com.tw/profile
+VITE_RESUME_SYNC_LINKEDIN_URL=https://www.linkedin.com/in/your-id/
+VITE_RESUME_SYNC_CAKE_URL=https://www.cake.me/resumes/your-resume
+```
+
+啟動前端即可同時啟動履歷編輯器與本機同步 API：
+
+```bash
+npm run dev
+```
+
+按下 `同步到平台` 後，最新同步包會先保存到：
+
+```text
+C:\tmp\resume-platform-sync-latest.json
+```
+
+同時也會產生可人工核對或貼到平台上的分平台檔案：
+
+```text
+C:\tmp\resume-platform-sync\104.md
+C:\tmp\resume-platform-sync\104.json
+C:\tmp\resume-platform-sync\linkedin.md
+C:\tmp\resume-platform-sync\linkedin.json
+C:\tmp\resume-platform-sync\cake.md
+C:\tmp\resume-platform-sync\cake.json
+C:\tmp\resume-platform-sync\index.json
+C:\tmp\resume-platform-sync\sync-report.md
+C:\tmp\resume-platform-sync\sync-report.json
+```
+
+同步面板會提供每個平台的 `開啟履歷頁` 連結與每個區塊的 `複製區塊` 按鈕；`sync-report.md` 會列出每個平台目前的同步狀態、目標網址、區塊對應與下一步。三個平台目前都是 manual-assist，不會自動寫回外部平台。
+
+同步 API 目前整合在同一個 Vite 本機服務裡；實際寫回 104 / LinkedIn / Cake 的 OAuth token、API key 與平台呼叫應留在本機 middleware 或獨立後端內，不要放進前端 `.env.local`。要改後端報告使用的目標履歷網址時可設定：
+
+```powershell
+$env:RESUME_SYNC_104_URL="https://pda.104.com.tw/profile"
+$env:RESUME_SYNC_LINKEDIN_URL="https://www.linkedin.com/in/your-id/"
+$env:RESUME_SYNC_CAKE_URL="https://www.cake.me/resumes/your-resume"
+npm.cmd run dev
+```
 
 ## 資料維護
 

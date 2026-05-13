@@ -118,6 +118,10 @@
   color: var(--teal-strong);
 }
 
+.editor-local-badge.sync {
+  color: #4f62a8;
+}
+
 .editor-local-actions {
   display: flex;
   flex-wrap: wrap;
@@ -127,6 +131,186 @@
 
 .editor-file-input {
   display: none;
+}
+
+.platform-sync-panel {
+  align-items: start;
+}
+
+.platform-sync-panel > .platform-sync-body {
+  grid-column: 1 / -1;
+}
+
+.sync-endpoint {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.platform-sync-body,
+.platform-sync-summary {
+  display: grid;
+  gap: 14px;
+}
+
+.platform-tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.platform-tab-list button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: var(--surface-soft);
+  font: inherit;
+  font-weight: 760;
+  cursor: pointer;
+}
+
+.platform-tab-list button.active {
+  border-color: var(--teal);
+  color: var(--teal-strong);
+  background: var(--teal-soft);
+}
+
+.platform-sync-title {
+  display: grid;
+  gap: 4px;
+}
+
+.platform-sync-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.platform-sync-title strong {
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.platform-sync-title span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.platform-resume-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 10px;
+  color: var(--ink);
+  background: var(--surface-soft);
+  font-size: 0.88rem;
+  font-weight: 760;
+  text-decoration: none;
+  gap: 7px;
+}
+
+.platform-resume-link:hover {
+  border-color: var(--teal);
+  color: var(--teal-strong);
+}
+
+.platform-resume-link {
+  flex: 0 0 auto;
+}
+
+.sync-section-map {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sync-section-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 12px;
+  background: var(--surface-soft);
+  gap: 10px;
+}
+
+.sync-section-source,
+.sync-section-target {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.sync-section-row span {
+  color: var(--text-strong);
+  font-size: 0.88rem;
+  font-weight: 760;
+}
+
+.sync-section-row small,
+.sync-section-row p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.sync-section-row strong {
+  align-self: center;
+  color: var(--teal-strong);
+}
+
+.sync-section-row.manual {
+  border-color: rgba(15, 118, 110, 0.55);
+  background: #eef9f6;
+}
+
+.sync-section-editor {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 7px;
+}
+
+.sync-section-textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 132px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--paper-strong);
+  font: 0.9rem/1.55 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  resize: vertical;
+}
+
+.sync-section-textarea:focus {
+  border-color: var(--teal);
+  outline: 3px solid rgba(15, 118, 110, 0.12);
+}
+
+.sync-section-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sync-section-actions small {
+  flex: 1 1 220px;
+}
+
+.sync-section-actions small.manual {
+  color: var(--teal-strong);
+  font-weight: 760;
 }
 
 .resume-editor-grid {
@@ -308,6 +492,14 @@
   transform: translateY(-1px);
 }
 
+.editor-primary-action:disabled,
+.editor-secondary-action:disabled,
+.editor-small-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+}
+
 .editor-small-action.danger,
 .editor-icon-action.danger {
   color: #a4382d;
@@ -360,6 +552,19 @@
 
   .editor-local-actions {
     justify-content: start;
+  }
+
+  .sync-section-map {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-sync-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .platform-resume-link {
+    justify-content: center;
   }
 }
 
