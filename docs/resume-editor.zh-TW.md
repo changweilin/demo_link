@@ -1,39 +1,42 @@
-# 線上履歷編輯器設定
+# 本地履歷編輯器
 
-這個專案部署在 GitHub Pages，因此前端不能安全保存可寫入 repo 的秘密。編輯器採用兩段式權限：
+履歷編輯器已改為本地端 UI，不需要 Google 登入、GitHub token 或 GitHub Actions。編輯入口仍是：
 
-- Google 帳戶登入：控制誰能進入編輯介面。
-- GitHub fine-grained token：只在瀏覽器當次輸入，用來把 `src/data/resume.json` 提交回 repo。
+- 首頁導覽列：`本地編輯履歷`
+- 本機網址：`http://localhost:5173/#resume-editor`
 
-## Google 登入
+## 使用方式
 
-1. 到 Google Cloud 建立 OAuth 2.0 Web Client。
-2. Authorized JavaScript origins 加入：
-   - `https://changweilin.github.io`
-   - `http://localhost:5173`
-3. 在部署環境設定：
+1. 啟動本機開發伺服器：
 
-```text
-VITE_GOOGLE_CLIENT_ID=你的 OAuth Client ID
-VITE_RESUME_EDITOR_ALLOWED_EMAILS=x111281@gmail.com
+```bash
+npm run dev
 ```
 
-GitHub Pages 部署會從 repository variables 讀取 `VITE_GOOGLE_CLIENT_ID` 與 `VITE_RESUME_EDITOR_ALLOWED_EMAILS`。請到 `Settings` → `Secrets and variables` → `Actions` → `Variables` 新增這兩個值。
+2. 開啟 `http://localhost:5173/#resume-editor`。
+3. 在 UI 中編輯履歷內容。
+4. 使用 `下載 JSON` 匯出 `resume.json`，或使用 `複製 JSON` 取得目前草稿內容。
 
-Google Identity Services 的 JavaScript API 會回傳 ID token，前端會檢查 `aud`、`iss`、到期時間、信箱驗證狀態與允許信箱。
+編輯器會把草稿暫存在目前瀏覽器的 `localStorage`，重新整理頁面後仍可繼續編輯。若要帶入其他版本，使用 `匯入 JSON` 選擇本機的 `resume.json`。
 
-## GitHub 儲存
+## 更新專案內建履歷
 
-建立 fine-grained personal access token：
+若要讓完整版履歷頁預設載入新的內容，請把匯出的 JSON 內容更新到：
 
-- Repository access：只選 `changweilin/demo_link`
-- Permissions：`Contents` 設為 `Read and write`
-- 到期日：建議短期，需要時再重建
+```text
+src/data/resume.json
+```
 
-在編輯器輸入 token 後，按「儲存到 GitHub」會透過 GitHub Contents API 更新 `src/data/resume.json`。token 不會寫進程式碼、JSON 或 localStorage。
+更新後重新執行：
 
-## 編輯入口
+```bash
+npm run build
+npm run preview
+```
 
-- 首頁導覽列：`編輯履歷`
-- 直接網址：`https://changweilin.github.io/demo_link/#resume-editor`
-- 本機網址：`http://localhost:5173/#resume-editor`
+## 已移除的遠端流程
+
+- Google OAuth 登入檢查
+- GitHub fine-grained token 輸入
+- GitHub Contents API 寫回 repo
+- GitHub Actions 部署與排程同步 workflow

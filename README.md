@@ -1,16 +1,15 @@
 # 張維麟作品集
 
-Vite + React + TypeScript 建置的個人作品集首頁，展示張維麟的履歷連結、社群入口與公開作品。內容以繁體中文為主，作品資料集中維護在 `src/data/portfolio.json`。
-
-線上頁面：https://changweilin.github.io/demo_link/
+Vite + React + TypeScript 建置的個人作品集與本地履歷 UI。內容以繁體中文為主，作品資料集中維護在 `src/data/portfolio.json`，完整版履歷資料維護在 `src/data/resume.json`。
 
 ## 專案特色
 
-- 個人首頁：姓名、角色定位、簡介、引言、Cake 履歷、GitHub 與 LinkedIn。
+- 個人首頁：姓名、角色定位、簡介、引言、站內完整版履歷、GitHub 與 LinkedIn。
+- 履歷頁：以 `src/data/resume.json` 產生站內完整版履歷，支援列印輸出 PDF。
+- 本地履歷編輯器：不需要登入、不使用 GitHub token；透過本機 UI 匯入、複製、下載 `resume.json`。
 - 作品索引：支援作品分類篩選、依建立日期 / 最後更新日期排序、Demo 截圖預覽與外部 Demo / repository 連結。
 - 響應式版面：桌面與手機皆可閱讀，適合用 Tailscale 在手機上測試。
 - 主題切換：支援 day / night 模式，並記住使用者選擇。
-- GitHub Pages 部署：已包含 GitHub Actions workflow，會依 repository name 設定 Vite base path。
 
 ## 收錄作品
 
@@ -31,9 +30,8 @@ Vite + React + TypeScript 建置的個人作品集首頁，展示張維麟的履
 - TypeScript
 - Vite 6
 - lucide-react
-- GitHub Actions / GitHub Pages
 
-GitHub Actions 使用 Node.js 22；本機開發建議使用 Node.js 20 以上。
+本機開發建議使用 Node.js 20 以上。
 
 ## 本機開發
 
@@ -47,6 +45,14 @@ npm install
 
 ```bash
 npm run dev
+```
+
+主要入口：
+
+```text
+http://localhost:5173/
+http://localhost:5173/#full-resume
+http://localhost:5173/#resume-editor
 ```
 
 `npm run dev` 會將 Vite 綁定到 `0.0.0.0`，同一個 Tailscale network 內的手機可以直接打開。先在電腦查 Tailscale IPv4：
@@ -75,20 +81,35 @@ npm run track:github-updates
 - `npm run dev`：啟動本機開發伺服器。
 - `npm run build`：執行 TypeScript 檢查並建立正式輸出。
 - `npm run preview`：預覽 `dist/` build 結果，同樣綁定 `0.0.0.0`。
-- `npm run track:github-updates`：讀取作品集中的 GitHub repository 連結，將每個 project 的 `updatedAt` 同步成 GitHub 的最後 push 時間，並輸出追蹤快照到 `docs/github-last-updated.*`。
+- `npm run track:github-updates`：手動讀取作品集中的 GitHub repository 連結，將每個 project 的 `updatedAt` 同步成 GitHub 的最後 push 時間，並輸出追蹤快照到 `docs/github-last-updated.*`。
+
+## 履歷編輯
+
+履歷編輯器已改為本地端流程：
+
+1. 開啟 `http://localhost:5173/#resume-editor`。
+2. 直接編輯履歷內容，不需要登入。
+3. 使用 `匯入 JSON` 載入本機 `resume.json`，或使用 `下載 JSON` 匯出目前草稿。
+4. 若要更新專案預設履歷，將匯出的內容放回 `src/data/resume.json` 後重新 build。
+
+草稿會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub，也不會觸發 GitHub Actions。
 
 ## 資料維護
 
-主要內容來源是 `src/data/portfolio.json`：
+主要內容來源：
 
-- `profile`：姓名、英文名、角色、地點、履歷連結、簡介、引言與社群連結。
-- `projects`：作品標題、摘要、完整描述、標籤、分類、年份、建立日期、最後更新日期、Demo 截圖與外部連結。
+- `src/data/portfolio.json`：姓名、角色、作品列表、作品日期、Demo 截圖與外部連結。
+- `src/data/resume.json`：完整版履歷內容。
+- `public/project-screenshots/`：作品 Demo 截圖。
+- `public/resume-icons/`：履歷公司與學校 icon。
 
-更新作品時，通常只需要修改 `src/data/portfolio.json`。Demo 截圖放在 `public/project-screenshots/`，其他公開圖片或 icon 請放在 `public/`；若要調整 SEO、Open Graph 或 favicon，請修改 `index.html`。
+## GitHub 更新日期追蹤
 
-### GitHub 最後更新日期追蹤
+GitHub 專案更新日期追蹤保留為本機手動指令，不再由 GitHub Actions 排程執行。需要同步時執行：
 
-`.github/workflows/github-last-updated.yml` 會每天自動執行一次，也可以在 GitHub Actions 手動觸發。流程會從 `src/data/portfolio.json` 的 `projects[].links.repo` 收集 repository，因此新增作品時只要填入 GitHub repo URL，就會被納入追蹤。
+```bash
+npm run track:github-updates
+```
 
 同步後會更新：
 
@@ -96,34 +117,20 @@ npm run track:github-updates
 - `docs/github-last-updated.json`：保留最近 30 次檢查快照。
 - `docs/github-last-updated.md`：產生方便閱讀的表格摘要。
 
-## 部署
-
-專案已包含 GitHub Actions workflow：`.github/workflows/deploy.yml`。
-
-首次部署前請在 GitHub repository 設定：
-
-1. 進入 `Settings` -> `Pages`。
-2. 將 `Build and deployment` 的 `Source` 選為 `GitHub Actions`。
-3. push 到 `main` 後，workflow 會自動執行 `npm ci`、`npm run build`，並部署 `dist/`。
-
-部署時 workflow 會設定：
-
-```text
-VITE_BASE_PATH=/${{ github.event.repository.name }}/
-```
-
-因此 repository 名稱為 `demo_link` 時，GitHub Pages 路徑會是 `/demo_link/`。本機開發模式則固定使用 `/` 作為 base path。
-
 ## 專案結構
 
 ```text
 .
-├─ .github/workflows/deploy.yml
-├─ docs/correction-notes.zh-TW.md
+├─ docs/
 ├─ public/
+├─ scripts/
 ├─ src/
-│  ├─ data/portfolio.json
+│  ├─ data/
+│  │  ├─ portfolio.json
+│  │  └─ resume.json
 │  ├─ App.tsx
+│  ├─ CakeResumePage.tsx
+│  ├─ ResumeEditorPage.tsx
 │  ├─ main.tsx
 │  └─ styles.css
 ├─ index.html

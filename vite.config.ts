@@ -8,9 +8,9 @@ const devServer = {
   strictPort: false,
 };
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(() => ({
   plugins: [react()],
-  base: command === "serve" ? "/" : process.env.VITE_BASE_PATH ?? "/demo_link/",
+  base: process.env.VITE_BASE_PATH ?? "/",
   server: devServer,
   preview: devServer,
 }));

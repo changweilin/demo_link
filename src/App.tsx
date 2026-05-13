@@ -9,10 +9,10 @@ import {
   ExternalLink,
   Github,
   Linkedin,
-  LockKeyhole,
   Microscope,
   Moon,
   Mountain,
+  Pencil,
   Radar,
   Sun,
   Telescope,
@@ -266,6 +266,11 @@ function resolvePublicAssetPath(path: string) {
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
 }
 
+function getLocalResumeUrl() {
+  if (typeof window === "undefined") return "#full-resume";
+  return `${window.location.origin}${window.location.pathname}${window.location.search}#full-resume`;
+}
+
 function App() {
   const [activeCategory, setActiveCategory] = useState("全部");
   const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>(defaultProjectSort);
@@ -312,7 +317,7 @@ function App() {
   }, []);
 
   const handleCopyProfile = async () => {
-    const text = `${profile.name} / ${profile.role}\n${profile.resumeUrl}`;
+    const text = `${profile.name} / ${profile.role}\n${getLocalResumeUrl()}`;
 
     try {
       await navigator.clipboard?.writeText(text);
@@ -403,7 +408,7 @@ function App() {
               完整版履歷
             </a>
             <a href="#resume-editor" onClick={handleOpenResumeEditor}>
-              編輯履歷
+              本地編輯履歷
             </a>
             <a href="#contact">聯絡</a>
           </nav>
@@ -444,10 +449,10 @@ function App() {
               查看作品
               <ArrowRight size={20} aria-hidden="true" />
             </a>
-            <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
-              Cake 履歷
-              <ExternalLink size={19} aria-hidden="true" />
-            </a>
+            <button className="button button-secondary" type="button" onClick={handleOpenCakeResume}>
+              完整版履歷
+              <ArrowRight size={19} aria-hidden="true" />
+            </button>
           </div>
           <SocialLinks links={profile.socialLinks.filter((link) => link.label !== "履歷")} />
         </div>
@@ -573,8 +578,8 @@ function App() {
               <ExternalLink size={17} aria-hidden="true" />
             </a>
             <a className="inline-link" href="#resume-editor" onClick={handleOpenResumeEditor}>
-              管理履歷
-              <LockKeyhole size={17} aria-hidden="true" />
+              本地編輯履歷
+              <Pencil size={17} aria-hidden="true" />
             </a>
           </div>
           <div className="experience-columns">
@@ -588,17 +593,17 @@ function App() {
         <div>
           <p className="eyebrow">Profile Links</p>
           <h2 id="contact-title">聯絡與履歷</h2>
-          <p>目前先建立繁體中文版本。可透過 Cake 履歷、GitHub 或 LinkedIn 查看完整經歷與作品。</p>
+          <p>目前先建立繁體中文版本。可透過站內完整履歷、GitHub 或 LinkedIn 查看完整經歷與作品。</p>
         </div>
         <div className="contact-actions">
           <button className="button button-primary" type="button" onClick={handleCopyProfile}>
             {copied ? "已複製履歷資訊" : "複製履歷資訊"}
             <Check size={20} aria-hidden="true" />
           </button>
-          <a className="button button-secondary" href={profile.resumeUrl} target="_blank" rel="noreferrer">
-            Cake 履歷
-            <ExternalLink size={20} aria-hidden="true" />
-          </a>
+          <button className="button button-secondary" type="button" onClick={handleOpenCakeResume}>
+            完整版履歷
+            <ArrowRight size={20} aria-hidden="true" />
+          </button>
         </div>
       </section>
     </main>

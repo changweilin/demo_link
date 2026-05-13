@@ -1,26 +1,16 @@
 import {
   AlertTriangle,
   ArrowLeft,
+  Download,
   ExternalLink,
   FileJson,
-  LockKeyhole,
-  LogOut,
   Plus,
-  RefreshCw,
-  Save,
+  RotateCcw,
   ShieldCheck,
   Trash2,
+  Upload,
 } from "lucide-react";
-import {
-  type ChangeEvent,
-  type ReactNode,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import resumeSeed from "./data/resume.json";
 import "./resumeEditor.css";
 import type { ResumeBullet, ResumeData, ResumeLinkIcon, TimelineItem } from "./types/resume";
@@ -31,92 +21,19 @@ type SavePhase = "idle" | "loading" | "saving" | "success" | "error";
 type AsyncStatus = {
   phase: SavePhase;
   message: string;
-  url?: string;
 };
 
-type GoogleCredentialResponse = {
-  credential: string;
-  select_by?: string;
+type EditorInitialState = {
+  draft: ResumeData;
+  status: AsyncStatus;
 };
-
-type GoogleJwtPayload = {
-  aud?: string;
-  email?: string;
-  email_verified?: boolean;
-  exp?: number;
-  iss?: string;
-  name?: string;
-  picture?: string;
-  sub?: string;
-};
-
-type GoogleUser = {
-  email: string;
-  name: string;
-  picture?: string;
-  allowed: boolean;
-};
-
-type GitHubContentResponse = {
-  sha: string;
-  content?: string;
-  encoding?: string;
-};
-
-type GitHubPutResponse = {
-  commit?: {
-    html_url?: string;
-  };
-};
-
-type GoogleButtonConfig = {
-  theme?: "outline" | "filled_blue" | "filled_black";
-  size?: "large" | "medium" | "small";
-  shape?: "rectangular" | "pill" | "circle" | "square";
-  text?: "signin_with" | "signup_with" | "continue_with" | "signin";
-  locale?: string;
-};
-
-type GoogleIdApi = {
-  initialize: (config: {
-    auto_select?: boolean;
-    callback: (response: GoogleCredentialResponse) => void;
-    cancel_on_tap_outside?: boolean;
-    client_id: string;
-  }) => void;
-  renderButton: (parent: HTMLElement, options: GoogleButtonConfig) => void;
-  disableAutoSelect: () => void;
-};
-
-declare global {
-  interface Window {
-    google?: {
-      accounts?: {
-        id?: GoogleIdApi;
-      };
-    };
-  }
-}
 
 const initialResume = resumeSeed as ResumeData;
-const resumeDataPath = "src/data/resume.json";
-const githubOwner = import.meta.env.VITE_GITHUB_OWNER || "changweilin";
-const githubRepo = import.meta.env.VITE_GITHUB_REPO || "demo_link";
-const githubBranch = import.meta.env.VITE_GITHUB_BRANCH || "main";
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
-const defaultAllowedEmails = ["x111281@gmail.com"];
+const localDraftStorageKey = "resume-editor-local-draft-v1";
 const linkIconOptions: ResumeLinkIcon[] = ["external", "github", "linkedin", "mail"];
-
-let googleScriptPromise: Promise<void> | null = null;
 
 function cloneResume(data: ResumeData) {
   return JSON.parse(JSON.stringify(data)) as ResumeData;
-}
-
-function getAllowedEmails() {
-  const configuredEmails = import.meta.env.VITE_RESUME_EDITOR_ALLOWED_EMAILS as string | undefined;
-  const source = configuredEmails ? configuredEmails.split(",") : defaultAllowedEmails;
-  return source.map((email) => email.trim().toLowerCase()).filter(Boolean);
 }
 
 function replaceAt<T>(items: T[], index: number, nextItem: T) {
@@ -174,38 +91,6 @@ function removeBulletFromTree(bullets: ResumeBullet[], path: number[]): ResumeBu
   });
 }
 
-function encodeUtf8Base64(text: string) {
-  const bytes = new TextEncoder().encode(text);
-  let binary = "";
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary);
-}
-
-function decodeUtf8Base64(base64: string) {
-  const binary = atob(base64.replace(/\s/g, ""));
-  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
-
-function decodeBase64UrlJson(tokenPart: string) {
-  const normalized = tokenPart.replace(/-/g, "+").replace(/_/g, "/");
-  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
-  return JSON.parse(decodeUtf8Base64(padded)) as unknown;
-}
-
-function decodeGoogleCredential(credential: string): GoogleJwtPayload | null {
-  const [, payload] = credential.split(".");
-  if (!payload) return null;
-
-  try {
-    return decodeBase64UrlJson(payload) as GoogleJwtPayload;
-  } catch {
-    return null;
-  }
-}
-
 function isResumeData(value: unknown): value is ResumeData {
   if (!value || typeof value !== "object") return false;
 
@@ -219,98 +104,85 @@ function isResumeData(value: unknown): value is ResumeData {
   );
 }
 
-function getGitHubContentUrl() {
-  const encodedPath = resumeDataPath.split("/").map(encodeURIComponent).join("/");
-  return `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${encodedPath}`;
+function getResumeJson(draft: ResumeData) {
+  return `${JSON.stringify(draft, null, 2)}\n`;
 }
 
-async function parseGitHubError(response: Response) {
-  const fallback = `${response.status} ${response.statusText}`;
-  const text = await response.text();
-  if (!text) return fallback;
+function getInitialEditorState(): EditorInitialState {
+  const fallbackDraft = cloneResume(initialResume);
+  const fallbackStatus = { phase: "idle", message: "" } satisfies AsyncStatus;
+
+  if (typeof window === "undefined") {
+    return { draft: fallbackDraft, status: fallbackStatus };
+  }
 
   try {
-    const payload = JSON.parse(text) as { message?: string };
-    return payload.message || fallback;
+    const storedDraft = window.localStorage.getItem(localDraftStorageKey);
+    if (!storedDraft) return { draft: fallbackDraft, status: fallbackStatus };
+
+    const parsedDraft = JSON.parse(storedDraft) as unknown;
+    if (isResumeData(parsedDraft)) {
+      return {
+        draft: cloneResume(parsedDraft),
+        status: { phase: "success", message: "已載入瀏覽器保存的本機草稿。" },
+      };
+    }
+
+    return {
+      draft: fallbackDraft,
+      status: { phase: "error", message: "本機草稿格式不符合履歷資料，已改用內建履歷。" },
+    };
   } catch {
-    return text;
+    return {
+      draft: fallbackDraft,
+      status: { phase: "error", message: "無法讀取本機草稿，已改用內建履歷。" },
+    };
   }
 }
 
-async function githubJsonRequest<T>(url: string, token: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${token}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(init?.headers ?? {}),
-    },
-  });
+function downloadTextFile(fileName: string, text: string) {
+  const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
-  if (!response.ok) {
-    throw new Error(await parseGitHubError(response));
-  }
-
-  return (await response.json()) as T;
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
-async function loadRemoteResume(token: string) {
-  const contentUrl = `${getGitHubContentUrl()}?ref=${encodeURIComponent(githubBranch)}`;
-  const file = await githubJsonRequest<GitHubContentResponse>(contentUrl, token);
-  if (file.encoding !== "base64" || !file.content) {
-    throw new Error("GitHub 回傳的檔案格式不是 base64。");
+async function writeClipboardText(text: string) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+  } catch {
+    // Fall back to the selection-based copy path below.
   }
 
-  const parsed = JSON.parse(decodeUtf8Base64(file.content)) as unknown;
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+async function readResumeFile(file: File) {
+  const text = await file.text();
+  const parsed = JSON.parse(text) as unknown;
+
   if (!isResumeData(parsed)) {
-    throw new Error("線上履歷資料格式不符合目前編輯器。");
+    throw new Error("匯入的 JSON 格式不符合目前履歷資料結構。");
   }
 
   return parsed;
-}
-
-async function saveRemoteResume(token: string, draft: ResumeData) {
-  const contentUrl = getGitHubContentUrl();
-  const currentFile = await githubJsonRequest<GitHubContentResponse>(
-    `${contentUrl}?ref=${encodeURIComponent(githubBranch)}`,
-    token,
-  );
-  const content = `${JSON.stringify(draft, null, 2)}\n`;
-
-  return githubJsonRequest<GitHubPutResponse>(contentUrl, token, {
-    body: JSON.stringify({
-      branch: githubBranch,
-      content: encodeUtf8Base64(content),
-      message: "docs: update resume content",
-      sha: currentFile.sha,
-    }),
-    method: "PUT",
-  });
-}
-
-function loadGoogleIdentityScript() {
-  if (window.google?.accounts?.id) return Promise.resolve();
-  if (googleScriptPromise) return googleScriptPromise;
-
-  googleScriptPromise = new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>('script[src="https://accounts.google.com/gsi/client"]');
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(), { once: true });
-      existingScript.addEventListener("error", () => reject(new Error("Google script failed to load.")), { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.async = true;
-    script.defer = true;
-    script.src = "https://accounts.google.com/gsi/client";
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Google script failed to load."));
-    document.head.appendChild(script);
-  });
-
-  return googleScriptPromise;
 }
 
 function ResumeEditorPage({
@@ -320,142 +192,65 @@ function ResumeEditorPage({
   onBackHome: () => void;
   onOpenResume: () => void;
 }) {
-  const googleButtonRef = useRef<HTMLDivElement>(null);
-  const allowedEmails = useMemo(() => getAllowedEmails(), []);
-  const allowedEmailSet = useMemo(() => new Set(allowedEmails), [allowedEmails]);
-  const [draft, setDraft] = useState<ResumeData>(() => cloneResume(initialResume));
-  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
-  const [googleStatus, setGoogleStatus] = useState("");
-  const [githubToken, setGithubToken] = useState("");
-  const [status, setStatus] = useState<AsyncStatus>({ phase: "idle", message: "" });
-  const canEdit = Boolean(googleUser?.allowed);
-
-  const handleGoogleCredential = useCallback(
-    (response: GoogleCredentialResponse) => {
-      const payload = decodeGoogleCredential(response.credential);
-      const email = payload?.email?.toLowerCase() ?? "";
-      const nowInSeconds = Math.floor(Date.now() / 1000);
-
-      if (!payload || payload.aud !== googleClientId || payload.iss !== "https://accounts.google.com") {
-        setGoogleStatus("Google 登入回應無法驗證。");
-        setGoogleUser(null);
-        return;
-      }
-
-      if (!payload.email_verified || !email || (payload.exp ?? 0) < nowInSeconds) {
-        setGoogleStatus("Google 帳戶尚未完成信箱驗證，或登入狀態已過期。");
-        setGoogleUser(null);
-        return;
-      }
-
-      const allowed = allowedEmailSet.has(email);
-      setGoogleUser({
-        allowed,
-        email,
-        name: payload.name || email,
-        picture: payload.picture,
-      });
-      setGoogleStatus(allowed ? "" : "這個 Google 帳戶沒有履歷編輯權限。");
-    },
-    [allowedEmailSet],
-  );
+  const [initialState] = useState(getInitialEditorState);
+  const [draft, setDraft] = useState<ResumeData>(() => initialState.draft);
+  const [status, setStatus] = useState<AsyncStatus>(() => initialState.status);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!googleClientId) {
-      setGoogleStatus("尚未設定 Google OAuth Client ID。");
-      return;
-    }
-
-    let active = true;
-    setGoogleStatus("正在載入 Google 登入。");
-
-    loadGoogleIdentityScript()
-      .then(() => {
-        if (!active || !googleButtonRef.current || !window.google?.accounts?.id) return;
-
-        googleButtonRef.current.innerHTML = "";
-        window.google.accounts.id.initialize({
-          auto_select: false,
-          callback: handleGoogleCredential,
-          cancel_on_tap_outside: true,
-          client_id: googleClientId,
-        });
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
-          locale: "zh_TW",
-          shape: "rectangular",
-          size: "large",
-          text: "signin_with",
-          theme: "outline",
-        });
-        setGoogleStatus("");
-      })
-      .catch(() => {
-        if (active) setGoogleStatus("Google 登入元件載入失敗。");
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [handleGoogleCredential]);
-
-  const handleSignOut = () => {
-    window.google?.accounts?.id?.disableAutoSelect();
-    setGoogleUser(null);
-    setGoogleStatus("");
-  };
-
-  const requireEditorAccess = () => {
-    if (!canEdit) {
-      setStatus({ phase: "error", message: "請先用允許的 Google 帳戶登入。" });
-      return false;
-    }
-
-    if (!githubToken.trim()) {
-      setStatus({ phase: "error", message: "請輸入具有 repo contents 讀寫權限的 GitHub token。" });
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleLoadRemote = async () => {
-    if (!requireEditorAccess()) return;
-
-    setStatus({ phase: "loading", message: "正在讀取 GitHub 上的履歷資料。" });
     try {
-      const remoteResume = await loadRemoteResume(githubToken.trim());
-      setDraft(cloneResume(remoteResume));
-      setStatus({ phase: "success", message: "已載入 GitHub 上的最新履歷資料。" });
+      window.localStorage.setItem(localDraftStorageKey, getResumeJson(draft));
+    } catch {
+      setStatus({ phase: "error", message: "無法保存本機草稿，請改用下載 JSON 備份。" });
+    }
+  }, [draft]);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportJson = async (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    setStatus({ phase: "loading", message: "正在匯入本機履歷 JSON。" });
+    try {
+      const importedResume = await readResumeFile(file);
+      setDraft(cloneResume(importedResume));
+      setStatus({ phase: "success", message: "已匯入本機履歷 JSON。" });
     } catch (error) {
       setStatus({
         phase: "error",
-        message: error instanceof Error ? error.message : "讀取線上履歷資料失敗。",
+        message: error instanceof Error ? error.message : "匯入履歷 JSON 失敗。",
       });
-    }
-  };
-
-  const handleSave = async () => {
-    if (!requireEditorAccess()) return;
-
-    setStatus({ phase: "saving", message: "正在提交履歷更新到 GitHub。" });
-    try {
-      const result = await saveRemoteResume(githubToken.trim(), draft);
-      setStatus({
-        phase: "success",
-        message: "履歷已提交。GitHub Pages 會在 Actions 完成後更新網站。",
-        url: result.commit?.html_url,
-      });
-    } catch (error) {
-      setStatus({
-        phase: "error",
-        message: error instanceof Error ? error.message : "儲存履歷資料失敗。",
-      });
+    } finally {
+      input.value = "";
     }
   };
 
   const handleCopyJson = async () => {
-    await navigator.clipboard?.writeText(`${JSON.stringify(draft, null, 2)}\n`);
-    setStatus({ phase: "success", message: "已複製目前履歷 JSON。" });
+    try {
+      await writeClipboardText(getResumeJson(draft));
+      setStatus({ phase: "success", message: "已複製目前履歷 JSON。" });
+    } catch {
+      setStatus({ phase: "error", message: "無法複製 JSON，請改用下載檔案。" });
+    }
+  };
+
+  const handleDownloadJson = () => {
+    try {
+      downloadTextFile("resume.json", getResumeJson(draft));
+      setStatus({ phase: "success", message: "已下載本機履歷 JSON。" });
+    } catch {
+      setStatus({ phase: "error", message: "無法下載 JSON，請改用複製內容。" });
+    }
+  };
+
+  const handleResetDraft = () => {
+    const resetDraft = cloneResume(initialResume);
+    setDraft(resetDraft);
+    setStatus({ phase: "success", message: "已重設為專案內建履歷資料。" });
   };
 
   const updateMeta = (field: keyof ResumeData["meta"], value: string) => {
@@ -611,7 +406,7 @@ function ResumeEditorPage({
         </button>
         <div>
           <p>Resume editor</p>
-          <h1>線上編輯履歷</h1>
+          <h1>本地編輯履歷</h1>
         </div>
         <div className="resume-editor-toolbar-actions">
           <button className="editor-secondary-action" type="button" onClick={onOpenResume}>
@@ -621,148 +416,96 @@ function ResumeEditorPage({
         </div>
       </header>
 
-      <section className={canEdit ? "resume-editor-shell" : "resume-editor-shell login-only"}>
-        <AuthPanel
-          allowedEmails={allowedEmails}
-          googleButtonRef={googleButtonRef}
-          googleClientId={googleClientId}
-          googleStatus={googleStatus}
-          googleUser={googleUser}
-          onSignOut={handleSignOut}
-        />
-
-        {canEdit ? (
-          <>
-            <section className="editor-save-panel" aria-label="儲存設定">
-              <label>
-                <span>GitHub token</span>
-                <input
-                  autoComplete="off"
-                  inputMode="text"
-                  type="password"
-                  value={githubToken}
-                  onChange={(event) => setGithubToken(event.target.value)}
-                  placeholder="github_pat_..."
-                />
-              </label>
-              <div className="editor-save-actions">
-                <button className="editor-secondary-action" type="button" onClick={handleLoadRemote}>
-                  <RefreshCw size={18} aria-hidden="true" />
-                  讀取線上版
-                </button>
-                <button className="editor-secondary-action" type="button" onClick={handleCopyJson}>
-                  <FileJson size={18} aria-hidden="true" />
-                  複製 JSON
-                </button>
-                <button className="editor-primary-action" type="button" onClick={handleSave}>
-                  <Save size={18} aria-hidden="true" />
-                  儲存到 GitHub
-                </button>
-              </div>
-              <StatusMessage status={status} />
-            </section>
-
-            <section className="resume-editor-grid" aria-label="履歷編輯表單">
-              <EditorCard title="頁面資訊">
-                <TextField label="工具列標籤" value={draft.meta.eyebrow} onChange={(value) => updateMeta("eyebrow", value)} />
-                <TextField label="頁面標題" value={draft.meta.title} onChange={(value) => updateMeta("title", value)} />
-                <TextField label="Cake 履歷網址" value={draft.meta.sourceUrl} onChange={(value) => updateMeta("sourceUrl", value)} />
-                <TextField label="照片網址" value={draft.meta.profileImage} onChange={(value) => updateMeta("profileImage", value)} />
-              </EditorCard>
-
-              <EditorCard title="個人資料">
-                <TextField label="姓名" value={draft.profile.name} onChange={(value) => updateProfile("name", value)} />
-                <TextField label="角色" value={draft.profile.role} onChange={(value) => updateProfile("role", value)} />
-                <TextField label="地點" value={draft.profile.location} onChange={(value) => updateProfile("location", value)} />
-                <StringListEditor
-                  addLabel="新增自我介紹"
-                  items={draft.profile.summary}
-                  label="自我介紹"
-                  multiline
-                  onChange={updateProfileSummary}
-                />
-                <ProfileLinkEditor links={draft.profile.links} onChange={updateProfileLinks} />
-              </EditorCard>
-
-              <EditorCard title="技能">
-                <SkillsEditor skills={draft.skills} onChange={updateSkills} />
-              </EditorCard>
-            </section>
-
-            <TimelineEditor
-              items={draft.workExperience}
-              section="workExperience"
-              title="工作經歷"
-              onAddBullet={addBullet}
-              onRemoveBullet={removeBullet}
-              onUpdateBullet={updateBullet}
-              onUpdateField={updateTimelineField}
-              onUpdateItems={updateTimelineItems}
-            />
-
-            <TimelineEditor
-              items={draft.education}
-              section="education"
-              title="學歷"
-              onAddBullet={addBullet}
-              onRemoveBullet={removeBullet}
-              onUpdateBullet={updateBullet}
-              onUpdateField={updateTimelineField}
-              onUpdateItems={updateTimelineItems}
-            />
-          </>
-        ) : null}
-      </section>
-    </main>
-  );
-}
-
-function AuthPanel({
-  allowedEmails,
-  googleButtonRef,
-  googleClientId,
-  googleStatus,
-  googleUser,
-  onSignOut,
-}: {
-  allowedEmails: string[];
-  googleButtonRef: RefObject<HTMLDivElement | null>;
-  googleClientId: string;
-  googleStatus: string;
-  googleUser: GoogleUser | null;
-  onSignOut: () => void;
-}) {
-  return (
-    <section className="editor-auth-panel" aria-label="Google 登入">
-      <div className="editor-auth-copy">
-        <span className={googleUser?.allowed ? "editor-auth-badge allowed" : "editor-auth-badge"}>
-          {googleUser?.allowed ? <ShieldCheck size={18} aria-hidden="true" /> : <LockKeyhole size={18} aria-hidden="true" />}
-          {googleUser?.allowed ? "已授權" : "需要 Google 登入"}
-        </span>
-        <h2>履歷管理</h2>
-        <p>允許帳戶：{allowedEmails.join(", ")}</p>
-      </div>
-
-      <div className="editor-auth-action">
-        {googleUser ? (
-          <div className="editor-user-card">
-            {googleUser.picture ? <img src={googleUser.picture} alt="" /> : null}
-            <div>
-              <strong>{googleUser.name}</strong>
-              <span>{googleUser.email}</span>
-            </div>
-            <button className="editor-icon-action" type="button" aria-label="登出 Google 帳戶" onClick={onSignOut}>
-              <LogOut size={18} aria-hidden="true" />
+      <section className="resume-editor-shell">
+        <section className="editor-local-panel" aria-label="本地履歷編輯">
+          <div className="editor-local-copy">
+            <span className="editor-local-badge allowed">
+              <ShieldCheck size={18} aria-hidden="true" />
+              離線模式
+            </span>
+            <h2>本機履歷草稿</h2>
+            <p>
+              不需要登入或 token；變更會保存在此瀏覽器，可匯入、複製或下載為 <code>resume.json</code>。
+            </p>
+          </div>
+          <div className="editor-local-actions">
+            <button className="editor-secondary-action" type="button" onClick={handleImportClick}>
+              <Upload size={18} aria-hidden="true" />
+              匯入 JSON
+            </button>
+            <button className="editor-secondary-action" type="button" onClick={handleCopyJson}>
+              <FileJson size={18} aria-hidden="true" />
+              複製 JSON
+            </button>
+            <button className="editor-primary-action" type="button" onClick={handleDownloadJson}>
+              <Download size={18} aria-hidden="true" />
+              下載 JSON
+            </button>
+            <button className="editor-secondary-action" type="button" onClick={handleResetDraft}>
+              <RotateCcw size={18} aria-hidden="true" />
+              重設
             </button>
           </div>
-        ) : (
-          <div className="google-button-slot" ref={googleButtonRef} aria-disabled={!googleClientId} />
-        )}
-        {googleStatus ? (
-          <p className={googleUser && !googleUser.allowed ? "editor-status error" : "editor-status"}>{googleStatus}</p>
-        ) : null}
-      </div>
-    </section>
+          <input
+            ref={fileInputRef}
+            className="editor-file-input"
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportJson}
+          />
+          <StatusMessage status={status} />
+        </section>
+
+        <section className="resume-editor-grid" aria-label="履歷編輯表單">
+          <EditorCard title="頁面資訊">
+            <TextField label="工具列標籤" value={draft.meta.eyebrow} onChange={(value) => updateMeta("eyebrow", value)} />
+            <TextField label="頁面標題" value={draft.meta.title} onChange={(value) => updateMeta("title", value)} />
+            <TextField label="參考來源網址" value={draft.meta.sourceUrl} onChange={(value) => updateMeta("sourceUrl", value)} />
+            <TextField label="照片網址" value={draft.meta.profileImage} onChange={(value) => updateMeta("profileImage", value)} />
+          </EditorCard>
+
+          <EditorCard title="個人資料">
+            <TextField label="姓名" value={draft.profile.name} onChange={(value) => updateProfile("name", value)} />
+            <TextField label="角色" value={draft.profile.role} onChange={(value) => updateProfile("role", value)} />
+            <TextField label="地點" value={draft.profile.location} onChange={(value) => updateProfile("location", value)} />
+            <StringListEditor
+              addLabel="新增自我介紹"
+              items={draft.profile.summary}
+              label="自我介紹"
+              multiline
+              onChange={updateProfileSummary}
+            />
+            <ProfileLinkEditor links={draft.profile.links} onChange={updateProfileLinks} />
+          </EditorCard>
+
+          <EditorCard title="技能">
+            <SkillsEditor skills={draft.skills} onChange={updateSkills} />
+          </EditorCard>
+        </section>
+
+        <TimelineEditor
+          items={draft.workExperience}
+          section="workExperience"
+          title="工作經歷"
+          onAddBullet={addBullet}
+          onRemoveBullet={removeBullet}
+          onUpdateBullet={updateBullet}
+          onUpdateField={updateTimelineField}
+          onUpdateItems={updateTimelineItems}
+        />
+
+        <TimelineEditor
+          items={draft.education}
+          section="education"
+          title="學歷"
+          onAddBullet={addBullet}
+          onRemoveBullet={removeBullet}
+          onUpdateBullet={updateBullet}
+          onUpdateField={updateTimelineField}
+          onUpdateItems={updateTimelineItems}
+        />
+      </section>
+    </main>
   );
 }
 
@@ -773,11 +516,6 @@ function StatusMessage({ status }: { status: AsyncStatus }) {
     <p className={`editor-status ${status.phase}`}>
       {status.phase === "error" ? <AlertTriangle size={16} aria-hidden="true" /> : null}
       <span>{status.message}</span>
-      {status.url ? (
-        <a href={status.url} target="_blank" rel="noreferrer">
-          查看 commit
-        </a>
-      ) : null}
     </p>
   );
 }

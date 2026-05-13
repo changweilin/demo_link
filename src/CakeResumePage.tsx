@@ -55,10 +55,6 @@ function CakeResumePage({ onBackHome, onOpenEditor }: CakeResumePageProps) {
             編輯履歷
             <Pencil size={18} aria-hidden="true" />
           </button>
-          <a href={resume.meta.sourceUrl} target="_blank" rel="noreferrer">
-            原始 Cake 頁面
-            <ExternalLink size={18} aria-hidden="true" />
-          </a>
           <button type="button" onClick={handlePrint}>
             輸出 PDF
             <Download size={18} aria-hidden="true" />
