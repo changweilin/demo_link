@@ -13,7 +13,6 @@ import {
   Microscope,
   Moon,
   Mountain,
-  Pencil,
   Radar,
   Sun,
   Telescope,
@@ -362,10 +361,6 @@ function App() {
     handleOpenPage("full-resume", "full-resume");
   };
 
-  const handleOpenResumeEditor = () => {
-    handleOpenPage("resume-editor", "resume-editor");
-  };
-
   const handleBackHome = () => {
     setPageMode("home");
     window.history.pushState(null, "", `${window.location.pathname}${window.location.search}`);
@@ -406,7 +401,7 @@ function App() {
   };
 
   if (pageMode === "full-resume") {
-    return <CakeResumePage onBackHome={handleBackHome} onOpenEditor={handleOpenResumeEditor} />;
+    return <CakeResumePage onBackHome={handleBackHome} />;
   }
 
   if (pageMode === "resume-editor") {
@@ -428,9 +423,6 @@ function App() {
             <a href="#resume">履歷</a>
             <a href="#full-resume" onClick={handleOpenCakeResume}>
               完整版履歷
-            </a>
-            <a href="#resume-editor" onClick={handleOpenResumeEditor}>
-              本地編輯履歷
             </a>
             <a href="#contact">聯絡</a>
           </nav>
@@ -598,10 +590,6 @@ function App() {
             <a className="inline-link" href="#full-resume" onClick={handleOpenCakeResume}>
               查看完整版履歷
               <ExternalLink size={17} aria-hidden="true" />
-            </a>
-            <a className="inline-link" href="#resume-editor" onClick={handleOpenResumeEditor}>
-              本地編輯履歷
-              <Pencil size={17} aria-hidden="true" />
             </a>
           </div>
           <div className="experience-columns">

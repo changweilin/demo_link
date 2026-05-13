@@ -6,7 +6,6 @@ import {
   Linkedin,
   Mail,
   MapPin,
-  Pencil,
 } from "lucide-react";
 import resumeData from "./data/resume.json";
 import "./cakeResume.css";
@@ -14,7 +13,6 @@ import type { ResumeBullet, ResumeData, ResumeLink, ResumeLinkIcon, SkillColumn,
 
 type CakeResumePageProps = {
   onBackHome: () => void;
-  onOpenEditor: () => void;
 };
 
 const resume = resumeData as ResumeData;
@@ -34,7 +32,7 @@ function getLinkIcon(icon: ResumeLinkIcon) {
   return <ExternalLink {...iconProps} />;
 }
 
-function CakeResumePage({ onBackHome, onOpenEditor }: CakeResumePageProps) {
+function CakeResumePage({ onBackHome }: CakeResumePageProps) {
   const handlePrint = () => {
     window.print();
   };
@@ -51,10 +49,6 @@ function CakeResumePage({ onBackHome, onOpenEditor }: CakeResumePageProps) {
           <h1>{resume.meta.title}</h1>
         </div>
         <div className="cake-clone-actions">
-          <button className="cake-clone-editor-action" type="button" onClick={onOpenEditor}>
-            編輯履歷
-            <Pencil size={18} aria-hidden="true" />
-          </button>
           <button type="button" onClick={handlePrint}>
             輸出 PDF
             <Download size={18} aria-hidden="true" />
