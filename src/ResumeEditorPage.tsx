@@ -1065,8 +1065,11 @@ function PlatformSyncPanel({
           {isExpanded ? <ChevronDown size={18} aria-hidden="true" /> : <ChevronRight size={18} aria-hidden="true" />}
           {isExpanded ? "收合平台同步" : "展開平台同步"}
         </button>
-        {isExpanded ? (
-          <>
+      </div>
+
+      {isExpanded ? (
+        <>
+          <div className="editor-local-actions platform-sync-command-row">
             <button className="editor-primary-action" type="button" disabled={isSaving} onClick={onPushAll}>
               <CloudUpload size={18} aria-hidden="true" />
               {syncBridgeEndpoint ? "同步到平台" : "產生同步包"}
@@ -1083,12 +1086,9 @@ function PlatformSyncPanel({
               <RotateCcw size={18} aria-hidden="true" />
               清除手動覆寫
             </button>
-          </>
-        ) : null}
-      </div>
+          </div>
 
-      {isExpanded ? (
-        <div className="platform-sync-body" id="platform-sync-body">
+          <div className="platform-sync-body" id="platform-sync-body">
           <PlatformAuthPanel
             authEndpoint={authEndpoint}
             packages={packages}
@@ -1178,7 +1178,8 @@ function PlatformSyncPanel({
               })}
             </div>
           </div>
-        </div>
+          </div>
+        </>
       ) : null}
 
       <StatusMessage status={status} />

@@ -149,6 +149,11 @@
   align-self: start;
 }
 
+.platform-sync-command-row {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
 .platform-sync-toggle {
   white-space: nowrap;
 }
