@@ -109,7 +109,9 @@ npm run track:github-updates
 
 同步面板內每個平台區塊都可手動編輯，也可直接按 `複製區塊` 把該區塊內容放進剪貼簿。手動覆寫只影響同步包、複製內容與下載 JSON，不會反向修改主履歷草稿；可用 `還原來源` 或 `清除手動覆寫` 回到履歷來源自動產生的內容。
 
-若 `.env` 設定 `VITE_RESUME_SYNC_ENDPOINT`，按下編輯器的同步按鈕會將全平台 JSON `POST` 到該 endpoint，由後端負責 OAuth、API 憑證與平台寫回。未設定 endpoint 時，同步按鈕會改為複製全平台 JSON，適合貼到後端流程或平台履歷編輯頁。
+同步面板上方的 `平台登入` 區塊會直接進入各平台登入流程：LinkedIn 使用 OAuth / OpenID Connect callback；104 與 Cake 目前先開啟官方登入頁，因為兩者沒有公開的個人履歷 OAuth 文件可直接接入。登入狀態由本機 auth API 管理，不會把 token 暴露到前端。
+
+若 `.env` 設定 `VITE_RESUME_SYNC_ENDPOINT`，按下編輯器的同步按鈕會將全平台 JSON `POST` 到該 endpoint。未設定 endpoint 時，同步按鈕會改為複製全平台 JSON，適合貼到後端流程或平台履歷編輯頁。
 
 站內完整版履歷會優先讀取同一份本機草稿；在編輯器修改後點擊 `查看履歷`，可直接預覽最新 Cake 版履歷。
 
@@ -117,12 +119,17 @@ npm run track:github-updates
 
 ```env
 VITE_RESUME_SYNC_ENDPOINT=/api/resume-sync
+VITE_RESUME_AUTH_ENDPOINT=/api/resume-platform-auth
 VITE_RESUME_SYNC_104_URL=https://pda.104.com.tw/profile
 VITE_RESUME_SYNC_LINKEDIN_URL=https://www.linkedin.com/in/your-id/
 VITE_RESUME_SYNC_CAKE_URL=https://www.cake.me/resumes/your-resume
+RESUME_AUTH_BASE_URL=http://127.0.0.1:43177
+RESUME_AUTH_LINKEDIN_CLIENT_ID=
+RESUME_AUTH_LINKEDIN_CLIENT_SECRET=
+RESUME_AUTH_LINKEDIN_SCOPE=openid profile email
 ```
 
-啟動前端即可同時啟動履歷編輯器與本機同步 API：
+啟動前端即可同時啟動履歷編輯器、本機同步 API 與本機登入 API：
 
 ```bash
 npm run dev
@@ -150,7 +157,7 @@ C:\tmp\resume-platform-sync\sync-report.json
 
 同步面板會提供每個平台的 `開啟履歷頁` 連結與每個區塊的 `複製區塊` 按鈕；`sync-report.md` 會列出每個平台目前的同步狀態、目標網址、區塊對應與下一步。三個平台目前都是 manual-assist，不會自動寫回外部平台。
 
-同步 API 目前整合在同一個 Vite 本機服務裡；實際寫回 104 / LinkedIn / Cake 的 OAuth token、API key 與平台呼叫應留在本機 middleware 或獨立後端內，不要放進前端 `.env.local`。要改後端報告使用的目標履歷網址時可設定：
+同步 API 與登入 API 目前整合在同一個 Vite 本機服務裡；LinkedIn token 會保存在 `RESUME_AUTH_STATE_FILE` 指定的本機檔案，104 / Cake 則只紀錄外部登入頁已開啟。要改後端報告使用的目標履歷網址時可設定：
 
 ```powershell
 $env:RESUME_SYNC_104_URL="https://pda.104.com.tw/profile"
@@ -158,6 +165,14 @@ $env:RESUME_SYNC_LINKEDIN_URL="https://www.linkedin.com/in/your-id/"
 $env:RESUME_SYNC_CAKE_URL="https://www.cake.me/resumes/your-resume"
 npm.cmd run dev
 ```
+
+LinkedIn OAuth callback 預設為：
+
+```text
+http://127.0.0.1:43177/api/resume-platform-auth/linkedin/callback
+```
+
+請在 LinkedIn Developer App 內加入同一個 redirect URL，並把 `RESUME_AUTH_LINKEDIN_CLIENT_ID`、`RESUME_AUTH_LINKEDIN_CLIENT_SECRET` 放在本機 `.env.local` 或啟動 shell 環境；不要使用 `VITE_` 前綴保存 secret。
 
 ## 資料維護
 

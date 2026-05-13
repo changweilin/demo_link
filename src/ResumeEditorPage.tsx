@@ -7,7 +7,9 @@ import {
   ExternalLink,
   FileJson,
   Link2,
+  LogIn,
   Plus,
+  RefreshCw,
   RotateCcw,
   ShieldCheck,
   Trash2,
@@ -41,6 +43,29 @@ type SavePhase = "idle" | "loading" | "saving" | "success" | "error";
 type AsyncStatus = {
   phase: SavePhase;
   message: string;
+};
+
+type PlatformAuthProfile = {
+  email?: string;
+  name?: string;
+  picture?: string;
+};
+
+type PlatformAuthState = {
+  connectedAt?: string;
+  expiresAt?: string;
+  message: string;
+  mode: "oauth" | "external-login";
+  platform: ResumeSyncPlatformId;
+  platformLabel: string;
+  profile?: PlatformAuthProfile;
+  status: "connected" | "error" | "external_login" | "external_login_started" | "not_configured" | "ready";
+};
+
+type PlatformAuthStatus = {
+  phase: SavePhase;
+  message: string;
+  platforms: PlatformAuthState[];
 };
 
 type EditorInitialState = {
@@ -120,6 +145,40 @@ function getPlatformResumeUrls(draft: ResumeData): Record<ResumeSyncPlatformId, 
       defaultPlatformResumeUrls.linkedin,
     cake: import.meta.env.VITE_RESUME_SYNC_CAKE_URL?.trim() || cakeUrl || defaultPlatformResumeUrls.cake,
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isResumeSyncPlatformId(value: unknown): value is ResumeSyncPlatformId {
+  return value === "104" || value === "linkedin" || value === "cake";
+}
+
+function isPlatformAuthState(value: unknown): value is PlatformAuthState {
+  if (!isRecord(value)) return false;
+  if (!isResumeSyncPlatformId(value.platform)) return false;
+
+  return (
+    typeof value.platformLabel === "string" &&
+    (value.mode === "oauth" || value.mode === "external-login") &&
+    typeof value.status === "string" &&
+    typeof value.message === "string"
+  );
+}
+
+function getPlatformAuthStates(value: unknown) {
+  if (!isRecord(value) || !Array.isArray(value.platforms)) return [];
+  return value.platforms.filter(isPlatformAuthState);
+}
+
+function getPlatformAuthStartUrl(authEndpoint: string, platform: ResumeSyncPlatformId) {
+  const path = `${authEndpoint.replace(/\/+$/, "")}/${platform}/start`;
+  if (typeof window === "undefined") return path;
+
+  const url = new URL(path, window.location.origin);
+  url.searchParams.set("returnTo", `${window.location.pathname}${window.location.search}#resume-editor`);
+  return url.toString();
 }
 
 function replaceAt<T>(items: T[], index: number, nextItem: T) {
@@ -438,10 +497,16 @@ function ResumeEditorPage({
   const [draft, setDraft] = useState<ResumeData>(() => initialState.draft);
   const [status, setStatus] = useState<AsyncStatus>(() => initialState.status);
   const [platformSyncStatus, setPlatformSyncStatus] = useState<AsyncStatus>({ phase: "idle", message: "" });
+  const [platformAuthStatus, setPlatformAuthStatus] = useState<PlatformAuthStatus>({
+    phase: "idle",
+    message: "",
+    platforms: [],
+  });
   const [selectedPlatformId, setSelectedPlatformId] = useState<ResumeSyncPlatformId>("104");
   const [manualSyncTexts, setManualSyncTexts] = useState<ManualSyncTexts>(getInitialManualSyncTexts);
   const [lastSyncDraftAt, setLastSyncDraftAt] = useState(() => new Date().toISOString());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const platformAuthEndpoint = import.meta.env.VITE_RESUME_AUTH_ENDPOINT?.trim() || "/api/resume-platform-auth";
   const syncBridgeEndpoint = import.meta.env.VITE_RESUME_SYNC_ENDPOINT?.trim();
   const platformResumeUrls = useMemo(() => getPlatformResumeUrls(draft), [draft]);
   const baseSyncPackages = useMemo(
@@ -485,6 +550,60 @@ function ResumeEditorPage({
       setPlatformSyncStatus({ phase: "error", message: "無法儲存同步面板手動覆寫，請先同步或下載備份。" });
     }
   }, [manualSyncTexts]);
+
+  useEffect(() => {
+    const refreshPlatformAuthStatus = async () => {
+      setPlatformAuthStatus((current) => ({ ...current, phase: "loading", message: "正在讀取平台登入狀態。" }));
+
+      try {
+        const response = await fetch(platformAuthEndpoint);
+        const payload = (await response.json()) as unknown;
+
+        if (!response.ok) {
+          throw new Error(isRecord(payload) && typeof payload.message === "string" ? payload.message : `登入 API 回應 ${response.status}`);
+        }
+
+        setPlatformAuthStatus({
+          phase: "success",
+          message: "已更新平台登入狀態。",
+          platforms: getPlatformAuthStates(payload),
+        });
+      } catch (error) {
+        setPlatformAuthStatus((current) => ({
+          ...current,
+          phase: "error",
+          message: error instanceof Error ? error.message : "無法讀取平台登入狀態。",
+        }));
+      }
+    };
+
+    void refreshPlatformAuthStatus();
+  }, [platformAuthEndpoint]);
+
+  const refreshPlatformAuthStatus = async () => {
+    setPlatformAuthStatus((current) => ({ ...current, phase: "loading", message: "正在讀取平台登入狀態。" }));
+
+    try {
+      const response = await fetch(platformAuthEndpoint);
+      const payload = (await response.json()) as unknown;
+
+      if (!response.ok) {
+        throw new Error(isRecord(payload) && typeof payload.message === "string" ? payload.message : `登入 API 回應 ${response.status}`);
+      }
+
+      setPlatformAuthStatus({
+        phase: "success",
+        message: "已更新平台登入狀態。",
+        platforms: getPlatformAuthStates(payload),
+      });
+    } catch (error) {
+      setPlatformAuthStatus((current) => ({
+        ...current,
+        phase: "error",
+        message: error instanceof Error ? error.message : "無法讀取平台登入狀態。",
+      }));
+    }
+  };
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -792,6 +911,8 @@ function ResumeEditorPage({
         </section>
 
         <PlatformSyncPanel
+          authEndpoint={platformAuthEndpoint}
+          authStatus={platformAuthStatus}
           manualSyncTexts={manualSyncTexts}
           platformResumeUrls={platformResumeUrls}
           packages={syncPackages}
@@ -803,6 +924,7 @@ function ResumeEditorPage({
           onDownloadAll={handleDownloadPlatformSync}
           onPlatformChange={setSelectedPlatformId}
           onPushAll={handlePushPlatformSync}
+          onRefreshAuthStatus={refreshPlatformAuthStatus}
           onResetAllManualTexts={resetAllManualSyncTexts}
           onResetSectionText={resetManualSyncText}
           onUpdateSectionText={updateManualSyncText}
@@ -863,12 +985,15 @@ function StatusMessage({ status }: { status: AsyncStatus }) {
 }
 
 function PlatformSyncPanel({
+  authEndpoint,
+  authStatus,
   manualSyncTexts,
   onCopySelected,
   onCopySection,
   onDownloadAll,
   onPlatformChange,
   onPushAll,
+  onRefreshAuthStatus,
   onResetAllManualTexts,
   onResetSectionText,
   onUpdateSectionText,
@@ -878,12 +1003,15 @@ function PlatformSyncPanel({
   status,
   syncBridgeEndpoint,
 }: {
+  authEndpoint: string;
+  authStatus: PlatformAuthStatus;
   manualSyncTexts: ManualSyncTexts;
   onCopySelected: () => void;
   onCopySection: (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey) => void;
   onDownloadAll: () => void;
   onPlatformChange: (platformId: ResumeSyncPlatformId) => void;
   onPushAll: () => void;
+  onRefreshAuthStatus: () => void;
   onResetAllManualTexts: () => void;
   onResetSectionText: (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey) => void;
   onUpdateSectionText: (platform: ResumeSyncPlatformId, section: ResumeSyncSectionKey, value: string) => void;
@@ -940,6 +1068,13 @@ function PlatformSyncPanel({
       </div>
 
       <div className="platform-sync-body">
+        <PlatformAuthPanel
+          authEndpoint={authEndpoint}
+          packages={packages}
+          status={authStatus}
+          onRefresh={onRefreshAuthStatus}
+        />
+
         <div className="platform-tab-list" role="tablist" aria-label="同步平台">
           {packages.map((syncPackage) => (
             <button
@@ -1025,6 +1160,84 @@ function PlatformSyncPanel({
       </div>
 
       <StatusMessage status={status} />
+    </section>
+  );
+}
+
+function getPlatformAuthLabel(authState?: PlatformAuthState) {
+  if (!authState) return "未知";
+
+  if (authState.status === "connected") return "已登入";
+  if (authState.status === "ready") return "可登入";
+  if (authState.status === "not_configured") return "待設定";
+  if (authState.status === "external_login_started") return "已開啟";
+  if (authState.status === "error") return "登入失敗";
+  return "外部登入";
+}
+
+function getPlatformAuthActionLabel(authState?: PlatformAuthState) {
+  if (authState?.mode === "oauth") return authState.status === "connected" ? "重新登入" : "登入";
+  return authState?.status === "external_login_started" ? "重新開啟" : "開啟登入";
+}
+
+function getPlatformAuthDetail(authState?: PlatformAuthState) {
+  const profileName = authState?.profile?.name?.trim();
+  const profileEmail = authState?.profile?.email?.trim();
+  const profileLabel = [profileName, profileEmail].filter(Boolean).join(" / ");
+
+  if (profileLabel) return profileLabel;
+  return authState?.message || "尚未讀取登入狀態。";
+}
+
+function PlatformAuthPanel({
+  authEndpoint,
+  onRefresh,
+  packages,
+  status,
+}: {
+  authEndpoint: string;
+  onRefresh: () => void;
+  packages: ResumePlatformSyncPackage[];
+  status: PlatformAuthStatus;
+}) {
+  const authStateByPlatform = new Map(status.platforms.map((authState) => [authState.platform, authState]));
+  const isLoading = status.phase === "loading";
+
+  return (
+    <section className="platform-auth-panel" aria-label="平台登入">
+      <div className="platform-auth-heading">
+        <div>
+          <strong>平台登入</strong>
+          <span>LinkedIn 使用 OAuth；104 / Cake 先開啟官方登入頁銜接帳號。</span>
+        </div>
+        <button className="editor-small-action" type="button" disabled={isLoading} onClick={onRefresh}>
+          <RefreshCw size={15} aria-hidden="true" />
+          刷新
+        </button>
+      </div>
+
+      <div className="platform-auth-grid">
+        {packages.map((syncPackage) => {
+          const authState = authStateByPlatform.get(syncPackage.platform);
+          const startUrl = getPlatformAuthStartUrl(authEndpoint, syncPackage.platform);
+
+          return (
+            <article className={`platform-auth-card ${authState?.status ?? "unknown"}`} key={syncPackage.platform}>
+              <div className="platform-auth-card-title">
+                <span>{syncPackage.platformLabel}</span>
+                <small>{getPlatformAuthLabel(authState)}</small>
+              </div>
+              <p>{getPlatformAuthDetail(authState)}</p>
+              <a className="editor-small-action" href={startUrl} rel="noreferrer" target="_blank">
+                <LogIn size={15} aria-hidden="true" />
+                {getPlatformAuthActionLabel(authState)}
+              </a>
+            </article>
+          );
+        })}
+      </div>
+
+      {status.phase === "error" ? <StatusMessage status={status} /> : null}
     </section>
   );
 }

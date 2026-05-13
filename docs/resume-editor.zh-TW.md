@@ -56,8 +56,11 @@ npm run dev
 
 同步面板的每個平台區塊都可直接手動編輯，也可按 `複製區塊` 把該區塊內容放進剪貼簿。手動覆寫會保存於本機，只影響同步包、複製內容與下載 JSON；不會反向改動主履歷草稿。需要回到履歷來源內容時，可按單一區塊的 `還原來源` 或整體的 `清除手動覆寫`。
 
+同步面板上方的 `平台登入` 區塊會直接進入各平台登入流程：LinkedIn 使用 OAuth / OpenID Connect callback；104 與 Cake 目前先開啟官方登入頁，因為兩者沒有公開的個人履歷 OAuth 文件可直接接入。登入狀態由本機 auth API 管理，不會把 token 暴露到前端。
+
 同步面板提供下列操作：
 
+- `平台登入`：進入 LinkedIn OAuth，或開啟 104 / Cake 官方登入頁。
 - `同步到平台`：若 `.env` 設定 `VITE_RESUME_SYNC_ENDPOINT`，會把全平台 JSON `POST` 到該 endpoint。
 - `產生同步包`：未設定 endpoint 時，同一顆按鈕會改為複製全平台 JSON。
 - `複製區塊`：直接複製目前平台某一個對應區塊。
@@ -70,12 +73,17 @@ npm run dev
 
 ```env
 VITE_RESUME_SYNC_ENDPOINT=/api/resume-sync
+VITE_RESUME_AUTH_ENDPOINT=/api/resume-platform-auth
 VITE_RESUME_SYNC_104_URL=https://pda.104.com.tw/profile
 VITE_RESUME_SYNC_LINKEDIN_URL=https://www.linkedin.com/in/your-id/
 VITE_RESUME_SYNC_CAKE_URL=https://www.cake.me/resumes/your-resume
+RESUME_AUTH_BASE_URL=http://127.0.0.1:43177
+RESUME_AUTH_LINKEDIN_CLIENT_ID=
+RESUME_AUTH_LINKEDIN_CLIENT_SECRET=
+RESUME_AUTH_LINKEDIN_SCOPE=openid profile email
 ```
 
-啟動前端即可同時啟動履歷編輯器與同步 API：
+啟動前端即可同時啟動履歷編輯器、同步 API 與登入 API：
 
 ```bash
 npm run dev
@@ -120,6 +128,14 @@ $env:RESUME_SYNC_LINKEDIN_URL="https://www.linkedin.com/in/your-id/"
 $env:RESUME_SYNC_CAKE_URL="https://www.cake.me/resumes/your-resume"
 npm.cmd run dev
 ```
+
+LinkedIn OAuth callback 預設為：
+
+```text
+http://127.0.0.1:43177/api/resume-platform-auth/linkedin/callback
+```
+
+請在 LinkedIn Developer App 內加入同一個 redirect URL，並把 `RESUME_AUTH_LINKEDIN_CLIENT_ID`、`RESUME_AUTH_LINKEDIN_CLIENT_SECRET` 放在本機 `.env.local` 或啟動 shell 環境；不要使用 `VITE_` 前綴保存 secret。LinkedIn token 會保存在 `RESUME_AUTH_STATE_FILE` 指定的本機檔案；104 / Cake 只紀錄外部登入頁已開啟。
 
 ## 更新專案內建履歷
 
