@@ -1,6 +1,8 @@
 import {
   AlertTriangle,
   ArrowLeft,
+  ChevronDown,
+  ChevronRight,
   ClipboardCopy,
   CloudUpload,
   Download,
@@ -1021,13 +1023,17 @@ function PlatformSyncPanel({
   status: AsyncStatus;
   syncBridgeEndpoint?: string;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const selectedPackage = packages.find((syncPackage) => syncPackage.platform === selectedPlatformId) ?? packages[0];
   const selectedPlatformResumeUrl = platformResumeUrls[selectedPackage.platform];
   const isSaving = status.phase === "saving";
   const hasManualSyncText = Object.keys(manualSyncTexts).length > 0;
 
   return (
-    <section className="editor-local-panel platform-sync-panel" aria-label="104 LinkedIn Cake 履歷同步">
+    <section
+      className={`editor-local-panel platform-sync-panel${isExpanded ? " expanded" : " collapsed"}`}
+      aria-label="104 LinkedIn Cake 履歷同步"
+    >
       <div className="editor-local-copy">
         <span className="editor-local-badge sync">
           <Link2 size={18} aria-hidden="true" />
@@ -1048,116 +1054,132 @@ function PlatformSyncPanel({
           )}
         </p>
       </div>
-      <div className="editor-local-actions">
-        <button className="editor-primary-action" type="button" disabled={isSaving} onClick={onPushAll}>
-          <CloudUpload size={18} aria-hidden="true" />
-          {syncBridgeEndpoint ? "同步到平台" : "產生同步包"}
+      <div className="editor-local-actions platform-sync-actions">
+        <button
+          className="editor-secondary-action platform-sync-toggle"
+          type="button"
+          aria-expanded={isExpanded}
+          aria-controls="platform-sync-body"
+          onClick={() => setIsExpanded((expanded) => !expanded)}
+        >
+          {isExpanded ? <ChevronDown size={18} aria-hidden="true" /> : <ChevronRight size={18} aria-hidden="true" />}
+          {isExpanded ? "收合平台同步" : "展開平台同步"}
         </button>
-        <button className="editor-secondary-action" type="button" onClick={onCopySelected}>
-          <ClipboardCopy size={18} aria-hidden="true" />
-          複製目前平台
-        </button>
-        <button className="editor-secondary-action" type="button" onClick={onDownloadAll}>
-          <Download size={18} aria-hidden="true" />
-          下載全平台 JSON
-        </button>
-        <button className="editor-secondary-action" type="button" disabled={!hasManualSyncText} onClick={onResetAllManualTexts}>
-          <RotateCcw size={18} aria-hidden="true" />
-          清除手動覆寫
-        </button>
-      </div>
-
-      <div className="platform-sync-body">
-        <PlatformAuthPanel
-          authEndpoint={authEndpoint}
-          packages={packages}
-          status={authStatus}
-          onRefresh={onRefreshAuthStatus}
-        />
-
-        <div className="platform-tab-list" role="tablist" aria-label="同步平台">
-          {packages.map((syncPackage) => (
-            <button
-              className={syncPackage.platform === selectedPlatformId ? "active" : ""}
-              type="button"
-              role="tab"
-              aria-selected={syncPackage.platform === selectedPlatformId}
-              key={syncPackage.platform}
-              onClick={() => onPlatformChange(syncPackage.platform)}
-            >
-              {syncPackage.platformLabel}
+        {isExpanded ? (
+          <>
+            <button className="editor-primary-action" type="button" disabled={isSaving} onClick={onPushAll}>
+              <CloudUpload size={18} aria-hidden="true" />
+              {syncBridgeEndpoint ? "同步到平台" : "產生同步包"}
             </button>
-          ))}
-        </div>
-
-        <div className="platform-sync-summary">
-          <div className="platform-sync-heading">
-            <div className="platform-sync-title">
-              <strong>{selectedPackage.platformLabel}</strong>
-              <span>{selectedPackage.description}</span>
-            </div>
-            <a className="platform-resume-link" href={selectedPlatformResumeUrl} rel="noreferrer" target="_blank">
-              開啟履歷頁
-              <ExternalLink size={15} aria-hidden="true" />
-            </a>
-          </div>
-          <div className="sync-section-map">
-            {selectedPackage.sections.map((section) => {
-              const manualKey = getManualSyncTextKey(selectedPackage.platform, section.key);
-              const isManual = manualSyncTexts[manualKey] !== undefined;
-              const syncText = getResumeSyncSectionText(section);
-
-              return (
-                <article
-                  className={`sync-section-row${isManual ? " manual" : ""}`}
-                  key={`${selectedPackage.platform}-${section.key}`}
-                >
-                  <div className="sync-section-source">
-                    <span>{section.sourceLabel}</span>
-                    <small>{section.sourcePath}</small>
-                  </div>
-                  <strong aria-hidden="true">→</strong>
-                  <div className="sync-section-target">
-                    <span>{section.targetLabel}</span>
-                    <small>{section.itemCount} 項</small>
-                  </div>
-                  <label className="sync-section-editor">
-                    <span>{isManual ? "手動同步內容" : "同步內容"}</span>
-                    <textarea
-                      className="sync-section-textarea"
-                      rows={Math.max(4, Math.min(12, syncText.split(/\r?\n/).length + 1))}
-                      value={syncText}
-                      onChange={(event) => onUpdateSectionText(selectedPackage.platform, section.key, event.target.value)}
-                    />
-                  </label>
-                  <div className="sync-section-actions">
-                    <small className={isManual ? "manual" : ""}>
-                      {isManual ? "使用手動覆寫，會出現在複製、下載與同步資料包。" : "目前使用履歷來源自動產生內容。"}
-                    </small>
-                    <button
-                      className="editor-small-action"
-                      type="button"
-                      onClick={() => onCopySection(selectedPackage.platform, section.key)}
-                    >
-                      <ClipboardCopy size={15} aria-hidden="true" />
-                      複製區塊
-                    </button>
-                    <button
-                      className="editor-small-action"
-                      type="button"
-                      disabled={!isManual}
-                      onClick={() => onResetSectionText(selectedPackage.platform, section.key)}
-                    >
-                      <RotateCcw size={15} aria-hidden="true" />
-                      還原來源
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
+            <button className="editor-secondary-action" type="button" onClick={onCopySelected}>
+              <ClipboardCopy size={18} aria-hidden="true" />
+              複製目前平台
+            </button>
+            <button className="editor-secondary-action" type="button" onClick={onDownloadAll}>
+              <Download size={18} aria-hidden="true" />
+              下載全平台 JSON
+            </button>
+            <button className="editor-secondary-action" type="button" disabled={!hasManualSyncText} onClick={onResetAllManualTexts}>
+              <RotateCcw size={18} aria-hidden="true" />
+              清除手動覆寫
+            </button>
+          </>
+        ) : null}
       </div>
+
+      {isExpanded ? (
+        <div className="platform-sync-body" id="platform-sync-body">
+          <PlatformAuthPanel
+            authEndpoint={authEndpoint}
+            packages={packages}
+            status={authStatus}
+            onRefresh={onRefreshAuthStatus}
+          />
+
+          <div className="platform-tab-list" role="tablist" aria-label="同步平台">
+            {packages.map((syncPackage) => (
+              <button
+                className={syncPackage.platform === selectedPlatformId ? "active" : ""}
+                type="button"
+                role="tab"
+                aria-selected={syncPackage.platform === selectedPlatformId}
+                key={syncPackage.platform}
+                onClick={() => onPlatformChange(syncPackage.platform)}
+              >
+                {syncPackage.platformLabel}
+              </button>
+            ))}
+          </div>
+
+          <div className="platform-sync-summary">
+            <div className="platform-sync-heading">
+              <div className="platform-sync-title">
+                <strong>{selectedPackage.platformLabel}</strong>
+                <span>{selectedPackage.description}</span>
+              </div>
+              <a className="platform-resume-link" href={selectedPlatformResumeUrl} rel="noreferrer" target="_blank">
+                開啟履歷頁
+                <ExternalLink size={15} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="sync-section-map">
+              {selectedPackage.sections.map((section) => {
+                const manualKey = getManualSyncTextKey(selectedPackage.platform, section.key);
+                const isManual = manualSyncTexts[manualKey] !== undefined;
+                const syncText = getResumeSyncSectionText(section);
+
+                return (
+                  <article
+                    className={`sync-section-row${isManual ? " manual" : ""}`}
+                    key={`${selectedPackage.platform}-${section.key}`}
+                  >
+                    <div className="sync-section-source">
+                      <span>{section.sourceLabel}</span>
+                      <small>{section.sourcePath}</small>
+                    </div>
+                    <strong aria-hidden="true">→</strong>
+                    <div className="sync-section-target">
+                      <span>{section.targetLabel}</span>
+                      <small>{section.itemCount} 項</small>
+                    </div>
+                    <label className="sync-section-editor">
+                      <span>{isManual ? "手動同步內容" : "同步內容"}</span>
+                      <textarea
+                        className="sync-section-textarea"
+                        rows={Math.max(4, Math.min(12, syncText.split(/\r?\n/).length + 1))}
+                        value={syncText}
+                        onChange={(event) => onUpdateSectionText(selectedPackage.platform, section.key, event.target.value)}
+                      />
+                    </label>
+                    <div className="sync-section-actions">
+                      <small className={isManual ? "manual" : ""}>
+                        {isManual ? "使用手動覆寫，會出現在複製、下載與同步資料包。" : "目前使用履歷來源自動產生內容。"}
+                      </small>
+                      <button
+                        className="editor-small-action"
+                        type="button"
+                        onClick={() => onCopySection(selectedPackage.platform, section.key)}
+                      >
+                        <ClipboardCopy size={15} aria-hidden="true" />
+                        複製區塊
+                      </button>
+                      <button
+                        className="editor-small-action"
+                        type="button"
+                        disabled={!isManual}
+                        onClick={() => onResetSectionText(selectedPackage.platform, section.key)}
+                      >
+                        <RotateCcw size={15} aria-hidden="true" />
+                        還原來源
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <StatusMessage status={status} />
     </section>

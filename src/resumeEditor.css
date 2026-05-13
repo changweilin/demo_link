@@ -141,6 +141,18 @@
   grid-column: 1 / -1;
 }
 
+.platform-sync-panel.collapsed {
+  align-items: center;
+}
+
+.platform-sync-actions {
+  align-self: start;
+}
+
+.platform-sync-toggle {
+  white-space: nowrap;
+}
+
 .sync-endpoint {
   margin-top: 8px;
   font-size: 0.9rem;
