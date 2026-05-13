@@ -7,6 +7,7 @@
     "dev": "vite --config vite.config.ts",
     "build": "tsc --noEmit -p tsconfig.json && vite build --config vite.config.ts",
     "preview": "vite preview --config vite.config.ts",
+    "sync:readme-images": "node scripts/sync-readme-images.js",
     "track:github-updates": "node scripts/github-last-updated.js"
   },
   "dependencies": {

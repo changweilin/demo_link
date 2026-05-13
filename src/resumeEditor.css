@@ -46,7 +46,6 @@
 
 .resume-editor-toolbar-actions,
 .editor-local-actions,
-.bullet-editor-actions,
 .timeline-editor-heading,
 .editor-timeline-head,
 .editor-list-heading {
@@ -146,9 +145,7 @@
 }
 
 .editor-fields,
-.editor-stack,
-.editor-list,
-.bullet-editor-list {
+.editor-stack {
   display: grid;
   gap: 12px;
 }
@@ -172,9 +169,7 @@
 
 .editor-field input,
 .editor-field select,
-.editor-field textarea,
-.editor-list-row input,
-.editor-list-row textarea {
+.editor-field textarea {
   width: 100%;
   min-width: 0;
   border: 1px solid var(--line);
@@ -185,14 +180,12 @@
 }
 
 .editor-field input,
-.editor-field select,
-.editor-list-row input {
+.editor-field select {
   min-height: 42px;
   padding: 0 12px;
 }
 
-.editor-field textarea,
-.editor-list-row textarea {
+.editor-field textarea {
   min-height: 76px;
   padding: 10px 12px;
   line-height: 1.6;
@@ -205,16 +198,8 @@
   justify-content: space-between;
 }
 
-.editor-list-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 8px;
-}
-
 .editor-nested-card,
-.editor-timeline-card,
-.bullet-editor-item {
+.editor-timeline-card {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -246,19 +231,23 @@
   gap: 12px;
 }
 
-.bullet-editor-list {
-  padding-left: 16px;
-  border-left: 2px solid var(--line);
+.bullet-textarea-block,
+.indented-textarea-block {
+  gap: 8px;
 }
 
-.bullet-editor-item {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
+.bullet-textarea,
+.indented-textarea {
+  tab-size: 4;
+  min-height: 150px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
-.bullet-editor-item .bullet-editor-list {
-  margin-top: 2px;
+.bullet-indent-help,
+.indent-help {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .editor-primary-action,

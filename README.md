@@ -50,9 +50,9 @@ npm run dev
 主要入口：
 
 ```text
-http://localhost:5173/
-http://localhost:5173/#full-resume
-http://localhost:5173/#resume-editor
+http://localhost:43177/
+http://localhost:43177/#full-resume
+http://localhost:43177/#resume-editor
 ```
 
 `npm run dev` 會將 Vite 綁定到 `0.0.0.0`，同一個 Tailscale network 內的手機可以直接打開。先在電腦查 Tailscale IPv4：
@@ -64,10 +64,10 @@ tailscale ip -4
 再用手機開啟：
 
 ```text
-http://<your-tailscale-ip>:5173/
+http://<your-tailscale-ip>:43177/
 ```
 
-如果 5173 被占用，Vite 會在終端機顯示實際 port，手機改用該 port 即可。若手機無法連線，請確認手機與電腦都已連上 Tailscale，並允許 Windows 防火牆讓 Node.js / Vite 接受私人網路連線。
+如果 43177 被占用，Vite 會在終端機顯示實際 port，手機改用該 port 即可。若手機無法連線，請確認手機與電腦都已連上 Tailscale，並允許 Windows 防火牆讓 Node.js / Vite 接受私人網路連線。
 
 ## 常用指令
 
@@ -87,12 +87,14 @@ npm run track:github-updates
 
 履歷編輯器已改為本地端流程：
 
-1. 開啟 `http://localhost:5173/#resume-editor`。
+1. 開啟 `http://localhost:43177/#resume-editor`。
 2. 直接編輯履歷內容，不需要登入。
 3. 使用 `匯入 JSON` 載入本機 `resume.json`，或使用 `下載 JSON` 匯出目前草稿。
 4. 若要更新專案預設履歷，將匯出的內容放回 `src/data/resume.json` 後重新 build。
 
 草稿會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub，也不會觸發 GitHub Actions。
+自我介紹和技能都改為單一文字區；技能用不縮排的行表示分類，用 Tab 或四個半形空格表示分類下的技能項目。
+工作經歷與學歷的重點條列會自動把 Tab 或四個半形空格解析成子條列；連結條列可寫成 `[文字](https://example.com)`。
 
 ## 資料維護
 

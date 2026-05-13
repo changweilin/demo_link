@@ -10,7 +10,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
-import { type ChangeEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import resumeSeed from "./data/resume.json";
 import "./resumeEditor.css";
 import type { ResumeBullet, ResumeData, ResumeLinkIcon, TimelineItem } from "./types/resume";
@@ -58,37 +58,214 @@ function createEmptyTimelineItem(): TimelineItem {
   };
 }
 
-function updateBulletTree(
-  bullets: ResumeBullet[],
-  path: number[],
-  updater: (bullet: ResumeBullet) => ResumeBullet,
-): ResumeBullet[] {
-  const [targetIndex, ...restPath] = path;
+function getBulletLineContent(bullet: ResumeBullet) {
+  if (!bullet.href) return bullet.text;
+  return `[${bullet.text}](${bullet.href})`;
+}
 
-  return bullets.map((bullet, index) => {
-    if (index !== targetIndex) return bullet;
-    if (!restPath.length) return updater(bullet);
+function serializeBullets(bullets: ResumeBullet[], level = 0): string {
+  return bullets
+    .flatMap((bullet) => {
+      const currentLine = `${"\t".repeat(level)}${getBulletLineContent(bullet)}`;
+      const childLines = bullet.children?.length ? serializeBullets(bullet.children, level + 1).split("\n") : [];
 
-    return {
-      ...bullet,
-      children: updateBulletTree(bullet.children ?? [], restPath, updater),
-    };
+      return [currentLine, ...childLines];
+    })
+    .join("\n");
+}
+
+function getIndentedLineParts(line: string) {
+  let level = 0;
+  let index = 0;
+
+  while (index < line.length) {
+    if (line[index] === "\t") {
+      level += 1;
+      index += 1;
+      continue;
+    }
+
+    if (line.slice(index, index + 4) === "    ") {
+      level += 1;
+      index += 4;
+      continue;
+    }
+
+    break;
+  }
+
+  return {
+    content: line.slice(index).replace(/^[-*•]\s+/, "").trim(),
+    level,
+  };
+}
+
+function parseBulletContent(content: string): ResumeBullet {
+  const markdownLink = content.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+  if (!markdownLink) return { text: content };
+
+  return {
+    text: markdownLink[1].trim(),
+    href: markdownLink[2].trim(),
+  };
+}
+
+function parseIndentedBullets(value: string): ResumeBullet[] {
+  const roots: ResumeBullet[] = [];
+  const latestBulletByLevel: ResumeBullet[] = [];
+
+  value.split(/\r?\n/).forEach((line) => {
+    const { content, level: rawLevel } = getIndentedLineParts(line);
+    if (!content) return;
+
+    const level = Math.min(rawLevel, latestBulletByLevel.length);
+    const bullet = parseBulletContent(content);
+
+    if (level === 0) {
+      roots.push(bullet);
+    } else {
+      const parent = latestBulletByLevel[level - 1];
+      parent.children = [...(parent.children ?? []), bullet];
+    }
+
+    latestBulletByLevel[level] = bullet;
+    latestBulletByLevel.length = level + 1;
+  });
+
+  return roots;
+}
+
+function serializeStringItems(items: string[]) {
+  return items.join("\n");
+}
+
+function parseIndentedStringItems(value: string) {
+  return value
+    .split(/\r?\n/)
+    .map((line) => getIndentedLineParts(line).content)
+    .filter(Boolean);
+}
+
+function haveSameStringItems(left: string[], right: string[]) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function serializeSkills(skills: ResumeData["skills"]) {
+  return skills
+    .flatMap((skill) => [skill.title, ...skill.items.map((item) => `\t${item}`)])
+    .join("\n");
+}
+
+function parseIndentedSkills(value: string): ResumeData["skills"] {
+  const skills: ResumeData["skills"] = [];
+  let currentSkill: ResumeData["skills"][number] | null = null;
+
+  value.split(/\r?\n/).forEach((line) => {
+    const { content, level } = getIndentedLineParts(line);
+    if (!content) return;
+
+    if (level === 0) {
+      currentSkill = { title: content, items: [] };
+      skills.push(currentSkill);
+      return;
+    }
+
+    if (!currentSkill) {
+      currentSkill = { title: "未分類技能", items: [] };
+      skills.push(currentSkill);
+    }
+
+    currentSkill.items = [...currentSkill.items, content];
+  });
+
+  return skills;
+}
+
+function normalizeSkillsForComparison(skills: ResumeData["skills"]) {
+  return skills.map((skill) => ({
+    title: skill.title,
+    items: skill.items,
+  }));
+}
+
+function haveSameSkills(left: ResumeData["skills"], right: ResumeData["skills"]) {
+  return JSON.stringify(normalizeSkillsForComparison(left)) === JSON.stringify(normalizeSkillsForComparison(right));
+}
+
+function normalizeBulletsForComparison(bullets: ResumeBullet[]): ResumeBullet[] {
+  return bullets.map((bullet) => ({
+    text: bullet.text,
+    ...(bullet.href ? { href: bullet.href } : {}),
+    ...(bullet.children?.length ? { children: normalizeBulletsForComparison(bullet.children) } : {}),
+  }));
+}
+
+function haveSameBulletShape(left: ResumeBullet[], right: ResumeBullet[]) {
+  return JSON.stringify(normalizeBulletsForComparison(left)) === JSON.stringify(normalizeBulletsForComparison(right));
+}
+
+function outdentLine(line: string) {
+  if (line.startsWith("\t")) return line.slice(1);
+  if (line.startsWith("    ")) return line.slice(4);
+  return line;
+}
+
+function updateTextAreaSelection(textarea: HTMLTextAreaElement, start: number, end: number) {
+  window.requestAnimationFrame(() => {
+    textarea.selectionStart = start;
+    textarea.selectionEnd = end;
   });
 }
 
-function removeBulletFromTree(bullets: ResumeBullet[], path: number[]): ResumeBullet[] {
-  const [targetIndex, ...restPath] = path;
+function handleIndentedTextAreaKeyDown(
+  event: KeyboardEvent<HTMLTextAreaElement>,
+  value: string,
+  onChange: (value: string) => void,
+) {
+  if (event.key !== "Tab") return;
 
-  if (!restPath.length) return removeAt(bullets, targetIndex);
+  event.preventDefault();
 
-  return bullets.map((bullet, index) => {
-    if (index !== targetIndex) return bullet;
+  const textarea = event.currentTarget;
+  const { selectionStart, selectionEnd } = textarea;
+  const hasSelection = selectionStart !== selectionEnd;
 
-    return {
-      ...bullet,
-      children: removeBulletFromTree(bullet.children ?? [], restPath),
-    };
-  });
+  if (!hasSelection) {
+    const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+    const currentLine = value.slice(lineStart, selectionStart);
+
+    if (event.shiftKey) {
+      const outdentedLine = outdentLine(value.slice(lineStart, value.indexOf("\n", lineStart) === -1 ? value.length : value.indexOf("\n", lineStart)));
+      const lineEnd = value.indexOf("\n", lineStart) === -1 ? value.length : value.indexOf("\n", lineStart);
+      const removedLength = lineEnd - lineStart - outdentedLine.length;
+      const nextValue = `${value.slice(0, lineStart)}${outdentedLine}${value.slice(lineEnd)}`;
+      const nextCursor = selectionStart - Math.min(removedLength, currentLine.length);
+
+      onChange(nextValue);
+      updateTextAreaSelection(textarea, nextCursor, nextCursor);
+      return;
+    }
+
+    const nextValue = `${value.slice(0, selectionStart)}\t${value.slice(selectionEnd)}`;
+    const nextCursor = selectionStart + 1;
+
+    onChange(nextValue);
+    updateTextAreaSelection(textarea, nextCursor, nextCursor);
+    return;
+  }
+
+  const blockStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+  const blockEndCandidate = value.indexOf("\n", selectionEnd);
+  const blockEnd = blockEndCandidate === -1 ? value.length : blockEndCandidate;
+  const block = value.slice(blockStart, blockEnd);
+  const lines = block.split("\n");
+  const nextBlock = event.shiftKey ? lines.map(outdentLine).join("\n") : lines.map((line) => `\t${line}`).join("\n");
+  const nextValue = `${value.slice(0, blockStart)}${nextBlock}${value.slice(blockEnd)}`;
+  const firstLineDelta = nextBlock.split("\n")[0].length - lines[0].length;
+  const totalDelta = nextBlock.length - block.length;
+
+  onChange(nextValue);
+  updateTextAreaSelection(textarea, Math.max(blockStart, selectionStart + firstLineDelta), selectionEnd + totalDelta);
 }
 
 function isResumeData(value: unknown): value is ResumeData {
@@ -330,62 +507,13 @@ function ResumeEditorPage({
     }));
   };
 
-  const updateBullet = (
-    section: ResumeSectionKey,
-    itemIndex: number,
-    path: number[],
-    updater: (bullet: ResumeBullet) => ResumeBullet,
-  ) => {
+  const updateTimelineBullets = (section: ResumeSectionKey, itemIndex: number, bullets: ResumeBullet[]) => {
     setDraft((current) => {
       const items = current[section].map((item, index) =>
         index === itemIndex
           ? {
               ...item,
-              bullets: updateBulletTree(item.bullets, path, updater),
-            }
-          : item,
-      );
-
-      return {
-        ...current,
-        [section]: items,
-      };
-    });
-  };
-
-  const addBullet = (section: ResumeSectionKey, itemIndex: number, parentPath?: number[]) => {
-    if (!parentPath) {
-      setDraft((current) => {
-        const items = current[section].map((item, index) =>
-          index === itemIndex
-            ? {
-                ...item,
-                bullets: [...item.bullets, createEmptyBullet()],
-              }
-            : item,
-        );
-
-        return {
-          ...current,
-          [section]: items,
-        };
-      });
-      return;
-    }
-
-    updateBullet(section, itemIndex, parentPath, (bullet) => ({
-      ...bullet,
-      children: [...(bullet.children ?? []), createEmptyBullet()],
-    }));
-  };
-
-  const removeBullet = (section: ResumeSectionKey, itemIndex: number, path: number[]) => {
-    setDraft((current) => {
-      const items = current[section].map((item, index) =>
-        index === itemIndex
-          ? {
-              ...item,
-              bullets: removeBulletFromTree(item.bullets, path),
+              bullets,
             }
           : item,
       );
@@ -468,13 +596,7 @@ function ResumeEditorPage({
             <TextField label="姓名" value={draft.profile.name} onChange={(value) => updateProfile("name", value)} />
             <TextField label="角色" value={draft.profile.role} onChange={(value) => updateProfile("role", value)} />
             <TextField label="地點" value={draft.profile.location} onChange={(value) => updateProfile("location", value)} />
-            <StringListEditor
-              addLabel="新增自我介紹"
-              items={draft.profile.summary}
-              label="自我介紹"
-              multiline
-              onChange={updateProfileSummary}
-            />
+            <ProfileSummaryEditor items={draft.profile.summary} onChange={updateProfileSummary} />
             <ProfileLinkEditor links={draft.profile.links} onChange={updateProfileLinks} />
           </EditorCard>
 
@@ -487,9 +609,7 @@ function ResumeEditorPage({
           items={draft.workExperience}
           section="workExperience"
           title="工作經歷"
-          onAddBullet={addBullet}
-          onRemoveBullet={removeBullet}
-          onUpdateBullet={updateBullet}
+          onUpdateBullets={updateTimelineBullets}
           onUpdateField={updateTimelineField}
           onUpdateItems={updateTimelineItems}
         />
@@ -498,9 +618,7 @@ function ResumeEditorPage({
           items={draft.education}
           section="education"
           title="學歷"
-          onAddBullet={addBullet}
-          onRemoveBullet={removeBullet}
-          onUpdateBullet={updateBullet}
+          onUpdateBullets={updateTimelineBullets}
           onUpdateField={updateTimelineField}
           onUpdateItems={updateTimelineItems}
         />
@@ -548,73 +666,32 @@ function TextField({
   );
 }
 
-function TextAreaField({
-  label,
-  onChange,
-  placeholder,
-  rows = 3,
-  value,
-}: {
-  label: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  rows?: number;
-  value: string;
-}) {
-  return (
-    <label className="editor-field">
-      <span>{label}</span>
-      <textarea value={value} placeholder={placeholder} rows={rows} onChange={(event) => onChange(event.target.value)} />
-    </label>
-  );
-}
+function ProfileSummaryEditor({ items, onChange }: { items: string[]; onChange: (items: string[]) => void }) {
+  const [text, setText] = useState(() => serializeStringItems(items));
 
-function StringListEditor({
-  addLabel,
-  items,
-  label,
-  multiline = false,
-  onChange,
-}: {
-  addLabel: string;
-  items: string[];
-  label: string;
-  multiline?: boolean;
-  onChange: (items: string[]) => void;
-}) {
-  const updateItem = (index: number, value: string) => {
-    onChange(replaceAt(items, index, value));
+  useEffect(() => {
+    if (haveSameStringItems(parseIndentedStringItems(text), items)) return;
+    setText(serializeStringItems(items));
+  }, [items, text]);
+
+  const updateText = (nextText: string) => {
+    setText(nextText);
+    onChange(parseIndentedStringItems(nextText));
   };
 
   return (
-    <div className="editor-list-block">
-      <div className="editor-list-heading">
-        <span>{label}</span>
-        <button className="editor-small-action" type="button" onClick={() => onChange([...items, ""])}>
-          <Plus size={15} aria-hidden="true" />
-          {addLabel}
-        </button>
-      </div>
-      <div className="editor-list">
-        {items.map((item, index) => (
-          <div className="editor-list-row" key={`${label}-${index}`}>
-            {multiline ? (
-              <textarea value={item} rows={3} onChange={(event) => updateItem(index, event.target.value)} />
-            ) : (
-              <input value={item} onChange={(event) => updateItem(index, event.target.value)} />
-            )}
-            <button
-              className="editor-icon-action danger"
-              type="button"
-              aria-label={`移除${label}`}
-              onClick={() => onChange(removeAt(items, index))}
-            >
-              <Trash2 size={16} aria-hidden="true" />
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+    <label className="editor-field indented-textarea-block">
+      <span>自我介紹</span>
+      <textarea
+        className="indented-textarea"
+        rows={Math.max(5, text.split("\n").length + 1)}
+        value={text}
+        placeholder="每行一段自我介紹"
+        onChange={(event) => updateText(event.target.value)}
+        onKeyDown={(event) => handleIndentedTextAreaKeyDown(event, text, updateText)}
+      />
+      <small className="indent-help">每行會轉成一個自我介紹項目；Tab / Shift+Tab 可調整縮排。</small>
+    </label>
   );
 }
 
@@ -679,60 +756,50 @@ function SkillsEditor({
   onChange: (skills: ResumeData["skills"]) => void;
   skills: ResumeData["skills"];
 }) {
-  const updateSkill = (index: number, nextSkill: ResumeData["skills"][number]) => {
-    onChange(replaceAt(skills, index, nextSkill));
+  const [text, setText] = useState(() => serializeSkills(skills));
+
+  useEffect(() => {
+    if (haveSameSkills(parseIndentedSkills(text), skills)) return;
+    setText(serializeSkills(skills));
+  }, [skills, text]);
+
+  const updateText = (nextText: string) => {
+    setText(nextText);
+    onChange(parseIndentedSkills(nextText));
   };
 
   return (
-    <div className="editor-stack">
-      {skills.map((skill, index) => (
-        <article className="editor-nested-card" key={`${skill.title}-${index}`}>
-          <TextField label="技能分類" value={skill.title} onChange={(value) => updateSkill(index, { ...skill, title: value })} />
-          <StringListEditor
-            addLabel="新增技能"
-            items={skill.items}
-            label="技能項目"
-            onChange={(items) => updateSkill(index, { ...skill, items })}
-          />
-          <button className="editor-small-action danger" type="button" onClick={() => onChange(removeAt(skills, index))}>
-            <Trash2 size={15} aria-hidden="true" />
-            移除分類
-          </button>
-        </article>
-      ))}
-      <button className="editor-small-action" type="button" onClick={() => onChange([...skills, { items: [""], title: "新分類" }])}>
-        <Plus size={15} aria-hidden="true" />
-        新增技能分類
-      </button>
-    </div>
+    <label className="editor-field indented-textarea-block">
+      <span>技能分類與項目</span>
+      <textarea
+        className="indented-textarea"
+        rows={Math.max(8, text.split("\n").length + 1)}
+        value={text}
+        placeholder={"技能分類\n    技能項目\n    技能項目\n另一個分類"}
+        onChange={(event) => updateText(event.target.value)}
+        onKeyDown={(event) => handleIndentedTextAreaKeyDown(event, text, updateText)}
+      />
+      <small className="indent-help">不縮排的行是技能分類；Tab 或四個半形空格縮排的行會成為該分類下的技能項目。</small>
+    </label>
   );
 }
 
 function TimelineEditor({
   items,
-  onAddBullet,
-  onRemoveBullet,
-  onUpdateBullet,
   onUpdateField,
+  onUpdateBullets,
   onUpdateItems,
   section,
   title,
 }: {
   items: TimelineItem[];
-  onAddBullet: (section: ResumeSectionKey, itemIndex: number, parentPath?: number[]) => void;
-  onRemoveBullet: (section: ResumeSectionKey, itemIndex: number, path: number[]) => void;
-  onUpdateBullet: (
-    section: ResumeSectionKey,
-    itemIndex: number,
-    path: number[],
-    updater: (bullet: ResumeBullet) => ResumeBullet,
-  ) => void;
   onUpdateField: <K extends keyof TimelineItem>(
     section: ResumeSectionKey,
     index: number,
     field: K,
     value: TimelineItem[K],
   ) => void;
+  onUpdateBullets: (section: ResumeSectionKey, itemIndex: number, bullets: ResumeBullet[]) => void;
   onUpdateItems: (section: ResumeSectionKey, items: TimelineItem[]) => void;
   section: ResumeSectionKey;
   title: string;
@@ -763,18 +830,9 @@ function TimelineEditor({
               <TextField label="圖片替代文字" value={item.imageAlt} onChange={(value) => onUpdateField(section, index, "imageAlt", value)} />
               <TextField label="圖片連結" value={item.imageHref ?? ""} onChange={(value) => onUpdateField(section, index, "imageHref", value)} />
             </div>
-            <div className="editor-list-heading">
-              <span>重點條列</span>
-              <button className="editor-small-action" type="button" onClick={() => onAddBullet(section, index)}>
-                <Plus size={15} aria-hidden="true" />
-                新增條列
-              </button>
-            </div>
             <BulletListEditor
               bullets={item.bullets}
-              onAddChild={(path) => onAddBullet(section, index, path)}
-              onRemove={(path) => onRemoveBullet(section, index, path)}
-              onUpdate={(path, updater) => onUpdateBullet(section, index, path, updater)}
+              onChange={(bullets) => onUpdateBullets(section, index, bullets)}
             />
           </article>
         ))}
@@ -785,65 +843,36 @@ function TimelineEditor({
 
 function BulletListEditor({
   bullets,
-  onAddChild,
-  onRemove,
-  onUpdate,
-  pathPrefix = [],
+  onChange,
 }: {
   bullets: ResumeBullet[];
-  onAddChild: (path: number[]) => void;
-  onRemove: (path: number[]) => void;
-  onUpdate: (path: number[], updater: (bullet: ResumeBullet) => ResumeBullet) => void;
-  pathPrefix?: number[];
+  onChange: (bullets: ResumeBullet[]) => void;
 }) {
-  return (
-    <div className="bullet-editor-list">
-      {bullets.map((bullet, index) => {
-        const path = [...pathPrefix, index];
+  const [text, setText] = useState(() => serializeBullets(bullets));
 
-        return (
-          <div className="bullet-editor-item" key={path.join("-")}>
-            <TextAreaField
-              label="內容"
-              rows={2}
-              value={bullet.text}
-              onChange={(value) => onUpdate(path, (current) => ({ ...current, text: value }))}
-            />
-            <TextField
-              label="連結"
-              value={bullet.href ?? ""}
-              onChange={(value) =>
-                onUpdate(path, (current) => {
-                  const next = { ...current };
-                  if (value) next.href = value;
-                  else delete next.href;
-                  return next;
-                })
-              }
-            />
-            <div className="bullet-editor-actions">
-              <button className="editor-small-action" type="button" onClick={() => onAddChild(path)}>
-                <Plus size={15} aria-hidden="true" />
-                子條列
-              </button>
-              <button className="editor-small-action danger" type="button" onClick={() => onRemove(path)}>
-                <Trash2 size={15} aria-hidden="true" />
-                移除
-              </button>
-            </div>
-            {bullet.children?.length ? (
-              <BulletListEditor
-                bullets={bullet.children}
-                pathPrefix={path}
-                onAddChild={onAddChild}
-                onRemove={onRemove}
-                onUpdate={onUpdate}
-              />
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
+  useEffect(() => {
+    if (haveSameBulletShape(parseIndentedBullets(text), bullets)) return;
+    setText(serializeBullets(bullets));
+  }, [bullets, text]);
+
+  const updateText = (nextText: string) => {
+    setText(nextText);
+    onChange(parseIndentedBullets(nextText));
+  };
+
+  return (
+    <label className="editor-field bullet-textarea-block">
+      <span>重點條列</span>
+      <textarea
+        className="bullet-textarea"
+        rows={Math.max(5, text.split("\n").length + 1)}
+        value={text}
+        placeholder={"每行一項；Tab 或四個半形空格表示子條列\n[連結文字](https://example.com)"}
+        onChange={(event) => updateText(event.target.value)}
+        onKeyDown={(event) => handleIndentedTextAreaKeyDown(event, text, updateText)}
+      />
+      <small className="bullet-indent-help">Tab / Shift+Tab 可調整縮排，四個半形空格也會視為一層。</small>
+    </label>
   );
 }
 

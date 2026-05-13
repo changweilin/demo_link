@@ -45,13 +45,31 @@
       "updatedAt": "2026-05-07T15:19:55Z",
       "screenshot": {
         "src": "project-screenshots/win-rate-calculator.png",
-        "alt": "Win Rate Calculator 的互動式勝率計算 demo 截圖"
+        "alt": "Win Rate Calculator win rate desktop 作品圖片"
       },
       "links": {
         "demo": "https://changweilin.github.io/win_rate_calculator/",
         "repo": "https://github.com/changweilin/win_rate_calculator",
         "caseStudy": ""
-      }
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/win-rate-calculator.png",
+          "alt": "Win Rate Calculator win rate desktop 作品圖片"
+        },
+        {
+          "src": "project-screenshots/win-rate-calculator-2.png",
+          "alt": "Win Rate Calculator win rate mobile parameters 作品圖片"
+        },
+        {
+          "src": "project-screenshots/win-rate-calculator-3.png",
+          "alt": "Win Rate Calculator win rate mobile results 作品圖片"
+        },
+        {
+          "src": "project-screenshots/win-rate-calculator-4.png",
+          "alt": "Win Rate Calculator win rate mobile summary 作品圖片"
+        }
+      ]
     },
     {
       "title": "Mapping Elf",
@@ -72,13 +90,47 @@
       "updatedAt": "2026-05-11T08:03:46Z",
       "screenshot": {
         "src": "project-screenshots/mapping-elf.png",
-        "alt": "Mapping Elf 的戶外地圖與路線規劃 demo 截圖"
+        "alt": "Mapping Elf promo 01 intro a 作品圖片"
       },
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
         "repo": "https://github.com/changweilin/mapping_elf",
         "caseStudy": ""
-      }
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/mapping-elf.png",
+          "alt": "Mapping Elf promo 01 intro a 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-2.png",
+          "alt": "Mapping Elf promo 01 intro b 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-3.png",
+          "alt": "Mapping Elf promo 01 intro c 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-4.png",
+          "alt": "Mapping Elf promo 01 intro d 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-5.png",
+          "alt": "Mapping Elf promo 02 gpx a 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-6.png",
+          "alt": "Mapping Elf promo 02 gpx b 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-7.png",
+          "alt": "Mapping Elf promo 02 gpx c 作品圖片"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-8.png",
+          "alt": "Mapping Elf promo 02 gpx d 作品圖片"
+        }
+      ]
     },
     {
       "title": "Hex Snake",
@@ -104,7 +156,13 @@
         "demo": "https://changweilin.github.io/hex_snake/",
         "repo": "https://github.com/changweilin/hex_snake",
         "caseStudy": ""
-      }
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/hex-snake.png",
+          "alt": "Hex Snake 的六角格遊戲 demo 截圖"
+        }
+      ]
     },
     {
       "title": "Railway Elf",
@@ -121,13 +179,23 @@
       "updatedAt": "2026-05-11T13:44:18Z",
       "screenshot": {
         "src": "project-screenshots/railway-elf.png",
-        "alt": "Railway Elf 的鐵路地圖與列車預測 demo 截圖"
+        "alt": "Railway Elf map train passes desktop 作品圖片"
       },
       "links": {
         "demo": "https://changweilin.github.io/railway_elf/",
         "repo": "https://github.com/changweilin/railway_elf",
         "caseStudy": ""
-      }
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/railway-elf.png",
+          "alt": "Railway Elf map train passes desktop 作品圖片"
+        },
+        {
+          "src": "project-screenshots/railway-elf-2.png",
+          "alt": "Railway Elf map train passes mobile 作品圖片"
+        }
+      ]
     },
     {
       "title": "Web TSP App",
@@ -146,13 +214,23 @@
       "updatedAt": "2026-05-07T05:14:54Z",
       "screenshot": {
         "src": "project-screenshots/web-tsp-app.png",
-        "alt": "Web TSP App 的路線最佳化 demo 截圖"
+        "alt": "Web TSP App tsp city desktop 作品圖片"
       },
       "links": {
         "demo": "https://changweilin.github.io/web_tsp_app/",
         "repo": "https://github.com/changweilin/web_tsp_app",
         "caseStudy": ""
-      }
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/web-tsp-app.png",
+          "alt": "Web TSP App tsp city desktop 作品圖片"
+        },
+        {
+          "src": "project-screenshots/web-tsp-app-2.png",
+          "alt": "Web TSP App tsp city mobile 作品圖片"
+        }
+      ]
     },
     {
       "title": "IIR Filter Tool",
@@ -172,13 +250,31 @@
       "updatedAt": "2026-05-07T01:54:21Z",
       "screenshot": {
         "src": "project-screenshots/iir-filter-tool.png",
-        "alt": "IIR Filter Tool 的濾波器參數與響應圖 demo 截圖"
+        "alt": "IIR Filter Tool web ui desktop 作品圖片"
       },
       "links": {
         "demo": "https://changweilin.github.io/iir_filter_tool/",
         "repo": "https://github.com/changweilin/iir_filter_tool",
         "caseStudy": ""
-      }
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/iir-filter-tool.png",
+          "alt": "IIR Filter Tool web ui desktop 作品圖片"
+        },
+        {
+          "src": "project-screenshots/iir-filter-tool-2.png",
+          "alt": "IIR Filter Tool web ui mobile coefficients 作品圖片"
+        },
+        {
+          "src": "project-screenshots/iir-filter-tool-3.png",
+          "alt": "IIR Filter Tool web ui mobile parameters 作品圖片"
+        },
+        {
+          "src": "project-screenshots/iir-filter-tool-4.png",
+          "alt": "IIR Filter Tool web ui mobile response 作品圖片"
+        }
+      ]
     }
   ]
 }

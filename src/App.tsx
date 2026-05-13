@@ -4,6 +4,7 @@ import {
   CalendarClock,
   CalendarPlus,
   Check,
+  ChevronLeft,
   ChevronRight,
   Code2,
   ExternalLink,
@@ -18,7 +19,7 @@ import {
   Telescope,
   Waves,
 } from "lucide-react";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, type TouchEvent as ReactTouchEvent, useEffect, useMemo, useRef, useState } from "react";
 import CakeResumePage from "./CakeResumePage";
 import portfolio from "./data/portfolio.json";
 import ResumeEditorPage from "./ResumeEditorPage";
@@ -44,6 +45,7 @@ type Project = {
   createdAt: string;
   updatedAt: string;
   screenshot?: ProjectScreenshot;
+  screenshots?: ProjectScreenshot[];
   links: LinkSet;
 };
 
@@ -628,12 +630,218 @@ function SocialLinks({ links }: { links: SocialLink[] }) {
   );
 }
 
+function getProjectScreenshots(project: Project) {
+  const screenshots = project.screenshots?.length ? project.screenshots : project.screenshot ? [project.screenshot] : [];
+  return screenshots.filter((screenshot) => Boolean(screenshot.src));
+}
+
+type ImageZoomState = {
+  scale: number;
+  x: number;
+  y: number;
+};
+
+type ImageGesture =
+  | {
+      type: "pinch";
+      startDistance: number;
+      startMidpoint: { x: number; y: number };
+      startZoom: ImageZoomState;
+    }
+  | {
+      type: "pan";
+      startX: number;
+      startY: number;
+      startZoom: ImageZoomState;
+    }
+  | null;
+
+const defaultImageZoom: ImageZoomState = { scale: 1, x: 0, y: 0 };
+type ProjectTouchList = ReactTouchEvent<HTMLDivElement>["touches"];
+
+function clampValue(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getTouchDistance(touches: ProjectTouchList) {
+  const firstTouch = touches[0];
+  const secondTouch = touches[1];
+  return Math.hypot(secondTouch.clientX - firstTouch.clientX, secondTouch.clientY - firstTouch.clientY);
+}
+
+function getTouchMidpoint(touches: ProjectTouchList) {
+  const firstTouch = touches[0];
+  const secondTouch = touches[1];
+  return {
+    x: (firstTouch.clientX + secondTouch.clientX) / 2,
+    y: (firstTouch.clientY + secondTouch.clientY) / 2,
+  };
+}
+
+function constrainImageZoom(zoom: ImageZoomState, frame: HTMLDivElement | null): ImageZoomState {
+  const scale = clampValue(zoom.scale, 1, 4);
+  if (scale <= 1.01 || !frame) return defaultImageZoom;
+
+  const maxX = (frame.clientWidth * (scale - 1)) / 2;
+  const maxY = (frame.clientHeight * (scale - 1)) / 2;
+
+  return {
+    scale,
+    x: clampValue(zoom.x, -maxX, maxX),
+    y: clampValue(zoom.y, -maxY, maxY),
+  };
+}
+
+function ZoomableProjectImage({ src, alt }: { src: string; alt: string }) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const gestureRef = useRef<ImageGesture>(null);
+  const [zoom, setZoom] = useState<ImageZoomState>(defaultImageZoom);
+  const zoomRef = useRef<ImageZoomState>(defaultImageZoom);
+  const isZoomed = zoom.scale > 1.01;
+
+  useEffect(() => {
+    const resetZoom = defaultImageZoom;
+    zoomRef.current = resetZoom;
+    gestureRef.current = null;
+    setZoom(resetZoom);
+  }, [src]);
+
+  const updateZoom = (nextZoom: ImageZoomState) => {
+    const constrainedZoom = constrainImageZoom(nextZoom, frameRef.current);
+    zoomRef.current = constrainedZoom;
+    setZoom(constrainedZoom);
+  };
+
+  const handleTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (event.touches.length >= 2) {
+      event.preventDefault();
+      gestureRef.current = {
+        type: "pinch",
+        startDistance: getTouchDistance(event.touches),
+        startMidpoint: getTouchMidpoint(event.touches),
+        startZoom: zoomRef.current,
+      };
+      return;
+    }
+
+    if (event.touches.length === 1 && zoomRef.current.scale > 1.01) {
+      const touch = event.touches[0];
+      gestureRef.current = {
+        type: "pan",
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startZoom: zoomRef.current,
+      };
+    }
+  };
+
+  const handleTouchMove = (event: ReactTouchEvent<HTMLDivElement>) => {
+    const gesture = gestureRef.current;
+    if (!gesture) return;
+
+    if (gesture.type === "pinch" && event.touches.length >= 2) {
+      event.preventDefault();
+      const nextDistance = getTouchDistance(event.touches);
+      const nextMidpoint = getTouchMidpoint(event.touches);
+      const nextScale = gesture.startZoom.scale * (nextDistance / Math.max(gesture.startDistance, 1));
+
+      updateZoom({
+        scale: nextScale,
+        x: gesture.startZoom.x + nextMidpoint.x - gesture.startMidpoint.x,
+        y: gesture.startZoom.y + nextMidpoint.y - gesture.startMidpoint.y,
+      });
+      return;
+    }
+
+    if (gesture.type === "pan" && event.touches.length === 1 && zoomRef.current.scale > 1.01) {
+      event.preventDefault();
+      const touch = event.touches[0];
+
+      updateZoom({
+        ...gesture.startZoom,
+        x: gesture.startZoom.x + touch.clientX - gesture.startX,
+        y: gesture.startZoom.y + touch.clientY - gesture.startY,
+      });
+    }
+  };
+
+  const handleTouchEnd = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (event.touches.length >= 2) {
+      gestureRef.current = {
+        type: "pinch",
+        startDistance: getTouchDistance(event.touches),
+        startMidpoint: getTouchMidpoint(event.touches),
+        startZoom: zoomRef.current,
+      };
+      return;
+    }
+
+    if (event.touches.length === 1 && zoomRef.current.scale > 1.01) {
+      const touch = event.touches[0];
+      gestureRef.current = {
+        type: "pan",
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startZoom: zoomRef.current,
+      };
+      return;
+    }
+
+    gestureRef.current = null;
+    if (zoomRef.current.scale <= 1.01) updateZoom(defaultImageZoom);
+  };
+
+  return (
+    <div
+      className="zoomable-image-frame"
+      data-zoomed={isZoomed ? "true" : undefined}
+      ref={frameRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        draggable="false"
+        style={{ transform: `translate3d(${zoom.x}px, ${zoom.y}px, 0) scale(${zoom.scale})` }}
+      />
+    </div>
+  );
+}
+
 function ProjectDetail({ project }: { project: Project }) {
-  const screenshotSrc = project.screenshot?.src ? resolvePublicAssetPath(project.screenshot.src) : "";
-  const screenshotAlt = project.screenshot?.alt || `${project.title} demo 截圖`;
-  const screenshot = screenshotSrc ? (
-    <img src={screenshotSrc} alt={screenshotAlt} loading="lazy" decoding="async" />
-  ) : null;
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const screenshots = getProjectScreenshots(project);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const hasMultipleScreenshots = screenshots.length > 1;
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+    galleryRef.current?.scrollTo({ left: 0 });
+  }, [project.title]);
+
+  const handleImageSelect = (index: number) => {
+    const nextIndex = Math.min(Math.max(index, 0), screenshots.length - 1);
+    const gallery = galleryRef.current;
+
+    setActiveImageIndex(nextIndex);
+    gallery?.scrollTo({
+      left: gallery.clientWidth * nextIndex,
+      behavior: "smooth",
+    });
+  };
+
+  const handleGalleryScroll = () => {
+    const gallery = galleryRef.current;
+    if (!gallery || screenshots.length === 0) return;
+
+    const nextIndex = Math.round(gallery.scrollLeft / Math.max(gallery.clientWidth, 1));
+    setActiveImageIndex(Math.min(Math.max(nextIndex, 0), screenshots.length - 1));
+  };
 
   return (
     <article className="project-detail" aria-live="polite">
@@ -644,16 +852,62 @@ function ProjectDetail({ project }: { project: Project }) {
         <span>更新 {formatProjectDate(project.updatedAt)}</span>
       </div>
       <h3>{project.title}</h3>
-      {screenshot ? (
-        project.links.demo ? (
-          <a className="project-screenshot" href={project.links.demo} target="_blank" rel="noreferrer">
-            {screenshot}
-          </a>
-        ) : (
-          <figure className="project-screenshot">{screenshot}</figure>
-        )
-      ) : null}
       <p>{project.description}</p>
+      {screenshots.length > 0 ? (
+        <section className="project-gallery" aria-label={`${project.title} 作品圖片`}>
+          <div className="project-gallery-heading">
+            <h4>作品圖片</h4>
+            {hasMultipleScreenshots ? (
+              <div className="project-gallery-controls" aria-label="作品圖片切換">
+                <button
+                  type="button"
+                  aria-label="上一張作品圖片"
+                  disabled={activeImageIndex === 0}
+                  onClick={() => handleImageSelect(activeImageIndex - 1)}
+                >
+                  <ChevronLeft size={18} aria-hidden="true" />
+                </button>
+                <span>
+                  {activeImageIndex + 1} / {screenshots.length}
+                </span>
+                <button
+                  type="button"
+                  aria-label="下一張作品圖片"
+                  disabled={activeImageIndex === screenshots.length - 1}
+                  onClick={() => handleImageSelect(activeImageIndex + 1)}
+                >
+                  <ChevronRight size={18} aria-hidden="true" />
+                </button>
+              </div>
+            ) : null}
+          </div>
+          <div className="project-gallery-viewport" ref={galleryRef} onScroll={handleGalleryScroll}>
+            {screenshots.map((screenshot, index) => {
+              const alt = screenshot.alt || `${project.title} 作品圖片 ${index + 1}`;
+
+              return (
+                <figure className="project-gallery-slide" key={`${screenshot.src}-${index}`}>
+                  <ZoomableProjectImage src={resolvePublicAssetPath(screenshot.src)} alt={alt} />
+                </figure>
+              );
+            })}
+          </div>
+          {hasMultipleScreenshots ? (
+            <div className="project-gallery-dots" aria-label="作品圖片位置">
+              {screenshots.map((screenshot, index) => (
+                <button
+                  key={`${screenshot.src}-dot`}
+                  className={index === activeImageIndex ? "active" : ""}
+                  type="button"
+                  aria-label={`切換到第 ${index + 1} 張作品圖片`}
+                  aria-current={index === activeImageIndex ? "true" : undefined}
+                  onClick={() => handleImageSelect(index)}
+                />
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
       <div className="tag-row">
         {project.tags.map((tag) => (
           <span key={tag}>{tag}</span>
