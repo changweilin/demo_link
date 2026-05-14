@@ -52,7 +52,7 @@ npm run dev
 ```text
 http://localhost:43177/
 http://localhost:43177/#full-resume
-http://localhost:43177/#resume-editor
+http://localhost:43177/#resume-editor  # 僅本機 dev 使用
 ```
 
 `npm run dev` 會將 Vite 綁定到 `0.0.0.0`，同一個 Tailscale network 內的手機可以直接打開。先在電腦查 Tailscale IPv4：
@@ -80,8 +80,15 @@ npm run track:github-updates
 
 - `npm run dev`：啟動本機開發伺服器。
 - `npm run build`：執行 TypeScript 檢查並建立正式輸出。
+- `npm run build:github-pages`：建立 GitHub Pages 用的 public build，會停用履歷編輯分頁。
 - `npm run preview`：預覽 `dist/` build 結果，同樣綁定 `0.0.0.0`。
 - `npm run track:github-updates`：手動讀取作品集中的 GitHub repository 連結，將每個 project 的 `updatedAt` 同步成 GitHub 的最後 push 時間，並輸出追蹤快照到 `docs/github-last-updated.*`。
+
+## GitHub Pages / Actions
+
+`.github/workflows/deploy-main.yml` 會在 push 到 `main` 或手動執行時建置主網頁，並透過 GitHub Pages artifact 部署 `dist/`。
+
+Action 使用 `npm run build:github-pages` 與 `.env.github-pages`，其中 `VITE_BASE_PATH=/demo_link/`、`VITE_ENABLE_RESUME_EDITOR=false`。因此 public build 只保留主頁與 `#full-resume`；`#resume-editor` 在 GitHub Pages 上會回到首頁，履歷編輯器程式碼也不會打進 `dist/`。Workflow 也會忽略只有履歷編輯器相關檔案的 push。
 
 ## 履歷編輯
 
@@ -92,7 +99,7 @@ npm run track:github-updates
 3. 使用 `匯入 JSON` 載入本機 `resume.json`，或使用 `下載 JSON` 匯出目前草稿。
 4. 若要更新專案預設履歷，將匯出的內容放回 `src/data/resume.json` 後重新 build。
 
-草稿會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub，也不會觸發 GitHub Actions。
+草稿會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub；只有改到主網頁相關檔案時才會觸發主站部署 Action。
 自我介紹和技能都改為單一文字區；技能用不縮排的行表示分類，用 Tab 或四個半形空格表示分類下的技能項目。
 工作經歷與學歷的重點條列會自動把 Tab 或四個半形空格解析成子條列；連結條列可寫成 `[文字](https://example.com)`。
 
@@ -201,6 +208,9 @@ npm run track:github-updates
 
 ```text
 .
+├─ .github/
+│  └─ workflows/
+│     └─ deploy-main.yml
 ├─ docs/
 ├─ public/
 ├─ scripts/
@@ -215,6 +225,7 @@ npm run track:github-updates
 │  └─ styles.css
 ├─ index.html
 ├─ package.json
+├─ tsconfig.github-pages.json
 └─ vite.config.ts
 ```
 

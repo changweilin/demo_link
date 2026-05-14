@@ -19,9 +19,12 @@ import {
   Waves,
 } from "lucide-react";
 import {
+  type ComponentType,
   type ReactNode,
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
+  lazy,
+  Suspense,
   useEffect,
   useMemo,
   useRef,
@@ -29,7 +32,6 @@ import {
 } from "react";
 import CakeResumePage from "./CakeResumePage";
 import portfolio from "./data/portfolio.json";
-import ResumeEditorPage from "./ResumeEditorPage";
 
 type LinkSet = {
   demo?: string;
@@ -85,6 +87,11 @@ type ResumeSummaryItem = {
   icon: string;
 };
 
+type ResumeEditorPageProps = {
+  onBackHome: () => void;
+  onOpenResume: () => void;
+};
+
 type ThemeMode = "day" | "night";
 type PageMode = "home" | "full-resume" | "resume-editor";
 type ProjectSortMode = "updatedAt" | "createdAt";
@@ -101,6 +108,16 @@ const defaultSortedProjects = sortProjects(projects, defaultProjectSort, default
 const heroProject = defaultSortedProjects[0] ?? projects[0];
 const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
 const resumeIconPath = (fileName: string) => `${import.meta.env.BASE_URL}resume-icons/${fileName}`;
+const resumeEditorEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_RESUME_EDITOR !== "false";
+const resumeEditorModulePath = "/src/ResumeEditorPage.tsx";
+const LazyResumeEditorPage = resumeEditorEnabled
+  ? lazy(
+      () =>
+        import(/* @vite-ignore */ resumeEditorModulePath) as Promise<{
+          default: ComponentType<ResumeEditorPageProps>;
+        }>,
+    )
+  : null;
 const linkLabels: Record<keyof LinkSet, string> = {
   demo: "開啟作品",
   repo: "GitHub",
@@ -247,7 +264,7 @@ function getInitialPageMode(): PageMode {
 
 function getPageModeFromHash(): PageMode {
   if (typeof window === "undefined") return "home";
-  if (window.location.hash === "#resume-editor") return "resume-editor";
+  if (resumeEditorEnabled && window.location.hash === "#resume-editor") return "resume-editor";
   return window.location.hash === "#full-resume" ? "full-resume" : "home";
 }
 
@@ -404,8 +421,18 @@ function App() {
     return <CakeResumePage onBackHome={handleBackHome} />;
   }
 
-  if (pageMode === "resume-editor") {
-    return <ResumeEditorPage onBackHome={handleBackHome} onOpenResume={handleOpenCakeResume} />;
+  if (pageMode === "resume-editor" && LazyResumeEditorPage) {
+    return (
+      <Suspense
+        fallback={
+          <main className="section-shell" aria-live="polite">
+            <p>履歷編輯器載入中...</p>
+          </main>
+        }
+      >
+        <LazyResumeEditorPage onBackHome={handleBackHome} onOpenResume={handleOpenCakeResume} />
+      </Suspense>
+    );
   }
 
   return (
