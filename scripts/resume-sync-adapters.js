@@ -56,21 +56,28 @@ function getFilesForPlatform(generatedFiles, platform) {
   return generatedFiles.platformFiles.find((file) => file.platform === platform.platform) ?? null;
 }
 
+function normalizeTimelineHeading(value) {
+  return String(value)
+    .split(/[,/]/)
+    .map((part) => part.trim().replace(/\s+/g, " "))
+    .filter(Boolean)
+    .join("|");
+}
+
 function formatTimelineItems(items) {
   if (!Array.isArray(items)) return "";
 
   return items
-    .map((item) =>
-      [
-        item.title,
-        item.organization || item.role || item.period
-          ? [item.organization, item.role, item.period].filter(Boolean).join(" / ")
-          : "",
-        item.plainText,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-    )
+    .map((item) => {
+      const timelineLabel =
+        item.organization || item.role || item.period ? [item.organization, item.role, item.period].filter(Boolean).join(" / ") : "";
+      const heading =
+        timelineLabel && normalizeTimelineHeading(item.title) === normalizeTimelineHeading(timelineLabel)
+          ? timelineLabel
+          : [item.title, timelineLabel].filter(Boolean).join("\n");
+
+      return [heading, item.plainText].filter(Boolean).join("\n");
+    })
     .join("\n\n");
 }
 

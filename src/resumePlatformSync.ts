@@ -135,6 +135,14 @@ function getStringArray(value: unknown) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }
 
+function normalizeTimelineHeading(value: string) {
+  return value
+    .split(/[,/]/)
+    .map((part) => part.trim().replace(/\s+/g, " "))
+    .filter(Boolean)
+    .join("|");
+}
+
 function formatTimelineSyncText(items: unknown[]) {
   return items
     .map((item) => {
@@ -146,8 +154,12 @@ function formatTimelineSyncText(items: unknown[]) {
       const period = getStringValue(item.period);
       const details = getStringValue(item.plainText);
       const timelineLabel = organization || role || period ? [organization, role, period].filter(Boolean).join(" / ") : "";
+      const heading =
+        timelineLabel && normalizeTimelineHeading(title) === normalizeTimelineHeading(timelineLabel)
+          ? timelineLabel
+          : [title, timelineLabel].filter(Boolean).join("\n");
 
-      return [title, timelineLabel, details].filter(Boolean).join("\n");
+      return [heading, details].filter(Boolean).join("\n");
     })
     .filter(Boolean)
     .join("\n\n");
