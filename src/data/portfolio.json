@@ -90,7 +90,7 @@
       "updatedAt": "2026-05-11T08:03:46Z",
       "screenshot": {
         "src": "project-screenshots/mapping-elf.png",
-        "alt": "Mapping Elf promo 01 intro a 作品圖片"
+        "alt": "Mapping Elf 桌機版玉山步道路線天氣卡"
       },
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
@@ -100,35 +100,11 @@
       "screenshots": [
         {
           "src": "project-screenshots/mapping-elf.png",
-          "alt": "Mapping Elf promo 01 intro a 作品圖片"
+          "alt": "Mapping Elf 桌機版玉山步道路線天氣卡"
         },
         {
           "src": "project-screenshots/mapping-elf-2.png",
-          "alt": "Mapping Elf promo 01 intro b 作品圖片"
-        },
-        {
-          "src": "project-screenshots/mapping-elf-3.png",
-          "alt": "Mapping Elf promo 01 intro c 作品圖片"
-        },
-        {
-          "src": "project-screenshots/mapping-elf-4.png",
-          "alt": "Mapping Elf promo 01 intro d 作品圖片"
-        },
-        {
-          "src": "project-screenshots/mapping-elf-5.png",
-          "alt": "Mapping Elf promo 02 gpx a 作品圖片"
-        },
-        {
-          "src": "project-screenshots/mapping-elf-6.png",
-          "alt": "Mapping Elf promo 02 gpx b 作品圖片"
-        },
-        {
-          "src": "project-screenshots/mapping-elf-7.png",
-          "alt": "Mapping Elf promo 02 gpx c 作品圖片"
-        },
-        {
-          "src": "project-screenshots/mapping-elf-8.png",
-          "alt": "Mapping Elf promo 02 gpx d 作品圖片"
+          "alt": "Mapping Elf 手機版玉山步道路線天氣卡"
         }
       ]
     },
