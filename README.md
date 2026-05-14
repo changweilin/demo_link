@@ -88,6 +88,8 @@ npm run track:github-updates
 
 `.github/workflows/deploy-main.yml` 會在 push 到 `main` 或手動執行時建置主網頁，並透過 GitHub Pages artifact 部署 `dist/`。
 
+第一次使用這個 workflow 前，請先到 GitHub repo 的 `Settings` → `Pages`，在 `Build and deployment` 的 `Source` 選 `GitHub Actions`。如果還沒啟用，`actions/configure-pages` 會在 build job 先失敗；目前 workflow 已避免這個預檢步驟，但 Pages 來源仍需設定成 GitHub Actions 後才能部署。
+
 Action 使用 `npm run build:github-pages` 與 `.env.github-pages`，其中 `VITE_BASE_PATH=/demo_link/`、`VITE_ENABLE_RESUME_EDITOR=false`。因此 public build 只保留主頁與 `#full-resume`；`#resume-editor` 在 GitHub Pages 上會回到首頁，履歷編輯器程式碼也不會打進 `dist/`。Workflow 也會忽略只有履歷編輯器相關檔案的 push。
 
 ## 履歷編輯
