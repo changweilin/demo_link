@@ -150,7 +150,7 @@
       "updatedAt": "2026-05-12T01:17:48Z",
       "screenshot": {
         "src": "project-screenshots/hex-snake.png",
-        "alt": "Hex Snake 的六角格遊戲 demo 截圖"
+        "alt": "Hex Snake 桌機版遊戲畫面"
       },
       "links": {
         "demo": "https://changweilin.github.io/hex_snake/",
@@ -160,7 +160,11 @@
       "screenshots": [
         {
           "src": "project-screenshots/hex-snake.png",
-          "alt": "Hex Snake 的六角格遊戲 demo 截圖"
+          "alt": "Hex Snake 桌機版遊戲畫面"
+        },
+        {
+          "src": "project-screenshots/hex-snake-mobile.png",
+          "alt": "Hex Snake 手機版遊戲畫面"
         }
       ]
     },
