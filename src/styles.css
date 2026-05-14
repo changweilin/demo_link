@@ -540,9 +540,11 @@ button {
   border-radius: 6px;
   background: var(--paper-strong);
   box-shadow: var(--soft-shadow);
-  overscroll-behavior: contain;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  touch-action: pan-y;
 }
 
 .project-gallery-viewport::-webkit-scrollbar {
@@ -566,7 +568,7 @@ button {
   height: 100%;
   overflow: hidden;
   cursor: zoom-in;
-  touch-action: pan-x pan-y;
+  touch-action: pan-y;
   user-select: none;
 }
 

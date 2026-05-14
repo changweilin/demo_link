@@ -698,6 +698,14 @@ type ProjectSwipeGesture = {
   startY: number;
   ignore: boolean;
 } | null;
+type GallerySwipeGesture = {
+  startX: number;
+  startY: number;
+  startScrollLeft: number;
+  startIndex: number;
+  intent: "pending" | "horizontal" | "vertical";
+  ignore: boolean;
+} | null;
 
 function clampValue(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -860,6 +868,13 @@ function shouldIgnoreProjectSwipe(event: ReactTouchEvent<HTMLElement>) {
   return Boolean(target.closest(".project-gallery, .detail-links, a, button"));
 }
 
+function shouldIgnoreGallerySwipe(event: ReactTouchEvent<HTMLDivElement>) {
+  const target = event.target;
+  if (!(target instanceof Element)) return true;
+
+  return Boolean(target.closest('.zoomable-image-frame[data-zoomed="true"]'));
+}
+
 function ProjectDetail({
   project,
   onProjectSwipe,
@@ -869,6 +884,7 @@ function ProjectDetail({
 }) {
   const galleryRef = useRef<HTMLDivElement>(null);
   const galleryWheelRef = useRef({ delta: 0, lastSwitchAt: 0 });
+  const gallerySwipeRef = useRef<GallerySwipeGesture>(null);
   const projectSwipeRef = useRef<ProjectSwipeGesture>(null);
   const screenshots = getProjectScreenshots(project);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -876,6 +892,7 @@ function ProjectDetail({
 
   useEffect(() => {
     setActiveImageIndex(0);
+    gallerySwipeRef.current = null;
     galleryRef.current?.scrollTo({ left: 0 });
   }, [project.title]);
 
@@ -920,6 +937,82 @@ function ProjectDetail({
     wheelState.lastSwitchAt = now;
 
     if (nextIndex !== activeImageIndex) handleImageSelect(nextIndex);
+  };
+
+  const handleGalleryTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
+    const gallery = galleryRef.current;
+    if (!hasMultipleScreenshots || !gallery || event.touches.length !== 1) {
+      gallerySwipeRef.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    gallerySwipeRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      startScrollLeft: gallery.scrollLeft,
+      startIndex: activeImageIndex,
+      intent: "pending",
+      ignore: shouldIgnoreGallerySwipe(event),
+    };
+  };
+
+  const handleGalleryTouchMove = (event: ReactTouchEvent<HTMLDivElement>) => {
+    const gesture = gallerySwipeRef.current;
+    const gallery = galleryRef.current;
+    if (!gesture || gesture.ignore || !gallery || event.touches.length !== 1) return;
+
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - gesture.startX;
+    const deltaY = touch.clientY - gesture.startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (gesture.intent === "pending") {
+      if (absX < 8 && absY < 8) return;
+      if (absY > absX * 1.15) {
+        gesture.intent = "vertical";
+        return;
+      }
+      if (absX <= absY * 1.15) return;
+      gesture.intent = "horizontal";
+    }
+
+    if (gesture.intent === "vertical") return;
+
+    event.preventDefault();
+    gallery.scrollLeft = gesture.startScrollLeft - deltaX;
+  };
+
+  const handleGalleryTouchEnd = (event: ReactTouchEvent<HTMLDivElement>) => {
+    const gesture = gallerySwipeRef.current;
+    gallerySwipeRef.current = null;
+    if (!gesture || gesture.ignore || event.changedTouches.length === 0) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - gesture.startX;
+    const deltaY = touch.clientY - gesture.startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    const gallery = galleryRef.current;
+    const slideWidth = Math.max(gallery?.clientWidth ?? 1, 1);
+    const isHorizontalSwipe = gesture.intent === "horizontal" || (absX >= 24 && absX > absY * 1.2);
+
+    if (!isHorizontalSwipe) return;
+
+    const shouldSwitch = absX >= 54 || absX / slideWidth >= 0.18;
+    const direction = deltaX < 0 ? 1 : -1;
+    const nextIndex = shouldSwitch
+      ? Math.min(Math.max(gesture.startIndex + direction, 0), screenshots.length - 1)
+      : gesture.startIndex;
+
+    handleImageSelect(nextIndex);
+  };
+
+  const handleGalleryTouchCancel = () => {
+    const gesture = gallerySwipeRef.current;
+    gallerySwipeRef.current = null;
+    if (gesture?.intent === "horizontal") handleImageSelect(gesture.startIndex);
   };
 
   const handleProjectTouchStart = (event: ReactTouchEvent<HTMLElement>) => {
@@ -1015,6 +1108,10 @@ function ProjectDetail({
             ref={galleryRef}
             onScroll={handleGalleryScroll}
             onWheel={handleGalleryWheel}
+            onTouchStart={handleGalleryTouchStart}
+            onTouchMove={handleGalleryTouchMove}
+            onTouchEnd={handleGalleryTouchEnd}
+            onTouchCancel={handleGalleryTouchCancel}
           >
             {screenshots.map((screenshot, index) => {
               const alt = screenshot.alt || `${project.title} 作品圖片 ${index + 1}`;
