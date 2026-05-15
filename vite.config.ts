@@ -1,10 +1,19 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { createPortfolioGeminiMiddleware } from "./scripts/portfolio-gemini-core.js";
 import { createResumePlatformAuthMiddleware } from "./scripts/resume-platform-auth.js";
 import { createResumeSyncMiddleware } from "./scripts/resume-sync-core.js";
 
 function mergeServerEnv(mode: string) {
-  const env = loadEnv(mode, process.cwd(), ["VITE_", "RESUME_AUTH_", "RESUME_SYNC_"]);
+  const env = loadEnv(mode, process.cwd(), [
+    "VITE_",
+    "RESUME_AUTH_",
+    "RESUME_SYNC_",
+    "GEMINI_",
+    "GOOGLE_API_KEY",
+    "GITHUB_TOKEN",
+    "PORTFOLIO_GEMINI_",
+  ]);
 
   Object.entries(env).forEach(([key, value]) => {
     process.env[key] ??= value;
@@ -41,6 +50,15 @@ export default defineConfig(({ mode }) => {
         },
         configurePreviewServer(server) {
           server.middlewares.use(createResumeSyncMiddleware());
+        },
+      },
+      {
+        name: "local-portfolio-gemini",
+        configureServer(server) {
+          server.middlewares.use(createPortfolioGeminiMiddleware());
+        },
+        configurePreviewServer(server) {
+          server.middlewares.use(createPortfolioGeminiMiddleware());
         },
       },
     ],

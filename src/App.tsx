@@ -31,52 +31,8 @@ import {
   useState,
 } from "react";
 import CakeResumePage from "./CakeResumePage";
-import portfolio from "./data/portfolio.json";
-
-type LinkSet = {
-  demo?: string;
-  repo?: string;
-  caseStudy?: string;
-};
-
-type ProjectScreenshot = {
-  src: string;
-  alt: string;
-};
-
-type Project = {
-  title: string;
-  summary: string;
-  description: string;
-  tags: string[];
-  category: string;
-  year: string;
-  createdAt: string;
-  updatedAt: string;
-  screenshot?: ProjectScreenshot;
-  screenshots?: ProjectScreenshot[];
-  links: LinkSet;
-};
-
-type SocialLink = {
-  label: string;
-  url: string;
-};
-
-type Profile = {
-  name: string;
-  englishName: string;
-  role: string;
-  location: string;
-  resumeUrl: string;
-  intro: string;
-  quote: {
-    zh: string;
-    en: string;
-    source: string;
-  };
-  socialLinks: SocialLink[];
-};
+import { loadPortfolioDraftFromStorage } from "./portfolioDraft";
+import type { PortfolioData, PortfolioLinkSet, PortfolioSocialLink, Project } from "./types/portfolio";
 
 type ResumeSummaryItem = {
   organization: string;
@@ -90,6 +46,7 @@ type ResumeSummaryItem = {
 type ResumeEditorPageProps = {
   onBackHome: () => void;
   onOpenResume: () => void;
+  onPortfolioChange: (portfolio: PortfolioData) => void;
 };
 
 type ThemeMode = "day" | "night";
@@ -101,11 +58,6 @@ type ProjectSwipeDirection = "previous" | "next";
 const themeStorageKey = "portfolio-theme-mode";
 const defaultProjectSort: ProjectSortMode = "updatedAt";
 const defaultProjectSortDirection: ProjectSortDirection = "desc";
-const projects = portfolio.projects as Project[];
-const profile = portfolio.profile as Profile;
-const categories = ["全部", ...Array.from(new Set(projects.map((project) => project.category)))];
-const defaultSortedProjects = sortProjects(projects, defaultProjectSort, defaultProjectSortDirection);
-const heroProject = defaultSortedProjects[0] ?? projects[0];
 const profileAvatarImage = `${import.meta.env.BASE_URL}github-avatar.png`;
 const resumeIconPath = (fileName: string) => `${import.meta.env.BASE_URL}resume-icons/${fileName}`;
 const resumeEditorEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_RESUME_EDITOR !== "false";
@@ -118,7 +70,7 @@ const LazyResumeEditorPage = resumeEditorEnabled
         }>,
     )
   : null;
-const linkLabels: Record<keyof LinkSet, string> = {
+const linkLabels: Record<keyof PortfolioLinkSet, string> = {
   demo: "開啟作品",
   repo: "GitHub",
   caseStudy: "專案筆記",
@@ -299,14 +251,21 @@ function getLocalResumeUrl() {
 }
 
 function App() {
+  const [portfolioDraft, setPortfolioDraft] = useState<PortfolioData>(() => loadPortfolioDraftFromStorage().draft);
   const [activeCategory, setActiveCategory] = useState("全部");
   const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>(defaultProjectSort);
   const [projectSortDirection, setProjectSortDirection] =
     useState<ProjectSortDirection>(defaultProjectSortDirection);
-  const [selectedProject, setSelectedProject] = useState<Project>(heroProject);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(() => {
+    const initialProjects = loadPortfolioDraftFromStorage().draft.projects;
+    return sortProjects(initialProjects, defaultProjectSort, defaultProjectSortDirection)[0] ?? initialProjects[0] ?? null;
+  });
   const [copied, setCopied] = useState(false);
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
   const [pageMode, setPageMode] = useState<PageMode>(getInitialPageMode);
+  const projects = portfolioDraft.projects;
+  const profile = portfolioDraft.profile;
+  const categories = useMemo(() => ["全部", ...Array.from(new Set(projects.map((project) => project.category)))], [projects]);
   const isNightMode = themeMode === "night";
   const activeSortOption =
     projectSortOptions.find((option) => option.value === projectSortMode) ?? projectSortOptions[0];
@@ -315,7 +274,7 @@ function App() {
     const categoryProjects =
       activeCategory === "全部" ? projects : projects.filter((project) => project.category === activeCategory);
     return sortProjects(categoryProjects, projectSortMode, projectSortDirection);
-  }, [activeCategory, projectSortMode, projectSortDirection]);
+  }, [activeCategory, projectSortDirection, projectSortMode, projects]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -331,6 +290,22 @@ function App() {
       // Theme still works for the current session when storage is unavailable.
     }
   }, [isNightMode, themeMode]);
+
+  useEffect(() => {
+    if (categories.includes(activeCategory)) return;
+    setActiveCategory("全部");
+  }, [activeCategory, categories]);
+
+  useEffect(() => {
+    setSelectedProject((currentProject) => {
+      if (currentProject) {
+        const refreshedProject = projects.find((project) => project.title === currentProject.title);
+        if (refreshedProject) return refreshedProject;
+      }
+
+      return visibleProjects[0] ?? projects[0] ?? null;
+    });
+  }, [projects, visibleProjects]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -390,7 +365,7 @@ function App() {
     const categoryProjects =
       category === "全部" ? projects : projects.filter((project) => project.category === category);
     const sortedCategoryProjects = sortProjects(categoryProjects, projectSortMode, projectSortDirection);
-    const selectedProjectIsVisible = sortedCategoryProjects.some((project) => project.title === selectedProject.title);
+    const selectedProjectIsVisible = sortedCategoryProjects.some((project) => project.title === selectedProject?.title);
 
     if (!selectedProjectIsVisible && sortedCategoryProjects[0]) {
       setSelectedProject(sortedCategoryProjects[0]);
@@ -398,7 +373,7 @@ function App() {
   };
 
   const handleProjectSelect = (project: Project) => {
-    if (project.title === selectedProject.title && project.links.demo) {
+    if (project.title === selectedProject?.title && project.links.demo) {
       window.location.assign(project.links.demo);
       return;
     }
@@ -407,6 +382,8 @@ function App() {
   };
 
   const handleProjectSwipe = (direction: ProjectSwipeDirection) => {
+    if (!selectedProject) return;
+
     const currentIndex = visibleProjects.findIndex((project) => project.title === selectedProject.title);
     if (currentIndex === -1) return;
 
@@ -430,7 +407,11 @@ function App() {
           </main>
         }
       >
-        <LazyResumeEditorPage onBackHome={handleBackHome} onOpenResume={handleOpenCakeResume} />
+        <LazyResumeEditorPage
+          onBackHome={handleBackHome}
+          onOpenResume={handleOpenCakeResume}
+          onPortfolioChange={setPortfolioDraft}
+        />
       </Suspense>
     );
   }
@@ -559,10 +540,10 @@ function App() {
             {visibleProjects.map((project) => (
               <button
                 key={project.title}
-                className={project.title === selectedProject.title ? "project-row selected" : "project-row"}
+                className={project.title === selectedProject?.title ? "project-row selected" : "project-row"}
                 type="button"
                 aria-label={
-                  project.title === selectedProject.title && project.links.demo
+                  project.title === selectedProject?.title && project.links.demo
                     ? `${project.title}，再次點擊開啟 Demo`
                     : project.title
                 }
@@ -581,7 +562,17 @@ function App() {
               </button>
             ))}
           </div>
-          <ProjectDetail project={selectedProject} onProjectSwipe={handleProjectSwipe} />
+          {selectedProject ? (
+            <ProjectDetail project={selectedProject} onProjectSwipe={handleProjectSwipe} />
+          ) : (
+            <article className="project-detail" aria-live="polite">
+              <div className="detail-meta">
+                <span>尚未建立作品</span>
+              </div>
+              <h3>作品列表是空的</h3>
+              <p>請到本地編輯頁新增作品，主頁會讀取同一份瀏覽器草稿。</p>
+            </article>
+          )}
         </div>
       </section>
 
@@ -647,7 +638,7 @@ function App() {
   );
 }
 
-function SocialLinks({ links }: { links: SocialLink[] }) {
+function SocialLinks({ links }: { links: PortfolioSocialLink[] }) {
   return (
     <div className="social-links" aria-label="個人連結">
       {links.map((link) => (
@@ -1145,7 +1136,7 @@ function ProjectDetail({
         ))}
       </div>
       <div className="detail-links">
-        {(Object.entries(project.links) as [keyof LinkSet, string][])
+        {(Object.entries(project.links) as [keyof PortfolioLinkSet, string][])
           .filter(([, url]) => Boolean(url))
           .map(([key, url]) => (
             <a key={key} href={url} target="_blank" rel="noreferrer">

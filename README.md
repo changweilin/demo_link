@@ -6,7 +6,7 @@ Vite + React + TypeScript 建置的個人作品集與本地履歷 UI。內容以
 
 - 個人首頁：姓名、角色定位、簡介、引言、站內完整版履歷、GitHub 與 LinkedIn。
 - 履歷頁：以 `src/data/resume.json` 產生站內完整版履歷，支援列印輸出 PDF。
-- 本地履歷編輯器：不需要登入、不使用 GitHub token；透過本機 UI 匯入、複製、下載 `resume.json`，並產生 104 / LinkedIn / Cake 的一對一區塊同步資料包。
+- 本地編輯器：不需要登入；可匯入、複製、下載 `resume.json` 與 `portfolio.json`，也能管理作品並透過 Gemini 讀取 README 產生作品文案。
 - 作品索引：支援作品分類篩選、依建立日期 / 最後更新日期排序、Demo 截圖預覽與外部 Demo / repository 連結。
 - 響應式版面：桌面與手機皆可閱讀，適合用 Tailscale 在手機上測試。
 - 主題切換：支援 day / night 模式，並記住使用者選擇。
@@ -129,9 +129,13 @@ Action 使用 `npm run build:github-pages` 與 `.env.github-pages`，其中 `VIT
 ```env
 VITE_RESUME_SYNC_ENDPOINT=/api/resume-sync
 VITE_RESUME_AUTH_ENDPOINT=/api/resume-platform-auth
+VITE_PORTFOLIO_GEMINI_ENDPOINT=/api/portfolio-gemini
 VITE_RESUME_SYNC_104_URL=https://pda.104.com.tw/profile
 VITE_RESUME_SYNC_LINKEDIN_URL=https://www.linkedin.com/in/your-id/
 VITE_RESUME_SYNC_CAKE_URL=https://www.cake.me/resumes/your-resume
+GEMINI_API_KEY=
+PORTFOLIO_GEMINI_MODEL=gemini-2.0-flash
+GITHUB_TOKEN=
 RESUME_AUTH_BASE_URL=http://127.0.0.1:43177
 RESUME_AUTH_LINKEDIN_CLIENT_ID=
 RESUME_AUTH_LINKEDIN_CLIENT_SECRET=
@@ -182,6 +186,12 @@ http://127.0.0.1:43177/api/resume-platform-auth/linkedin/callback
 ```
 
 請在 LinkedIn Developer App 內加入同一個 redirect URL，並把 `RESUME_AUTH_LINKEDIN_CLIENT_ID`、`RESUME_AUTH_LINKEDIN_CLIENT_SECRET` 放在本機 `.env.local` 或啟動 shell 環境；不要使用 `VITE_` 前綴保存 secret。
+
+## 作品管理與 Gemini 文案
+
+編輯頁 `#resume-editor` 也包含作品管理區，可新增、編輯、刪除作品並把目前作品草稿下載為 `portfolio.json`。草稿會保存在瀏覽器 `localStorage`，主頁會即時讀取同一份草稿；若要更新專案預設作品資料，將下載內容放回 `src/data/portfolio.json`。
+
+新增專案時可填 GitHub repository URL、README URL，或直接貼上 README 內容。前端會送到本機 `/api/portfolio-gemini`，由 Vite middleware 讀取 README 並使用 Gemini `generateContent` 產生標題、摘要、詳細介紹、標籤與分類。請把 Gemini key 放在 `.env.local` 的 `GEMINI_API_KEY`，不要使用 `VITE_` 前綴。`GITHUB_TOKEN` 為選填，只用來提高 GitHub README 讀取額度。
 
 ## 資料維護
 

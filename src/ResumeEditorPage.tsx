@@ -29,6 +29,14 @@ import {
 } from "./resumeDraft";
 import "./resumeEditor.css";
 import {
+  clonePortfolio,
+  getPortfolioJson,
+  initialPortfolio,
+  isPortfolioData,
+  loadPortfolioDraftFromStorage,
+  localPortfolioDraftStorageKey,
+} from "./portfolioDraft";
+import {
   buildResumePlatformSyncPackages,
   getResumePlatformClipboardText,
   getResumePlatformSyncJson,
@@ -37,6 +45,7 @@ import {
   type ResumeSyncPlatformId,
   type ResumeSyncSectionKey,
 } from "./resumePlatformSync";
+import type { PortfolioData, Project, ProjectScreenshot } from "./types/portfolio";
 import type { ResumeBullet, ResumeData, ResumeLinkIcon, TimelineItem } from "./types/resume";
 
 type ResumeSectionKey = "workExperience" | "education";
@@ -74,6 +83,25 @@ type EditorInitialState = {
   draft: ResumeData;
   status: AsyncStatus;
 };
+
+type PortfolioEditorInitialState = {
+  draft: PortfolioData;
+  status: AsyncStatus;
+};
+
+type ProjectGeminiRequest = {
+  caseStudyUrl: string;
+  category: string;
+  demoUrl: string;
+  readmeText: string;
+  readmeUrl: string;
+  repoUrl: string;
+  screenshotAlt: string;
+  screenshotSrc: string;
+  title: string;
+};
+
+type GeminiGeneratedProject = Pick<Project, "category" | "description" | "summary" | "tags" | "title" | "year">;
 
 const linkIconOptions: ResumeLinkIcon[] = ["external", "github", "linkedin", "mail"];
 const manualSyncTextsStorageKey = "resume-editor-platform-sync-manual-texts-v1";
@@ -443,6 +471,34 @@ function getInitialEditorState(): EditorInitialState {
   return { draft: loadedDraft.draft, status: fallbackStatus };
 }
 
+function getInitialPortfolioEditorState(): PortfolioEditorInitialState {
+  const fallbackStatus = { phase: "idle", message: "" } satisfies AsyncStatus;
+
+  const loadedDraft = loadPortfolioDraftFromStorage();
+  if (loadedDraft.source === "stored") {
+    return {
+      draft: loadedDraft.draft,
+      status: { phase: "success", message: "已載入瀏覽器保存的作品草稿。" },
+    };
+  }
+
+  if (loadedDraft.source === "invalid") {
+    return {
+      draft: loadedDraft.draft,
+      status: { phase: "error", message: "本機作品草稿格式不符合資料結構，已改用內建作品。" },
+    };
+  }
+
+  if (loadedDraft.source === "unreadable") {
+    return {
+      draft: loadedDraft.draft,
+      status: { phase: "error", message: "無法讀取本機作品草稿，已改用內建作品。" },
+    };
+  }
+
+  return { draft: loadedDraft.draft, status: fallbackStatus };
+}
+
 function downloadTextFile(fileName: string, text: string) {
   const blob = new Blob([text], { type: "application/json;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -488,16 +544,91 @@ async function readResumeFile(file: File) {
   return parsed;
 }
 
+async function readPortfolioFile(file: File) {
+  const text = await file.text();
+  const parsed = JSON.parse(text) as unknown;
+
+  if (!isPortfolioData(parsed)) {
+    throw new Error("匯入的 JSON 格式不符合目前作品資料結構。");
+  }
+
+  return parsed;
+}
+
+function createEmptyProject(): Project {
+  const now = new Date().toISOString();
+
+  return {
+    title: "新專案",
+    summary: "",
+    description: "",
+    tags: [],
+    category: "互動網頁",
+    year: String(new Date().getFullYear()),
+    createdAt: now,
+    updatedAt: now,
+    links: {
+      demo: "",
+      repo: "",
+      caseStudy: "",
+    },
+  };
+}
+
+function createProjectFromGemini(request: ProjectGeminiRequest, generated: GeminiGeneratedProject, repoUrl: string): Project {
+  const now = new Date().toISOString();
+  const screenshotSrc = request.screenshotSrc.trim();
+  const screenshotAlt = request.screenshotAlt.trim() || `${generated.title} 作品截圖`;
+  const screenshot = screenshotSrc ? { src: screenshotSrc, alt: screenshotAlt } : undefined;
+
+  return {
+    title: generated.title || request.title.trim() || "未命名專案",
+    summary: generated.summary,
+    description: generated.description,
+    tags: generated.tags,
+    category: generated.category || request.category.trim() || "互動網頁",
+    year: generated.year || String(new Date().getFullYear()),
+    createdAt: now,
+    updatedAt: now,
+    ...(screenshot ? { screenshot, screenshots: [screenshot] } : {}),
+    links: {
+      demo: request.demoUrl.trim(),
+      repo: repoUrl || request.repoUrl.trim(),
+      caseStudy: request.caseStudyUrl.trim(),
+    },
+  };
+}
+
+function normalizeGeneratedProject(value: unknown): GeminiGeneratedProject {
+  if (!isRecord(value)) {
+    throw new Error("Gemini 回傳的 project 格式不正確。");
+  }
+
+  return {
+    title: typeof value.title === "string" ? value.title.trim() : "",
+    summary: typeof value.summary === "string" ? value.summary.trim() : "",
+    description: typeof value.description === "string" ? value.description.trim() : "",
+    tags: Array.isArray(value.tags) ? value.tags.map((tag) => String(tag).trim()).filter(Boolean) : [],
+    category: typeof value.category === "string" ? value.category.trim() : "",
+    year: typeof value.year === "string" ? value.year.trim() : "",
+  };
+}
+
 function ResumeEditorPage({
   onBackHome,
   onOpenResume,
+  onPortfolioChange,
 }: {
   onBackHome: () => void;
   onOpenResume: () => void;
+  onPortfolioChange: (portfolio: PortfolioData) => void;
 }) {
   const [initialState] = useState(getInitialEditorState);
+  const [initialPortfolioState] = useState(getInitialPortfolioEditorState);
   const [draft, setDraft] = useState<ResumeData>(() => initialState.draft);
   const [status, setStatus] = useState<AsyncStatus>(() => initialState.status);
+  const [portfolioDraft, setPortfolioDraft] = useState<PortfolioData>(() => initialPortfolioState.draft);
+  const [portfolioStatus, setPortfolioStatus] = useState<AsyncStatus>(() => initialPortfolioState.status);
   const [platformSyncStatus, setPlatformSyncStatus] = useState<AsyncStatus>({ phase: "idle", message: "" });
   const [platformAuthStatus, setPlatformAuthStatus] = useState<PlatformAuthStatus>({
     phase: "idle",
@@ -508,8 +639,10 @@ function ResumeEditorPage({
   const [manualSyncTexts, setManualSyncTexts] = useState<ManualSyncTexts>(getInitialManualSyncTexts);
   const [lastSyncDraftAt, setLastSyncDraftAt] = useState(() => new Date().toISOString());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const portfolioFileInputRef = useRef<HTMLInputElement>(null);
   const platformAuthEndpoint = import.meta.env.VITE_RESUME_AUTH_ENDPOINT?.trim() || "/api/resume-platform-auth";
   const syncBridgeEndpoint = import.meta.env.VITE_RESUME_SYNC_ENDPOINT?.trim();
+  const portfolioGeminiEndpoint = import.meta.env.VITE_PORTFOLIO_GEMINI_ENDPOINT?.trim() || "/api/portfolio-gemini";
   const platformResumeUrls = useMemo(() => getPlatformResumeUrls(draft), [draft]);
   const baseSyncPackages = useMemo(
     () => buildResumePlatformSyncPackages(draft, lastSyncDraftAt),
@@ -527,6 +660,15 @@ function ResumeEditorPage({
       setStatus({ phase: "error", message: "無法保存本機草稿，請改用下載 JSON 備份。" });
     }
   }, [draft]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(localPortfolioDraftStorageKey, getPortfolioJson(portfolioDraft));
+      onPortfolioChange(portfolioDraft);
+    } catch {
+      setPortfolioStatus({ phase: "error", message: "無法保存作品草稿，請改用下載 JSON 備份。" });
+    }
+  }, [onPortfolioChange, portfolioDraft]);
 
   useEffect(() => {
     setLastSyncDraftAt(new Date().toISOString());
@@ -655,6 +797,116 @@ function ResumeEditorPage({
     setDraft(resetDraft);
     setManualSyncTexts({});
     setStatus({ phase: "success", message: "已重設為專案內建履歷資料。" });
+  };
+
+  const handlePortfolioImportClick = () => {
+    portfolioFileInputRef.current?.click();
+  };
+
+  const handleImportPortfolioJson = async (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    setPortfolioStatus({ phase: "loading", message: "正在匯入作品 JSON。" });
+    try {
+      const importedPortfolio = await readPortfolioFile(file);
+      setPortfolioDraft(clonePortfolio(importedPortfolio));
+      setPortfolioStatus({ phase: "success", message: "已匯入作品 JSON。" });
+    } catch (error) {
+      setPortfolioStatus({
+        phase: "error",
+        message: error instanceof Error ? error.message : "匯入作品 JSON 失敗。",
+      });
+    } finally {
+      input.value = "";
+    }
+  };
+
+  const handleCopyPortfolioJson = async () => {
+    try {
+      await writeClipboardText(getPortfolioJson(portfolioDraft));
+      setPortfolioStatus({ phase: "success", message: "已複製目前作品 JSON。" });
+    } catch {
+      setPortfolioStatus({ phase: "error", message: "無法複製作品 JSON，請改用下載檔案。" });
+    }
+  };
+
+  const handleDownloadPortfolioJson = () => {
+    try {
+      downloadTextFile("portfolio.json", getPortfolioJson(portfolioDraft));
+      setPortfolioStatus({ phase: "success", message: "已下載作品 JSON。" });
+    } catch {
+      setPortfolioStatus({ phase: "error", message: "無法下載作品 JSON，請改用複製內容。" });
+    }
+  };
+
+  const handleResetPortfolioDraft = () => {
+    setPortfolioDraft(clonePortfolio(initialPortfolio));
+    setPortfolioStatus({ phase: "success", message: "已重設為專案內建作品資料。" });
+  };
+
+  const updateProjects = (projects: Project[]) => {
+    setPortfolioDraft((current) => ({
+      ...current,
+      projects,
+    }));
+  };
+
+  const updateProject = (projectIndex: number, project: Project) => {
+    setPortfolioDraft((current) => ({
+      ...current,
+      projects: replaceAt(current.projects, projectIndex, project),
+    }));
+  };
+
+  const handleAddEmptyProject = () => {
+    setPortfolioDraft((current) => ({
+      ...current,
+      projects: [createEmptyProject(), ...current.projects],
+    }));
+    setPortfolioStatus({ phase: "success", message: "已新增空白專案。" });
+  };
+
+  const handleGenerateProjectFromReadme = async (request: ProjectGeminiRequest) => {
+    setPortfolioStatus({ phase: "saving", message: "正在讀取 README 並請 Gemini 產生作品文案。" });
+
+    try {
+      const response = await fetch(portfolioGeminiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+      const payload = (await response.json()) as unknown;
+
+      if (!response.ok) {
+        throw new Error(isRecord(payload) && typeof payload.message === "string" ? payload.message : `Gemini API 回應 ${response.status}`);
+      }
+
+      if (!isRecord(payload)) {
+        throw new Error("Gemini API 回傳格式不正確。");
+      }
+
+      const generatedProject = normalizeGeneratedProject(payload.project);
+      const repoUrl = typeof payload.repoUrl === "string" ? payload.repoUrl : request.repoUrl.trim();
+      const nextProject = createProjectFromGemini(request, generatedProject, repoUrl);
+
+      setPortfolioDraft((current) => ({
+        ...current,
+        projects: [nextProject, ...current.projects],
+      }));
+      setPortfolioStatus({
+        phase: "success",
+        message: `已新增 ${nextProject.title}，文案由 README 與 Gemini 產生。`,
+      });
+    } catch (error) {
+      setPortfolioStatus({
+        phase: "error",
+        message: error instanceof Error ? error.message : "Gemini 作品文案產生失敗。",
+      });
+    }
   };
 
   const updateManualSyncText = (
@@ -930,6 +1182,28 @@ function ResumeEditorPage({
           onResetAllManualTexts={resetAllManualSyncTexts}
           onResetSectionText={resetManualSyncText}
           onUpdateSectionText={updateManualSyncText}
+        />
+
+        <ProjectManagementPanel
+          geminiEndpoint={portfolioGeminiEndpoint}
+          portfolio={portfolioDraft}
+          status={portfolioStatus}
+          onAddEmptyProject={handleAddEmptyProject}
+          onCopyJson={handleCopyPortfolioJson}
+          onDownloadJson={handleDownloadPortfolioJson}
+          onGenerateProject={handleGenerateProjectFromReadme}
+          onImportClick={handlePortfolioImportClick}
+          onResetPortfolio={handleResetPortfolioDraft}
+          onUpdateProject={updateProject}
+          onUpdateProjects={updateProjects}
+        />
+
+        <input
+          ref={portfolioFileInputRef}
+          className="editor-file-input"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportPortfolioJson}
         />
 
         <section className="resume-editor-grid" aria-label="履歷編輯表單">
@@ -1265,6 +1539,345 @@ function PlatformAuthPanel({
   );
 }
 
+function ProjectManagementPanel({
+  geminiEndpoint,
+  onAddEmptyProject,
+  onCopyJson,
+  onDownloadJson,
+  onGenerateProject,
+  onImportClick,
+  onResetPortfolio,
+  onUpdateProject,
+  onUpdateProjects,
+  portfolio,
+  status,
+}: {
+  geminiEndpoint: string;
+  onAddEmptyProject: () => void;
+  onCopyJson: () => void;
+  onDownloadJson: () => void;
+  onGenerateProject: (request: ProjectGeminiRequest) => void;
+  onImportClick: () => void;
+  onResetPortfolio: () => void;
+  onUpdateProject: (projectIndex: number, project: Project) => void;
+  onUpdateProjects: (projects: Project[]) => void;
+  portfolio: PortfolioData;
+  status: AsyncStatus;
+}) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const isGenerating = status.phase === "saving";
+
+  return (
+    <section
+      className={`editor-local-panel project-management-panel${isExpanded ? " expanded" : " collapsed"}`}
+      aria-label="作品管理"
+    >
+      <div className="editor-local-copy">
+        <span className="editor-local-badge project">
+          <FileJson size={18} aria-hidden="true" />
+          Portfolio
+        </span>
+        <h2>作品管理</h2>
+        <p>
+          新增、編輯、刪除的作品會暫存在此瀏覽器，可下載為 <code>portfolio.json</code> 後放回專案資料檔。
+        </p>
+        <p className="sync-endpoint">
+          Gemini endpoint <code>{geminiEndpoint}</code>
+        </p>
+      </div>
+      <div className="editor-local-actions project-management-actions">
+        <button
+          className="editor-secondary-action platform-sync-toggle"
+          type="button"
+          aria-expanded={isExpanded}
+          aria-controls="project-management-body"
+          onClick={() => setIsExpanded((expanded) => !expanded)}
+        >
+          {isExpanded ? <ChevronDown size={18} aria-hidden="true" /> : <ChevronRight size={18} aria-hidden="true" />}
+          {isExpanded ? "收合作品管理" : "展開作品管理"}
+        </button>
+      </div>
+
+      {isExpanded ? (
+        <div className="project-management-body" id="project-management-body">
+          <div className="editor-local-actions project-command-row">
+            <button className="editor-secondary-action" type="button" onClick={onImportClick}>
+              <Upload size={18} aria-hidden="true" />
+              匯入作品 JSON
+            </button>
+            <button className="editor-secondary-action" type="button" onClick={onCopyJson}>
+              <FileJson size={18} aria-hidden="true" />
+              複製作品 JSON
+            </button>
+            <button className="editor-primary-action" type="button" onClick={onDownloadJson}>
+              <Download size={18} aria-hidden="true" />
+              下載作品 JSON
+            </button>
+            <button className="editor-secondary-action" type="button" onClick={onAddEmptyProject}>
+              <Plus size={18} aria-hidden="true" />
+              新增空白專案
+            </button>
+            <button className="editor-secondary-action" type="button" onClick={onResetPortfolio}>
+              <RotateCcw size={18} aria-hidden="true" />
+              重設作品
+            </button>
+          </div>
+
+          <ProjectGeminiCreator disabled={isGenerating} onGenerateProject={onGenerateProject} />
+
+          <div className="project-editor-list">
+            {portfolio.projects.map((project, index) => (
+              <ProjectEditorCard
+                index={index}
+                key={`${project.title}-${index}`}
+                project={project}
+                onChange={(nextProject) => onUpdateProject(index, nextProject)}
+                onDelete={() => onUpdateProjects(removeAt(portfolio.projects, index))}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <StatusMessage status={status} />
+    </section>
+  );
+}
+
+function ProjectGeminiCreator({
+  disabled,
+  onGenerateProject,
+}: {
+  disabled: boolean;
+  onGenerateProject: (request: ProjectGeminiRequest) => void;
+}) {
+  const [form, setForm] = useState<ProjectGeminiRequest>({
+    caseStudyUrl: "",
+    category: "",
+    demoUrl: "",
+    readmeText: "",
+    readmeUrl: "",
+    repoUrl: "",
+    screenshotAlt: "",
+    screenshotSrc: "",
+    title: "",
+  });
+
+  const updateForm = (field: keyof ProjectGeminiRequest, value: string) => {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  return (
+    <section className="project-gemini-creator" aria-label="Gemini 新增專案">
+      <div className="project-gemini-heading">
+        <div>
+          <h3>Gemini README 產文案</h3>
+          <p>提供 GitHub repository、README URL 或直接貼上 README；新增時會產生標題、摘要、介紹、標籤與分類。</p>
+        </div>
+        <button
+          className="editor-primary-action"
+          type="button"
+          disabled={disabled}
+          onClick={() => onGenerateProject(form)}
+        >
+          <RefreshCw size={18} aria-hidden="true" />
+          {disabled ? "產生中" : "讀取 README 新增"}
+        </button>
+      </div>
+      <div className="project-gemini-grid">
+        <TextField label="偏好專案名稱" value={form.title} onChange={(value) => updateForm("title", value)} />
+        <TextField label="GitHub repository URL" value={form.repoUrl} onChange={(value) => updateForm("repoUrl", value)} />
+        <TextField label="README URL" value={form.readmeUrl} onChange={(value) => updateForm("readmeUrl", value)} />
+        <TextField label="Demo URL" value={form.demoUrl} onChange={(value) => updateForm("demoUrl", value)} />
+        <TextField label="專案筆記 URL" value={form.caseStudyUrl} onChange={(value) => updateForm("caseStudyUrl", value)} />
+        <TextField label="偏好分類" value={form.category} onChange={(value) => updateForm("category", value)} />
+        <TextField label="主截圖路徑" value={form.screenshotSrc} onChange={(value) => updateForm("screenshotSrc", value)} />
+        <TextField label="主截圖替代文字" value={form.screenshotAlt} onChange={(value) => updateForm("screenshotAlt", value)} />
+        <TextAreaField
+          className="project-readme-textarea"
+          label="README 內容"
+          rows={7}
+          value={form.readmeText}
+          placeholder="若 repository 不是公開 GitHub，可直接貼上 README。"
+          onChange={(value) => updateForm("readmeText", value)}
+        />
+      </div>
+    </section>
+  );
+}
+
+function ProjectEditorCard({
+  index,
+  onChange,
+  onDelete,
+  project,
+}: {
+  index: number;
+  onChange: (project: Project) => void;
+  onDelete: () => void;
+  project: Project;
+}) {
+  const screenshots = project.screenshots?.length ? project.screenshots : project.screenshot ? [project.screenshot] : [];
+
+  const updateField = <K extends keyof Project>(field: K, value: Project[K]) => {
+    onChange({
+      ...project,
+      [field]: value,
+    });
+  };
+
+  const updateLink = (field: keyof Project["links"], value: string) => {
+    onChange({
+      ...project,
+      links: {
+        ...project.links,
+        [field]: value,
+      },
+    });
+  };
+
+  const updateScreenshots = (nextScreenshots: ProjectScreenshot[]) => {
+    const { screenshot: _screenshot, screenshots: _screenshots, ...projectWithoutScreenshots } = project;
+    const firstScreenshot = nextScreenshots[0];
+
+    onChange({
+      ...projectWithoutScreenshots,
+      ...(firstScreenshot ? { screenshot: firstScreenshot, screenshots: nextScreenshots } : { screenshots: [] }),
+    });
+  };
+
+  return (
+    <article className="project-editor-card">
+      <div className="editor-timeline-head">
+        <h3>
+          {index + 1}. {project.title || "未命名專案"}
+        </h3>
+        <button className="editor-small-action danger" type="button" onClick={onDelete}>
+          <Trash2 size={15} aria-hidden="true" />
+          刪除專案
+        </button>
+      </div>
+
+      <div className="editor-two-column">
+        <TextField label="專案名稱" value={project.title} onChange={(value) => updateField("title", value)} />
+        <TextField label="分類" value={project.category} onChange={(value) => updateField("category", value)} />
+        <TextField label="年份" value={project.year} onChange={(value) => updateField("year", value)} />
+        <TextField label="建立時間" value={project.createdAt} onChange={(value) => updateField("createdAt", value)} />
+        <TextField label="更新時間" value={project.updatedAt} onChange={(value) => updateField("updatedAt", value)} />
+        <TextField label="Demo URL" value={project.links.demo ?? ""} onChange={(value) => updateLink("demo", value)} />
+        <TextField label="Repository URL" value={project.links.repo ?? ""} onChange={(value) => updateLink("repo", value)} />
+        <TextField label="專案筆記 URL" value={project.links.caseStudy ?? ""} onChange={(value) => updateLink("caseStudy", value)} />
+      </div>
+
+      <TextAreaField label="列表摘要" rows={3} value={project.summary} onChange={(value) => updateField("summary", value)} />
+      <TextAreaField label="詳細介紹" rows={5} value={project.description} onChange={(value) => updateField("description", value)} />
+      <ProjectTagsEditor tags={project.tags} onChange={(tags) => updateField("tags", tags)} />
+      <ProjectScreenshotsEditor
+        projectTitle={project.title}
+        screenshots={screenshots}
+        onChange={updateScreenshots}
+      />
+    </article>
+  );
+}
+
+function serializeProjectTags(tags: string[]) {
+  return tags.join("\n");
+}
+
+function parseProjectTags(value: string) {
+  const tags = value
+    .split(/[,\n]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set(tags));
+}
+
+function haveSameProjectTags(left: string[], right: string[]) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function ProjectTagsEditor({ onChange, tags }: { onChange: (tags: string[]) => void; tags: string[] }) {
+  const [text, setText] = useState(() => serializeProjectTags(tags));
+
+  useEffect(() => {
+    if (haveSameProjectTags(parseProjectTags(text), tags)) return;
+    setText(serializeProjectTags(tags));
+  }, [tags, text]);
+
+  const updateText = (nextText: string) => {
+    setText(nextText);
+    onChange(parseProjectTags(nextText));
+  };
+
+  return (
+    <TextAreaField
+      label="標籤"
+      rows={5}
+      value={text}
+      placeholder={"JavaScript\nVite\nInteractive Web"}
+      onChange={updateText}
+    />
+  );
+}
+
+function serializeProjectScreenshots(screenshots: ProjectScreenshot[]) {
+  return screenshots.map((screenshot) => `${screenshot.src} | ${screenshot.alt}`).join("\n");
+}
+
+function parseProjectScreenshots(value: string, projectTitle: string): ProjectScreenshot[] {
+  return value
+    .split(/\r?\n/)
+    .map((line, index) => {
+      const [src, ...altParts] = line.split("|");
+      const trimmedSrc = src.trim();
+      const alt = altParts.join("|").trim() || `${projectTitle || "專案"} 作品圖片 ${index + 1}`;
+
+      return trimmedSrc ? { src: trimmedSrc, alt } : null;
+    })
+    .filter((screenshot): screenshot is ProjectScreenshot => Boolean(screenshot));
+}
+
+function haveSameProjectScreenshots(left: ProjectScreenshot[], right: ProjectScreenshot[]) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function ProjectScreenshotsEditor({
+  onChange,
+  projectTitle,
+  screenshots,
+}: {
+  onChange: (screenshots: ProjectScreenshot[]) => void;
+  projectTitle: string;
+  screenshots: ProjectScreenshot[];
+}) {
+  const [text, setText] = useState(() => serializeProjectScreenshots(screenshots));
+
+  useEffect(() => {
+    if (haveSameProjectScreenshots(parseProjectScreenshots(text, projectTitle), screenshots)) return;
+    setText(serializeProjectScreenshots(screenshots));
+  }, [projectTitle, screenshots, text]);
+
+  const updateText = (nextText: string) => {
+    setText(nextText);
+    onChange(parseProjectScreenshots(nextText, projectTitle));
+  };
+
+  return (
+    <TextAreaField
+      label="截圖清單"
+      rows={5}
+      value={text}
+      placeholder={"project-screenshots/example.png | Example desktop\nproject-screenshots/example-mobile.png | Example mobile"}
+      onChange={updateText}
+    />
+  );
+}
+
 function EditorCard({ children, title }: { children: ReactNode; title: string }) {
   return (
     <section className="editor-card">
@@ -1289,6 +1902,29 @@ function TextField({
     <label className="editor-field">
       <span>{label}</span>
       <input value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
+    </label>
+  );
+}
+
+function TextAreaField({
+  className,
+  label,
+  onChange,
+  placeholder,
+  rows = 4,
+  value,
+}: {
+  className?: string;
+  label: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  rows?: number;
+  value: string;
+}) {
+  return (
+    <label className={`editor-field${className ? ` ${className}` : ""}`}>
+      <span>{label}</span>
+      <textarea rows={rows} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
     </label>
   );
 }
