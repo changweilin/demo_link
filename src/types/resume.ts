@@ -25,6 +25,18 @@ export type TimelineItem = {
   bullets: ResumeBullet[];
 };
 
+export type ResumeProjectLink = {
+  label: string;
+  href: string;
+};
+
+export type ResumeProject = {
+  title: string;
+  summary: string;
+  tags: string[];
+  links: ResumeProjectLink[];
+};
+
 export type ResumeData = {
   meta: {
     eyebrow: string;
@@ -40,6 +52,7 @@ export type ResumeData = {
     links: ResumeLink[];
   };
   skills: SkillColumn[];
+  projects?: ResumeProject[];
   workExperience: TimelineItem[];
   education: TimelineItem[];
 };

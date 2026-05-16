@@ -77,6 +77,89 @@
   cursor: pointer;
 }
 
+.cake-clone-version-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+  align-items: stretch;
+  width: min(100% - 48px, 1120px);
+  margin: 22px auto 0;
+  gap: 18px;
+}
+
+.cake-clone-version-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cake-clone-version-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d8dedb;
+  border-radius: 4px;
+  color: #335248;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 800;
+  white-space: nowrap;
+  gap: 7px;
+}
+
+.cake-clone-version-buttons button.active {
+  border-color: #0b663e;
+  color: #ffffff;
+  background: #0b663e;
+}
+
+.cake-clone-version-copy {
+  min-height: 84px;
+  padding: 14px 16px;
+  border-left: 3px solid #0b663e;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.cake-clone-version-copy p,
+.cake-clone-version-copy strong {
+  display: block;
+  margin: 0;
+  color: #25342f;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cake-clone-version-copy p {
+  color: #0b663e;
+  font-weight: 800;
+}
+
+.cake-clone-version-tags,
+.cake-clone-project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.cake-clone-version-tags {
+  margin-top: 10px;
+}
+
+.cake-clone-version-tags span,
+.cake-clone-project-tags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid #d8dedb;
+  border-radius: 4px;
+  color: #335248;
+  background: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .cake-clone-stage {
   display: flex;
   justify-content: center;
@@ -89,6 +172,30 @@
   padding: 48px 54px 56px;
   background: #ffffff;
   box-shadow: 0 22px 70px rgba(27, 39, 34, 0.18);
+}
+
+.cake-clone-paper-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e4e4e4;
+  gap: 8px 16px;
+}
+
+.cake-clone-paper-header span {
+  color: #0b663e;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.cake-clone-paper-header p {
+  margin: 0;
+  color: #666666;
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .cake-clone-profile {
@@ -212,6 +319,48 @@
   line-height: 1.2;
 }
 
+.cake-clone-projects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cake-clone-project {
+  padding: 0 0 15px;
+  border-bottom: 1px solid #e4e4e4;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cake-clone-project h3 {
+  margin: 0 0 8px;
+  color: #222222;
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.cake-clone-project p {
+  margin: 0 0 10px;
+  color: #222222;
+  font-size: 15px;
+  line-height: 1.58;
+}
+
+.cake-clone-project-links {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.cake-clone-project-links a {
+  color: #0b663e;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .cake-clone-timeline {
   display: grid;
   gap: 24px;
@@ -297,6 +446,15 @@
     justify-content: start;
   }
 
+  .cake-clone-version-panel {
+    grid-template-columns: 1fr;
+    width: min(100% - 28px, 1120px);
+  }
+
+  .cake-clone-version-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .cake-clone-paper {
     padding: 32px 24px 40px;
   }
@@ -315,6 +473,10 @@
     gap: 18px;
   }
 
+  .cake-clone-projects {
+    grid-template-columns: 1fr;
+  }
+
   .cake-clone-marker {
     display: none;
   }
@@ -329,6 +491,15 @@
   .cake-clone-stage {
     width: min(100% - 16px, 1120px);
     margin-top: 16px;
+  }
+
+  .cake-clone-version-panel {
+    width: min(100% - 16px, 1120px);
+    margin-top: 14px;
+  }
+
+  .cake-clone-version-buttons {
+    grid-template-columns: 1fr;
   }
 
   .cake-clone-actions {
@@ -357,11 +528,27 @@
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm 11mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
   .cake-clone-page {
     min-height: auto;
     padding: 0;
     color: #222222;
     background: #ffffff !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   .cake-clone-stage {
@@ -374,11 +561,26 @@
     width: auto;
     padding: 0;
     background: #ffffff;
+    box-shadow: none;
+  }
+
+  .cake-clone-paper-header {
+    margin-bottom: 5mm;
+    padding-bottom: 3mm;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .cake-clone-paper-header span,
+  .cake-clone-paper-header p {
+    font-size: 9pt;
   }
 
   .cake-clone-profile {
     grid-template-columns: 28mm 1fr;
     gap: 8mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .cake-clone-photo {
@@ -392,6 +594,8 @@
   .cake-clone-section h2 {
     margin-bottom: 4mm;
     font-size: 20pt;
+    break-after: avoid;
+    page-break-after: avoid;
   }
 
   .cake-clone-summary {
@@ -409,6 +613,8 @@
 
   .cake-clone-section {
     margin-top: 8mm;
+    break-inside: auto;
+    page-break-inside: auto;
   }
 
   .cake-clone-skill-columns {
@@ -422,6 +628,51 @@
 
   .cake-clone-skill h3 {
     font-size: 14pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .cake-clone-skill,
+  .cake-clone-project {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .cake-clone-projects {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5mm;
+  }
+
+  .cake-clone-project {
+    padding-bottom: 3mm;
+  }
+
+  .cake-clone-project h3 {
+    margin-bottom: 2mm;
+    font-size: 11.5pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .cake-clone-project p {
+    margin-bottom: 2mm;
+    font-size: 9.5pt;
+    line-height: 1.45;
+  }
+
+  .cake-clone-project-tags span {
+    min-height: 0;
+    padding: 0 5px;
+    font-size: 7.6pt;
+  }
+
+  .cake-clone-project-links {
+    gap: 6px;
+    margin-top: 2mm;
+  }
+
+  .cake-clone-project-links a {
+    font-size: 8.5pt;
   }
 
   .cake-clone-timeline {
@@ -431,11 +682,25 @@
   .cake-clone-entry {
     grid-template-columns: 11mm 1fr 24mm;
     gap: 5mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .cake-clone-copy h3 {
     margin-bottom: 2.5mm;
     font-size: 11.5pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .cake-clone-copy ul,
+  .cake-clone-copy li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .cake-clone-marker::after {
+    bottom: -6mm;
   }
 
   .cake-clone-image img {

@@ -2,14 +2,26 @@ import {
   ArrowLeft,
   Download,
   ExternalLink,
+  FileText,
   Github,
   Linkedin,
   Mail,
   MapPin,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import "./cakeResume.css";
+import { loadPortfolioDraftFromStorage } from "./portfolioDraft";
 import { loadResumeDraftFromStorage } from "./resumeDraft";
-import type { ResumeBullet, ResumeData, ResumeLink, ResumeLinkIcon, SkillColumn, TimelineItem } from "./types/resume";
+import { buildResumeVersions, type ResumeVersion, type ResumeVersionId } from "./resumeVersions";
+import type {
+  ResumeBullet,
+  ResumeData,
+  ResumeLink,
+  ResumeLinkIcon,
+  ResumeProject,
+  SkillColumn,
+  TimelineItem,
+} from "./types/resume";
 
 type CakeResumePageProps = {
   onBackHome: () => void;
@@ -31,10 +43,25 @@ function getLinkIcon(icon: ResumeLinkIcon) {
 }
 
 function CakeResumePage({ onBackHome }: CakeResumePageProps) {
-  const resume = loadResumeDraftFromStorage().draft;
+  const baseResume = useMemo(() => loadResumeDraftFromStorage().draft, []);
+  const portfolio = useMemo(() => loadPortfolioDraftFromStorage().draft, []);
+  const resumeVersions = useMemo(() => buildResumeVersions(baseResume, portfolio), [baseResume, portfolio]);
+  const [selectedVersionId, setSelectedVersionId] = useState<ResumeVersionId>("original");
+  const selectedVersion =
+    resumeVersions.find((version) => version.id === selectedVersionId) ?? resumeVersions[0];
+  const resume = selectedVersion.resume;
 
   const handlePrint = () => {
+    const previousTitle = document.title;
+    const restoreTitle = () => {
+      document.title = previousTitle;
+      window.removeEventListener("afterprint", restoreTitle);
+    };
+
+    document.title = selectedVersion.pdfFileName;
+    window.addEventListener("afterprint", restoreTitle, { once: true });
     window.print();
+    window.setTimeout(restoreTitle, 1200);
   };
 
   return (
@@ -56,15 +83,71 @@ function CakeResumePage({ onBackHome }: CakeResumePageProps) {
         </div>
       </header>
 
+      <ResumeVersionSelector
+        versions={resumeVersions}
+        selectedVersion={selectedVersion}
+        onSelectVersion={setSelectedVersionId}
+      />
+
       <section className="cake-clone-stage" aria-label="中文完整履歷">
         <article className="cake-clone-paper">
+          <ResumeVersionHeader version={selectedVersion} />
           <ResumeProfile profile={resume.profile} profileImage={resume.meta.profileImage} />
           <SkillsSection skills={resume.skills} />
+          {resume.projects?.length ? <FeaturedProjectsSection projects={resume.projects} /> : null}
           <TimelineSection title="工作經歷" items={resume.workExperience} />
           <TimelineSection title="學歷" items={resume.education} />
         </article>
       </section>
     </main>
+  );
+}
+
+function ResumeVersionSelector({
+  versions,
+  selectedVersion,
+  onSelectVersion,
+}: {
+  versions: ResumeVersion[];
+  selectedVersion: ResumeVersion;
+  onSelectVersion: (versionId: ResumeVersionId) => void;
+}) {
+  return (
+    <section className="cake-clone-version-panel no-print" aria-label="履歷版本">
+      <div className="cake-clone-version-buttons" role="radiogroup" aria-label="選擇履歷版本">
+        {versions.map((version) => (
+          <button
+            key={version.id}
+            className={version.id === selectedVersion.id ? "active" : ""}
+            type="button"
+            role="radio"
+            aria-checked={version.id === selectedVersion.id}
+            onClick={() => onSelectVersion(version.id)}
+          >
+            <FileText size={17} aria-hidden="true" />
+            <span>{version.shortLabel}</span>
+          </button>
+        ))}
+      </div>
+      <div className="cake-clone-version-copy" aria-live="polite">
+        <p>{selectedVersion.audience}</p>
+        <strong>{selectedVersion.description}</strong>
+        <div className="cake-clone-version-tags" aria-label="版本關鍵字">
+          {selectedVersion.keywords.map((keyword) => (
+            <span key={keyword}>{keyword}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ResumeVersionHeader({ version }: { version: ResumeVersion }) {
+  return (
+    <header className="cake-clone-paper-header" aria-label="履歷版本資訊">
+      <span>{version.label}</span>
+      <p>{version.audience}</p>
+    </header>
   );
 }
 
@@ -132,9 +215,46 @@ function SkillsSection({ skills }: { skills: SkillColumn[] }) {
   );
 }
 
-function TimelineSection({ title, items }: { title: string; items: TimelineItem[] }) {
+function FeaturedProjectsSection({ projects }: { projects: ResumeProject[] }) {
   return (
-    <section className="cake-clone-section" aria-labelledby={`cake-${title}-title`}>
+    <section className="cake-clone-section cake-clone-projects-section" aria-labelledby="cake-projects-title">
+      <h2 id="cake-projects-title">精選作品</h2>
+      <div className="cake-clone-projects">
+        {projects.map((project) => (
+          <article className="cake-clone-project" key={project.title}>
+            <h3>{project.title}</h3>
+            <p>{project.summary}</p>
+            <div className="cake-clone-project-tags" aria-label={`${project.title} 技術標籤`}>
+              {project.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+            {project.links.length ? (
+              <div className="cake-clone-project-links">
+                {project.links.map((link) => (
+                  <a key={`${project.title}-${link.label}`} href={link.href} target="_blank" rel="noreferrer">
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TimelineSection({ title, items }: { title: string; items: TimelineItem[] }) {
+  const sectionClassName =
+    title === "工作經歷"
+      ? "cake-clone-section cake-clone-work-section"
+      : title === "學歷"
+        ? "cake-clone-section cake-clone-education-section"
+        : "cake-clone-section";
+
+  return (
+    <section className={sectionClassName} aria-labelledby={`cake-${title}-title`}>
       <h2 id={`cake-${title}-title`}>{title}</h2>
       <div className="cake-clone-timeline">
         {items.map((item) => (
