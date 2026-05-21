@@ -28,6 +28,70 @@
   },
   "projects": [
     {
+      "title": "Elven Chewing",
+      "summary": "Rust 實作的 Windows 注音輸入法與 WebAssembly 瀏覽器沙盒，展示模糊注音猜詞、雙排輸入、最近文字重轉與簡繁切換。",
+      "description": "Elven Chewing 是以 Rust 與 Windows Text Services Framework 打造的注音輸入法專案，延伸新酷音/libchewing 的轉換基礎，加入 out-of-process UI、雙排輸入、模糊注音猜詞、最近一次送出文字重轉、簡繁即時切換與 MSI 打包流程；公開 Web Demo 則透過 WebAssembly 在瀏覽器中驗證核心輸入體驗與候選面板行為。",
+      "tags": [
+        "Rust",
+        "WebAssembly",
+        "Input Method",
+        "Zhuyin",
+        "Windows TSF",
+        "GitHub Pages"
+      ],
+      "category": "輸入法與系統工具",
+      "year": "2026",
+      "createdAt": "2026-05-13T16:52:21Z",
+      "updatedAt": "2026-05-21T16:46:39Z",
+      "screenshot": {
+        "src": "project-screenshots/elven-chewing.png",
+        "alt": "Elven Chewing 精靈語輸入法 Web Sandbox demo 介面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/elven-chewing/",
+        "repo": "https://github.com/changweilin/elven-chewing",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/elven-chewing.png",
+          "alt": "Elven Chewing 精靈語輸入法 Web Sandbox demo 介面"
+        }
+      ]
+    },
+    {
+      "title": "Novel Elf",
+      "summary": "小說與世界觀創作工作台，整合地圖、時間線、典籍、章節編輯與多語介面，用來管理 Aevenmere 世界資料。",
+      "description": "Novel Elf 是一套以 The Atelier of Aevenmere 為核心的創作工作台，將世界地圖、歷史時間線、角色與組織典籍、書庫章節、故事資料匯入匯出與多語介面集中在同一個瀏覽器介面中，適合整理長篇小說、TRPG 世界觀與設定集資料。",
+      "tags": [
+        "JavaScript",
+        "Worldbuilding",
+        "Writing Tool",
+        "Story Wiki",
+        "Interactive Map",
+        "i18n"
+      ],
+      "category": "創作工具",
+      "year": "2026",
+      "createdAt": "2026-05-20T13:41:44Z",
+      "updatedAt": "2026-05-21T15:15:19Z",
+      "screenshot": {
+        "src": "project-screenshots/novel-elf.png",
+        "alt": "Novel Elf Aevenmere 世界觀創作工作台介面"
+      },
+      "links": {
+        "demo": "",
+        "repo": "https://github.com/changweilin/novel_elf",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/novel-elf.png",
+          "alt": "Novel Elf Aevenmere 世界觀創作工作台介面"
+        }
+      ]
+    },
+    {
       "title": "Agent Task Manager (ATM)",
       "summary": "本機 npm dev server 管理台，可集中掃描、啟動、停止並監控多個前端專案，適合 Agent Coding 工作流使用。",
       "description": "Agent Task Manager (ATM) 是一套面向 Windows 開發環境的本機開發伺服器管理工具，結合 Node.js HTTP/WebSocket 伺服器、靜態 Web UI 與 PowerShell CLI，自動掃描含有 dev script 的專案，集中管理啟動、停止、重啟、健康檢查、即時 log、終端工作階段與跨裝置測試 URL。",
