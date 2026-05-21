@@ -97,11 +97,12 @@ Action 使用 `npm run build:github-pages` 與 `.env.github-pages`，其中 `VIT
 履歷編輯器已改為本地端流程：
 
 1. 開啟 `http://localhost:43177/#resume-editor`。
-2. 直接編輯履歷內容，不需要登入。
-3. 使用 `匯入 JSON` 載入本機 `resume.json`，或使用 `下載 JSON` 匯出目前草稿。
-4. 若要更新專案預設履歷，將匯出的內容放回 `src/data/resume.json` 後重新 build。
+2. 在 `目前履歷版本` 選擇要編輯的版本；表單內容會對應到該版本。
+3. 使用 `新增履歷` 複製目前版本建立新版本，或使用 `刪除履歷` 移除目前版本；至少會保留一份履歷。
+4. 使用 `匯入 JSON` 載入本機 `resume.json` 到目前版本，或使用 `下載 JSON` 匯出目前版本。
+5. 若要更新專案預設履歷，將匯出的內容放回 `src/data/resume.json` 後重新 build。
 
-草稿會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub；只有改到主網頁相關檔案時才會觸發主站部署 Action。
+履歷版本會暫存在目前瀏覽器的 `localStorage`，不會提交到 GitHub；也會同步保留目前選取版本的單一 `resume.json` 草稿格式，讓既有預覽與匯出流程相容。只有改到主網頁相關檔案時才會觸發主站部署 Action。
 自我介紹和技能都改為單一文字區；技能用不縮排的行表示分類，用 Tab 或四個半形空格表示分類下的技能項目。
 工作經歷與學歷的重點條列會自動把 Tab 或四個半形空格解析成子條列；連結條列可寫成 `[文字](https://example.com)`。
 
@@ -122,7 +123,7 @@ Action 使用 `npm run build:github-pages` 與 `.env.github-pages`，其中 `VIT
 
 若 `.env` 設定 `VITE_RESUME_SYNC_ENDPOINT`，按下編輯器的同步按鈕會將全平台 JSON `POST` 到該 endpoint。未設定 endpoint 時，同步按鈕會改為複製全平台 JSON，適合貼到後端流程或平台履歷編輯頁。
 
-站內完整版履歷會優先讀取同一份本機草稿；在編輯器修改後點擊 `查看履歷`，可直接預覽最新 Cake 版履歷。
+站內完整版履歷會優先讀取同一組本機履歷版本；在編輯器修改後點擊 `查看履歷`，可直接預覽並切換最新版本。
 
 本機開發可使用已建立的 `.env.local`：
 

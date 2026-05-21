@@ -28,6 +28,70 @@
   },
   "projects": [
     {
+      "title": "Agent Task Manager (ATM)",
+      "summary": "本機 npm dev server 管理台，可集中掃描、啟動、停止並監控多個前端專案，適合 Agent Coding 工作流使用。",
+      "description": "Agent Task Manager (ATM) 是一套面向 Windows 開發環境的本機開發伺服器管理工具，結合 Node.js HTTP/WebSocket 伺服器、靜態 Web UI 與 PowerShell CLI，自動掃描含有 dev script 的專案，集中管理啟動、停止、重啟、健康檢查、即時 log、終端工作階段與跨裝置測試 URL。",
+      "tags": [
+        "Node.js",
+        "WebSocket",
+        "PowerShell",
+        "Tailscale",
+        "Dev Server",
+        "Windows"
+      ],
+      "category": "開發工具",
+      "year": "2026",
+      "createdAt": "2026-05-14T17:49:03Z",
+      "updatedAt": "2026-05-21T14:35:42Z",
+      "screenshot": {
+        "src": "project-screenshots/agent-task-manager.png",
+        "alt": "Agent Task Manager 管理多個本機 dev server 的 Web UI"
+      },
+      "links": {
+        "demo": "",
+        "repo": "https://github.com/changweilin/agent-task-manager",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/agent-task-manager.png",
+          "alt": "Agent Task Manager 管理多個本機 dev server 的 Web UI"
+        }
+      ]
+    },
+    {
+      "title": "Music Elf",
+      "summary": "C++17 原生音樂分析核心，將單聲道歌唱錄音轉換為可編輯的 MIDI、MusicXML 樂譜與伴奏聲部。",
+      "description": "Music Elf 是一套歌聲到樂譜轉換的原生 C++17 核心與 Conductor Studio demo，從單聲道音訊進行音高偵測、音符切分、節奏量化、力度分析、調性與和弦推斷，並輸出可在 DAW 或譜面編輯軟體使用的 Standard MIDI 與 MusicXML。",
+      "tags": [
+        "C++17",
+        "DSP",
+        "MIDI",
+        "MusicXML",
+        "Audio Analysis",
+        "GitHub Pages"
+      ],
+      "category": "音樂與音訊工具",
+      "year": "2026",
+      "createdAt": "2026-05-09T08:13:03Z",
+      "updatedAt": "2026-05-21T06:52:05Z",
+      "screenshot": {
+        "src": "project-screenshots/music-elf.png",
+        "alt": "Music Elf Conductor Studio 音訊轉樂譜 demo 介面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/music_elf/",
+        "repo": "https://github.com/changweilin/music_elf",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/music-elf.png",
+          "alt": "Music Elf Conductor Studio 音訊轉樂譜 demo 介面"
+        }
+      ]
+    },
+    {
       "title": "Win Rate Calculator",
       "summary": "互動式勝率計算器，用於快速試算對戰、抽卡或決策情境中的機率與期望結果。",
       "description": "Win Rate Calculator 是以勝率與機率估算為主題的瀏覽器工具，透過簡潔表單讓使用者輸入成功率、嘗試次數或情境參數，快速得到累積勝率、期望值與比較結果。作品重點放在把抽象機率轉成可立即操作的介面，適合用於對戰策略、抽卡評估、測試成功率或決策風險試算，也展現資料驗證、狀態更新與結果呈現的實用型工具設計能力。",

@@ -17,7 +17,16 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
-import { type ChangeEvent, type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type KeyboardEvent,
+  type ReactNode,
+  type SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   cloneResume,
   getResumeJson,
@@ -27,6 +36,18 @@ import {
   localDraftStorageKey,
   platformSyncStorageKey,
 } from "./resumeDraft";
+import {
+  buildInitialResumeDraftVersions,
+  cloneResumeDraftVersions,
+  createResumeDraftVersion,
+  getResumeDraftLabel,
+  getResumeDraftShortLabel,
+  getResumeDraftVersionsJson,
+  loadResumeDraftVersionsFromStorage,
+  localDraftVersionsStorageKey,
+  selectedDraftVersionStorageKey,
+  type EditableResumeVersion,
+} from "./resumeDraftVersions";
 import "./resumeEditor.css";
 import {
   clonePortfolio,
@@ -80,8 +101,9 @@ type PlatformAuthStatus = {
 };
 
 type EditorInitialState = {
-  draft: ResumeData;
+  selectedVersionId: string;
   status: AsyncStatus;
+  versions: EditableResumeVersion[];
 };
 
 type PortfolioEditorInitialState = {
@@ -102,6 +124,7 @@ type ProjectGeminiRequest = {
 };
 
 type GeminiGeneratedProject = Pick<Project, "category" | "description" | "summary" | "tags" | "title" | "year">;
+type ResumeDraftUpdater = SetStateAction<ResumeData>;
 
 const linkIconOptions: ResumeLinkIcon[] = ["external", "github", "linkedin", "mail"];
 const manualSyncTextsStorageKey = "resume-editor-platform-sync-manual-texts-v1";
@@ -217,6 +240,10 @@ function replaceAt<T>(items: T[], index: number, nextItem: T) {
 
 function removeAt<T>(items: T[], index: number) {
   return items.filter((_, itemIndex) => itemIndex !== index);
+}
+
+function resolveResumeDraftUpdater(updater: ResumeDraftUpdater, current: ResumeData) {
+  return typeof updater === "function" ? updater(current) : updater;
 }
 
 function createEmptyBullet(): ResumeBullet {
@@ -443,32 +470,49 @@ function handleIndentedTextAreaKeyDown(
   updateTextAreaSelection(textarea, Math.max(blockStart, selectionStart + firstLineDelta), selectionEnd + totalDelta);
 }
 
-function getInitialEditorState(): EditorInitialState {
+function getInitialEditorState(portfolio: PortfolioData): EditorInitialState {
   const fallbackStatus = { phase: "idle", message: "" } satisfies AsyncStatus;
+  const legacyDraft = loadResumeDraftFromStorage();
+  const seedVersions = buildInitialResumeDraftVersions(legacyDraft.draft, portfolio);
+  const loadedVersions = loadResumeDraftVersionsFromStorage(seedVersions, "original");
 
-  const loadedDraft = loadResumeDraftFromStorage();
-  if (loadedDraft.source === "stored") {
+  if (loadedVersions.source === "stored") {
     return {
-      draft: loadedDraft.draft,
-      status: { phase: "success", message: "已載入瀏覽器保存的本機草稿。" },
+      selectedVersionId: loadedVersions.selectedVersionId,
+      status: { phase: "success", message: "已載入瀏覽器保存的履歷版本。" },
+      versions: loadedVersions.versions,
     };
   }
 
-  if (loadedDraft.source === "invalid") {
+  if (legacyDraft.source === "stored") {
     return {
-      draft: loadedDraft.draft,
-      status: { phase: "error", message: "本機草稿格式不符合履歷資料，已改用內建履歷。" },
+      selectedVersionId: loadedVersions.selectedVersionId,
+      status: { phase: "success", message: "已從既有本機草稿建立履歷版本。" },
+      versions: loadedVersions.versions,
     };
   }
 
-  if (loadedDraft.source === "unreadable") {
+  if (loadedVersions.source === "invalid") {
     return {
-      draft: loadedDraft.draft,
-      status: { phase: "error", message: "無法讀取本機草稿，已改用內建履歷。" },
+      selectedVersionId: loadedVersions.selectedVersionId,
+      status: { phase: "error", message: "本機履歷版本格式不符合資料結構，已改用內建版本。" },
+      versions: loadedVersions.versions,
     };
   }
 
-  return { draft: loadedDraft.draft, status: fallbackStatus };
+  if (loadedVersions.source === "unreadable") {
+    return {
+      selectedVersionId: loadedVersions.selectedVersionId,
+      status: { phase: "error", message: "無法讀取本機履歷版本，已改用內建版本。" },
+      versions: loadedVersions.versions,
+    };
+  }
+
+  return {
+    selectedVersionId: loadedVersions.selectedVersionId,
+    status: fallbackStatus,
+    versions: loadedVersions.versions,
+  };
 }
 
 function getInitialPortfolioEditorState(): PortfolioEditorInitialState {
@@ -623,9 +667,10 @@ function ResumeEditorPage({
   onOpenResume: () => void;
   onPortfolioChange: (portfolio: PortfolioData) => void;
 }) {
-  const [initialState] = useState(getInitialEditorState);
   const [initialPortfolioState] = useState(getInitialPortfolioEditorState);
-  const [draft, setDraft] = useState<ResumeData>(() => initialState.draft);
+  const [initialState] = useState(() => getInitialEditorState(initialPortfolioState.draft));
+  const [resumeDraftVersions, setResumeDraftVersions] = useState<EditableResumeVersion[]>(() => initialState.versions);
+  const [selectedResumeVersionId, setSelectedResumeVersionId] = useState(() => initialState.selectedVersionId);
   const [status, setStatus] = useState<AsyncStatus>(() => initialState.status);
   const [portfolioDraft, setPortfolioDraft] = useState<PortfolioData>(() => initialPortfolioState.draft);
   const [portfolioStatus, setPortfolioStatus] = useState<AsyncStatus>(() => initialPortfolioState.status);
@@ -643,6 +688,11 @@ function ResumeEditorPage({
   const platformAuthEndpoint = import.meta.env.VITE_RESUME_AUTH_ENDPOINT?.trim() || "/api/resume-platform-auth";
   const syncBridgeEndpoint = import.meta.env.VITE_RESUME_SYNC_ENDPOINT?.trim();
   const portfolioGeminiEndpoint = import.meta.env.VITE_PORTFOLIO_GEMINI_ENDPOINT?.trim() || "/api/portfolio-gemini";
+  const activeResumeVersion =
+    resumeDraftVersions.find((version) => version.id === selectedResumeVersionId) ??
+    resumeDraftVersions[0] ??
+    createResumeDraftVersion({ id: "original", resume: initialResume });
+  const draft = activeResumeVersion.resume;
   const platformResumeUrls = useMemo(() => getPlatformResumeUrls(draft), [draft]);
   const baseSyncPackages = useMemo(
     () => buildResumePlatformSyncPackages(draft, lastSyncDraftAt),
@@ -652,14 +702,37 @@ function ResumeEditorPage({
     () => applyManualSyncTexts(baseSyncPackages, manualSyncTexts),
     [baseSyncPackages, manualSyncTexts],
   );
+  const setDraft = (updater: ResumeDraftUpdater) => {
+    const now = new Date().toISOString();
+    const activeVersionId = activeResumeVersion.id;
+
+    setResumeDraftVersions((currentVersions) =>
+      currentVersions.map((version) => {
+        if (version.id !== activeVersionId) return version;
+
+        return {
+          ...version,
+          resume: cloneResume(resolveResumeDraftUpdater(updater, version.resume)),
+          updatedAt: now,
+        };
+      }),
+    );
+  };
+
+  useEffect(() => {
+    if (resumeDraftVersions.some((version) => version.id === selectedResumeVersionId)) return;
+    setSelectedResumeVersionId(resumeDraftVersions[0]?.id ?? "original");
+  }, [resumeDraftVersions, selectedResumeVersionId]);
 
   useEffect(() => {
     try {
+      window.localStorage.setItem(localDraftVersionsStorageKey, getResumeDraftVersionsJson(resumeDraftVersions));
+      window.localStorage.setItem(selectedDraftVersionStorageKey, activeResumeVersion.id);
       window.localStorage.setItem(localDraftStorageKey, getResumeJson(draft));
     } catch {
-      setStatus({ phase: "error", message: "無法保存本機草稿，請改用下載 JSON 備份。" });
+      setStatus({ phase: "error", message: "無法保存本機履歷版本，請改用下載 JSON 備份。" });
     }
-  }, [draft]);
+  }, [activeResumeVersion.id, draft, resumeDraftVersions]);
 
   useEffect(() => {
     try {
@@ -749,6 +822,65 @@ function ResumeEditorPage({
     }
   };
 
+  const handleSelectResumeVersion = (versionId: string) => {
+    const nextVersion = resumeDraftVersions.find((version) => version.id === versionId);
+    if (!nextVersion) return;
+
+    setSelectedResumeVersionId(versionId);
+    setManualSyncTexts({});
+    setStatus({ phase: "success", message: `已切換到「${nextVersion.label || "未命名履歷"}」。` });
+  };
+
+  const handleUpdateResumeVersionLabel = (label: string) => {
+    const now = new Date().toISOString();
+    const activeVersionId = activeResumeVersion.id;
+
+    setResumeDraftVersions((currentVersions) =>
+      currentVersions.map((version) =>
+        version.id === activeVersionId
+          ? {
+              ...version,
+              label,
+              shortLabel: getResumeDraftShortLabel(label),
+              updatedAt: now,
+            }
+          : version,
+      ),
+    );
+  };
+
+  const handleAddResumeVersion = () => {
+    const baseLabel = activeResumeVersion.label.trim() || getResumeDraftLabel(activeResumeVersion.resume);
+    const nextVersion = createResumeDraftVersion({
+      audience: activeResumeVersion.audience,
+      description: activeResumeVersion.description,
+      keywords: activeResumeVersion.keywords,
+      label: `${baseLabel} 副本`,
+      resume: activeResumeVersion.resume,
+    });
+
+    setResumeDraftVersions((currentVersions) => [nextVersion, ...cloneResumeDraftVersions(currentVersions)]);
+    setSelectedResumeVersionId(nextVersion.id);
+    setManualSyncTexts({});
+    setStatus({ phase: "success", message: `已新增「${nextVersion.label}」。` });
+  };
+
+  const handleRemoveResumeVersion = () => {
+    if (resumeDraftVersions.length <= 1) {
+      setStatus({ phase: "error", message: "至少需要保留一份履歷。" });
+      return;
+    }
+
+    const activeVersionIndex = resumeDraftVersions.findIndex((version) => version.id === activeResumeVersion.id);
+    const nextVersions = resumeDraftVersions.filter((version) => version.id !== activeResumeVersion.id);
+    const nextSelectedVersion = nextVersions[Math.max(0, activeVersionIndex - 1)] ?? nextVersions[0];
+
+    setResumeDraftVersions(nextVersions);
+    setSelectedResumeVersionId(nextSelectedVersion.id);
+    setManualSyncTexts({});
+    setStatus({ phase: "success", message: `已刪除「${activeResumeVersion.label || "未命名履歷"}」。` });
+  };
+
   const handleImportClick = () => {
     fileInputRef.current?.click();
   };
@@ -761,9 +893,25 @@ function ResumeEditorPage({
     setStatus({ phase: "loading", message: "正在匯入本機履歷 JSON。" });
     try {
       const importedResume = await readResumeFile(file);
-      setDraft(cloneResume(importedResume));
+      const nextResume = cloneResume(importedResume);
+      const nextLabel = getResumeDraftLabel(nextResume, activeResumeVersion.label || "匯入履歷");
+      const now = new Date().toISOString();
+
+      setResumeDraftVersions((currentVersions) =>
+        currentVersions.map((version) =>
+          version.id === activeResumeVersion.id
+            ? {
+                ...version,
+                label: nextLabel,
+                resume: nextResume,
+                shortLabel: getResumeDraftShortLabel(nextLabel),
+                updatedAt: now,
+              }
+            : version,
+        ),
+      );
       setManualSyncTexts({});
-      setStatus({ phase: "success", message: "已匯入本機履歷 JSON。" });
+      setStatus({ phase: "success", message: `已匯入 JSON 到「${nextLabel}」。` });
     } catch (error) {
       setStatus({
         phase: "error",
@@ -1153,6 +1301,35 @@ function ResumeEditorPage({
               <RotateCcw size={18} aria-hidden="true" />
               重設
             </button>
+          </div>
+          <div className="resume-version-control" aria-label="履歷版本管理">
+            <label className="editor-field">
+              <span>目前履歷版本</span>
+              <select value={activeResumeVersion.id} onChange={(event) => handleSelectResumeVersion(event.target.value)}>
+                {resumeDraftVersions.map((version) => (
+                  <option key={version.id} value={version.id}>
+                    {version.label || "未命名履歷"}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <TextField label="版本名稱" value={activeResumeVersion.label} onChange={handleUpdateResumeVersionLabel} />
+            <div className="resume-version-actions">
+              <span>{resumeDraftVersions.length} 份履歷版本</span>
+              <button className="editor-secondary-action" type="button" onClick={handleAddResumeVersion}>
+                <Plus size={18} aria-hidden="true" />
+                新增履歷
+              </button>
+              <button
+                className="editor-secondary-action danger"
+                type="button"
+                disabled={resumeDraftVersions.length <= 1}
+                onClick={handleRemoveResumeVersion}
+              >
+                <Trash2 size={18} aria-hidden="true" />
+                刪除履歷
+              </button>
+            </div>
           </div>
           <input
             ref={fileInputRef}

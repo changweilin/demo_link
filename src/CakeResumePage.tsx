@@ -11,8 +11,13 @@ import {
 import { useMemo, useState } from "react";
 import "./cakeResume.css";
 import { loadPortfolioDraftFromStorage } from "./portfolioDraft";
-import { loadResumeDraftFromStorage } from "./resumeDraft";
-import { buildResumeVersions, type ResumeVersion, type ResumeVersionId } from "./resumeVersions";
+import { getResumeJson, loadResumeDraftFromStorage, localDraftStorageKey } from "./resumeDraft";
+import {
+  buildInitialResumeDraftVersions,
+  loadResumeDraftVersionsFromStorage,
+  selectedDraftVersionStorageKey,
+  type EditableResumeVersion,
+} from "./resumeDraftVersions";
 import type {
   ResumeBullet,
   ResumeData,
@@ -43,10 +48,13 @@ function getLinkIcon(icon: ResumeLinkIcon) {
 }
 
 function CakeResumePage({ onBackHome }: CakeResumePageProps) {
-  const baseResume = useMemo(() => loadResumeDraftFromStorage().draft, []);
   const portfolio = useMemo(() => loadPortfolioDraftFromStorage().draft, []);
-  const resumeVersions = useMemo(() => buildResumeVersions(baseResume, portfolio), [baseResume, portfolio]);
-  const [selectedVersionId, setSelectedVersionId] = useState<ResumeVersionId>("original");
+  const resumeVersionState = useMemo(() => {
+    const baseResume = loadResumeDraftFromStorage().draft;
+    return loadResumeDraftVersionsFromStorage(buildInitialResumeDraftVersions(baseResume, portfolio), "original");
+  }, [portfolio]);
+  const resumeVersions = resumeVersionState.versions;
+  const [selectedVersionId, setSelectedVersionId] = useState(resumeVersionState.selectedVersionId);
   const selectedVersion =
     resumeVersions.find((version) => version.id === selectedVersionId) ?? resumeVersions[0];
   const resume = selectedVersion.resume;
@@ -62,6 +70,20 @@ function CakeResumePage({ onBackHome }: CakeResumePageProps) {
     window.addEventListener("afterprint", restoreTitle, { once: true });
     window.print();
     window.setTimeout(restoreTitle, 1200);
+  };
+
+  const handleSelectVersion = (versionId: string) => {
+    const nextVersion = resumeVersions.find((version) => version.id === versionId);
+    if (!nextVersion) return;
+
+    setSelectedVersionId(versionId);
+
+    try {
+      window.localStorage.setItem(selectedDraftVersionStorageKey, versionId);
+      window.localStorage.setItem(localDraftStorageKey, getResumeJson(nextVersion.resume));
+    } catch {
+      // Selection persistence is best-effort; printing and previewing still work in memory.
+    }
   };
 
   return (
@@ -86,7 +108,7 @@ function CakeResumePage({ onBackHome }: CakeResumePageProps) {
       <ResumeVersionSelector
         versions={resumeVersions}
         selectedVersion={selectedVersion}
-        onSelectVersion={setSelectedVersionId}
+        onSelectVersion={handleSelectVersion}
       />
 
       <section className="cake-clone-stage" aria-label="中文完整履歷">
@@ -108,9 +130,9 @@ function ResumeVersionSelector({
   selectedVersion,
   onSelectVersion,
 }: {
-  versions: ResumeVersion[];
-  selectedVersion: ResumeVersion;
-  onSelectVersion: (versionId: ResumeVersionId) => void;
+  versions: EditableResumeVersion[];
+  selectedVersion: EditableResumeVersion;
+  onSelectVersion: (versionId: string) => void;
 }) {
   return (
     <section className="cake-clone-version-panel no-print" aria-label="履歷版本">
@@ -142,7 +164,7 @@ function ResumeVersionSelector({
   );
 }
 
-function ResumeVersionHeader({ version }: { version: ResumeVersion }) {
+function ResumeVersionHeader({ version }: { version: EditableResumeVersion }) {
   return (
     <header className="cake-clone-paper-header" aria-label="履歷版本資訊">
       <span>{version.label}</span>
