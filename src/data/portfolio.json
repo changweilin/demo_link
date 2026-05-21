@@ -28,6 +28,38 @@
   },
   "projects": [
     {
+      "title": "Mapping Star",
+      "summary": "以 OpenStreetMap / Overpass API 搜尋 POI，計算五芒星或六芒星排列，並用 Leaflet 地圖呈現魔法陣動畫與匯出結果。",
+      "description": "Mapping Star 是一個地理空間探索工具，使用 React、TypeScript、Leaflet 與 OpenStreetMap 圖資，透過 Overpass API 依目標類別抓取周邊 POI，再用幾何求解器尋找可形成五芒星或六芒星的點位組合。介面支援寺廟/宗教等類別篩選、半徑範圍調整、星形解算、魔法陣動畫播放器、結果收藏，以及 GPX / KML 匯出。",
+      "tags": [
+        "TypeScript",
+        "React",
+        "Leaflet",
+        "OpenStreetMap",
+        "Overpass API",
+        "GitHub Pages"
+      ],
+      "category": "地理資訊與互動工具",
+      "year": "2026",
+      "createdAt": "2026-05-20T14:11:26Z",
+      "updatedAt": "2026-05-21T16:58:55Z",
+      "screenshot": {
+        "src": "project-screenshots/mapping-star.png",
+        "alt": "Mapping Star 使用寺廟/宗教目標類別產生魔法陣動畫的地圖 demo 介面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/mapping_star/",
+        "repo": "https://github.com/changweilin/mapping_star",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/mapping-star.png",
+          "alt": "Mapping Star 使用寺廟/宗教目標類別產生魔法陣動畫的地圖 demo 介面"
+        }
+      ]
+    },
+    {
       "title": "Elven Chewing",
       "summary": "Rust 實作的 Windows 注音輸入法與 WebAssembly 瀏覽器沙盒，展示模糊注音猜詞、雙排輸入、最近文字重轉與簡繁切換。",
       "description": "Elven Chewing 是以 Rust 與 Windows Text Services Framework 打造的注音輸入法專案，延伸新酷音/libchewing 的轉換基礎，加入 out-of-process UI、雙排輸入、模糊注音猜詞、最近一次送出文字重轉、簡繁即時切換與 MSI 打包流程；公開 Web Demo 則透過 WebAssembly 在瀏覽器中驗證核心輸入體驗與候選面板行為。",
