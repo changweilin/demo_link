@@ -106,13 +106,13 @@
       "category": "創作工具",
       "year": "2026",
       "createdAt": "2026-05-20T13:41:44Z",
-      "updatedAt": "2026-05-21T15:15:19Z",
+      "updatedAt": "2026-05-21T16:49:54Z",
       "screenshot": {
         "src": "project-screenshots/novel-elf.png",
         "alt": "Novel Elf Aevenmere 世界觀創作工作台介面"
       },
       "links": {
-        "demo": "",
+        "demo": "https://changweilin.github.io/novel_elf/",
         "repo": "https://github.com/changweilin/novel_elf",
         "caseStudy": ""
       },
