@@ -56,6 +56,10 @@
         {
           "src": "project-screenshots/mapping-star.png",
           "alt": "Mapping Star 使用寺廟/宗教目標類別產生魔法陣動畫的地圖 demo 介面"
+        },
+        {
+          "src": "project-screenshots/mapping-star-mobile.png",
+          "alt": "Mapping Star 手機版使用寺廟/宗教目標類別與高對比雷系魔法陣動畫"
         }
       ]
     },
@@ -88,6 +92,10 @@
         {
           "src": "project-screenshots/elven-chewing.png",
           "alt": "Elven Chewing 精靈語輸入法 Web Sandbox demo 介面"
+        },
+        {
+          "src": "project-screenshots/elven-chewing-mobile.png",
+          "alt": "Elven Chewing 精靈語輸入法 Web Sandbox 手機版 demo 介面"
         }
       ]
     },
@@ -120,6 +128,10 @@
         {
           "src": "project-screenshots/novel-elf.png",
           "alt": "Novel Elf Aevenmere 世界觀創作工作台介面"
+        },
+        {
+          "src": "project-screenshots/novel-elf-mobile.png",
+          "alt": "Novel Elf Aevenmere 世界觀創作工作台手機版介面"
         }
       ]
     },
@@ -152,6 +164,10 @@
         {
           "src": "project-screenshots/agent-task-manager.png",
           "alt": "Agent Task Manager 管理多個本機 dev server 的 Web UI"
+        },
+        {
+          "src": "project-screenshots/agent-task-manager-mobile.png",
+          "alt": "Agent Task Manager GitHub Pages 展示模式手機版 Web UI"
         }
       ]
     },
@@ -184,6 +200,10 @@
         {
           "src": "project-screenshots/music-elf.png",
           "alt": "Music Elf Conductor Studio 音訊轉樂譜 demo 介面"
+        },
+        {
+          "src": "project-screenshots/music-elf-mobile.png",
+          "alt": "Music Elf Conductor Studio 手機版錄音與混音 demo 介面"
         }
       ]
     },
