@@ -1,6 +1,9 @@
 name: Track GitHub project updates
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
   schedule:
     # 04:00 Asia/Taipei every day.
@@ -12,6 +15,7 @@ permissions:
 jobs:
   sync:
     name: Sync portfolio dates
+    if: github.event_name != 'push' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
