@@ -138,13 +138,13 @@
       "category": "開發工具",
       "year": "2026",
       "createdAt": "2026-05-14T17:49:03Z",
-      "updatedAt": "2026-05-21T14:35:42Z",
+      "updatedAt": "2026-05-21T18:19:06Z",
       "screenshot": {
         "src": "project-screenshots/agent-task-manager.png",
         "alt": "Agent Task Manager 管理多個本機 dev server 的 Web UI"
       },
       "links": {
-        "demo": "",
+        "demo": "https://changweilin.github.io/agent-task-manager/",
         "repo": "https://github.com/changweilin/agent-task-manager",
         "caseStudy": ""
       },
