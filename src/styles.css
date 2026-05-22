@@ -90,15 +90,25 @@
 }
 
 html {
+  max-width: 100%;
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
   min-width: 320px;
   color: var(--ink);
   background: var(--page-bg);
   overflow-x: hidden;
+}
+
+main {
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body::before {
@@ -427,6 +437,7 @@ button {
   display: flex;
   align-items: end;
   justify-content: space-between;
+  min-width: 0;
   gap: 24px;
 }
 
@@ -627,6 +638,8 @@ button {
   max-width: 760px;
   margin: 0;
   color: var(--text-detail);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .tag-row {
@@ -662,6 +675,8 @@ button {
 .works,
 .resume,
 .contact {
+  overflow-x: hidden;
+  overflow-x: clip;
   padding: 64px 0;
 }
 
@@ -680,6 +695,7 @@ button {
 
 .project-controls {
   display: grid;
+  min-width: 0;
   justify-items: end;
   gap: 10px;
 }
@@ -687,6 +703,7 @@ button {
 .sort-group {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   max-width: 100%;
   padding: 3px;
   border: 1px solid var(--line);
@@ -722,12 +739,15 @@ button {
 
 .filter-group {
   display: flex;
+  min-width: 0;
+  max-width: 100%;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
 }
 
 .filter-group button {
+  max-width: 100%;
   min-height: 38px;
   padding: 0 14px;
   border: 1px solid var(--line);
@@ -751,11 +771,18 @@ button {
 .work-layout {
   display: grid;
   grid-template-columns: minmax(280px, 0.86fr) minmax(420px, 1.14fr);
+  min-width: 0;
   gap: 20px;
+}
+
+.work-layout > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .project-list {
   display: grid;
+  min-width: 0;
   gap: 10px;
 }
 
@@ -788,7 +815,10 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
   min-height: 420px;
+  overflow: hidden;
   padding: clamp(28px, 4vw, 48px);
 }
 
@@ -1088,7 +1118,7 @@ button {
   }
 
   .work-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .project-detail {
@@ -1100,7 +1130,12 @@ button {
   }
 
   .project-controls {
-    justify-items: start;
+    justify-items: stretch;
+  }
+
+  .sort-group,
+  .filter-group {
+    width: 100%;
   }
 
   .contact-actions {
@@ -1239,14 +1274,27 @@ button {
     font-size: 2rem;
   }
 
-  .project-list,
-  .filter-group {
+  .project-list {
     display: flex;
     gap: 10px;
-    margin-right: -12px;
-    padding: 1px 12px 8px 0;
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    padding: 1px 0 8px;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
+  }
+
+  .filter-group {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 1px 0 0;
+    overflow: visible;
   }
 
   .project-row {
@@ -1273,11 +1321,15 @@ button {
 
   .project-controls {
     width: 100%;
+    justify-items: stretch;
+    overflow: hidden;
   }
 
   .sort-group {
     justify-content: flex-start;
+    width: 100%;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
 
@@ -1285,13 +1337,14 @@ button {
     flex: 0 0 auto;
   }
 
-  .filter-group {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-  }
-
   .filter-group button {
     flex: 0 0 auto;
+    max-width: 100%;
+    min-height: 36px;
+    padding: 8px 13px;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.2;
   }
 
   .work-layout {
