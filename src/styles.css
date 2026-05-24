@@ -599,6 +599,124 @@ button {
   will-change: transform;
 }
 
+.project-image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 3vw, 34px);
+  background: rgba(3, 6, 6, 0.92);
+  touch-action: none;
+}
+
+.project-lightbox-stage {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  place-items: center;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.project-lightbox-stage:active {
+  cursor: grabbing;
+}
+
+.project-lightbox-stage img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  box-shadow: 0 24px 78px rgba(0, 0, 0, 0.38);
+  transition: transform 160ms ease;
+  will-change: transform;
+}
+
+.project-lightbox-stage[data-dragging="true"] img {
+  transition: none;
+}
+
+.project-lightbox-close,
+.project-lightbox-nav {
+  position: fixed;
+  z-index: 101;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  background: rgba(9, 14, 15, 0.62);
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease,
+    opacity 180ms ease;
+}
+
+.project-lightbox-close:hover,
+.project-lightbox-nav:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.66);
+  background: rgba(15, 109, 120, 0.78);
+}
+
+.project-lightbox-close {
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.project-lightbox-nav {
+  top: 50%;
+  width: 50px;
+  height: 58px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+}
+
+.project-lightbox-nav:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.04);
+}
+
+.project-lightbox-nav:disabled {
+  cursor: default;
+  opacity: 0.28;
+}
+
+.project-lightbox-nav-previous {
+  left: 18px;
+}
+
+.project-lightbox-nav-next {
+  right: 18px;
+}
+
+.project-lightbox-counter {
+  position: fixed;
+  right: 50%;
+  bottom: 18px;
+  z-index: 101;
+  min-height: 32px;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(9, 14, 15, 0.62);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  transform: translateX(50%);
+  backdrop-filter: blur(14px);
+}
+
 .project-gallery-dots {
   display: flex;
   justify-content: center;
@@ -778,6 +896,16 @@ button {
 .work-layout > * {
   min-width: 0;
   max-width: 100%;
+}
+
+.desktop-project-detail,
+.project-list-item {
+  display: grid;
+  min-width: 0;
+}
+
+.mobile-project-detail {
+  display: none;
 }
 
 .project-list {
@@ -1275,15 +1403,13 @@ button {
   }
 
   .project-list {
-    display: flex;
+    display: grid;
     gap: 10px;
     width: 100%;
     max-width: 100%;
     margin-right: 0;
-    padding: 1px 0 8px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
+    padding: 0;
+    overflow: visible;
   }
 
   .filter-group {
@@ -1298,13 +1424,12 @@ button {
   }
 
   .project-row {
-    flex: 0 0 min(82vw, 320px);
-    scroll-snap-align: start;
+    width: 100%;
   }
 
   .project-row:hover,
   .project-row.selected {
-    transform: translateY(-2px);
+    transform: none;
   }
 
   .works,
@@ -1349,6 +1474,19 @@ button {
 
   .work-layout {
     gap: 14px;
+  }
+
+  .desktop-project-detail {
+    display: none;
+  }
+
+  .mobile-project-detail {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .mobile-project-detail .project-detail {
+    min-height: 0;
   }
 
   .project-row {
@@ -1399,6 +1537,34 @@ button {
     object-fit: contain;
   }
 
+  .project-image-lightbox {
+    padding: 10px;
+  }
+
+  .project-lightbox-close {
+    top: 12px;
+    right: 12px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .project-lightbox-nav {
+    width: 42px;
+    height: 50px;
+  }
+
+  .project-lightbox-nav-previous {
+    left: 10px;
+  }
+
+  .project-lightbox-nav-next {
+    right: 10px;
+  }
+
+  .project-lightbox-counter {
+    bottom: 12px;
+  }
+
   .detail-links a {
     flex: 1 1 100%;
     justify-content: center;
@@ -1440,10 +1606,6 @@ button {
 
   .role {
     font-size: 1.58rem;
-  }
-
-  .project-row {
-    flex-basis: min(86vw, 300px);
   }
 }
 

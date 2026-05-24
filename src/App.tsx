@@ -17,10 +17,13 @@ import {
   Sun,
   Telescope,
   Waves,
+  X,
 } from "lucide-react";
 import {
   type ComponentType,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
+  type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
   lazy,
@@ -32,7 +35,7 @@ import {
 } from "react";
 import CakeResumePage from "./CakeResumePage";
 import { loadPortfolioDraftFromStorage } from "./portfolioDraft";
-import type { PortfolioData, PortfolioLinkSet, PortfolioSocialLink, Project } from "./types/portfolio";
+import type { PortfolioData, PortfolioLinkSet, PortfolioSocialLink, Project, ProjectScreenshot } from "./types/portfolio";
 
 type ResumeSummaryItem = {
   organization: string;
@@ -537,35 +540,48 @@ function App() {
         </div>
         <div className="work-layout">
           <div className="project-list" aria-label="作品列表">
-            {visibleProjects.map((project) => (
-              <button
-                key={project.title}
-                className={project.title === selectedProject?.title ? "project-row selected" : "project-row"}
-                type="button"
-                aria-label={
-                  project.title === selectedProject?.title && project.links.demo
-                    ? `${project.title}，再次點擊開啟 Demo`
-                    : project.title
-                }
-                onClick={() => handleProjectSelect(project)}
-              >
-                <span>
-                  <strong>{project.title}</strong>
-                  <small>
-                    {project.category} / {project.year}
-                  </small>
-                  <small>
-                    {activeSortOption.metaLabel} {formatProjectDate(project[projectSortMode])}
-                  </small>
-                </span>
-                <ChevronRight size={18} aria-hidden="true" />
-              </button>
-            ))}
+            {visibleProjects.map((project) => {
+              const isSelectedProject = project.title === selectedProject?.title;
+
+              return (
+                <div className="project-list-item" key={project.title}>
+                  <button
+                    className={isSelectedProject ? "project-row selected" : "project-row"}
+                    type="button"
+                    aria-label={
+                      project.title === selectedProject?.title && project.links.demo
+                        ? `${project.title}，再次點擊開啟 Demo`
+                        : project.title
+                    }
+                    aria-expanded={isSelectedProject}
+                    onClick={() => handleProjectSelect(project)}
+                  >
+                    <span>
+                      <strong>{project.title}</strong>
+                      <small>
+                        {project.category} / {project.year}
+                      </small>
+                      <small>
+                        {activeSortOption.metaLabel} {formatProjectDate(project[projectSortMode])}
+                      </small>
+                    </span>
+                    <ChevronRight size={18} aria-hidden="true" />
+                  </button>
+                  {isSelectedProject ? (
+                    <div className="mobile-project-detail">
+                      <ProjectDetail project={project} onProjectSwipe={handleProjectSwipe} />
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
           {selectedProject ? (
-            <ProjectDetail project={selectedProject} onProjectSwipe={handleProjectSwipe} />
+            <div className="desktop-project-detail">
+              <ProjectDetail project={selectedProject} onProjectSwipe={handleProjectSwipe} />
+            </div>
           ) : (
-            <article className="project-detail" aria-live="polite">
+            <article className="project-detail desktop-project-detail" aria-live="polite">
               <div className="detail-meta">
                 <span>尚未建立作品</span>
               </div>
@@ -697,6 +713,12 @@ type GallerySwipeGesture = {
   intent: "pending" | "horizontal" | "vertical";
   ignore: boolean;
 } | null;
+type LightboxSwipeGesture = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  intent: "pending" | "horizontal" | "vertical";
+} | null;
 
 function clampValue(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -731,9 +753,10 @@ function constrainImageZoom(zoom: ImageZoomState, frame: HTMLDivElement | null):
   };
 }
 
-function ZoomableProjectImage({ src, alt }: { src: string; alt: string }) {
+function ZoomableProjectImage({ src, alt, onOpen }: { src: string; alt: string; onOpen: () => void }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const gestureRef = useRef<ImageGesture>(null);
+  const tapGestureRef = useRef<{ startX: number; startY: number; moved: boolean } | null>(null);
   const [zoom, setZoom] = useState<ImageZoomState>(defaultImageZoom);
   const zoomRef = useRef<ImageZoomState>(defaultImageZoom);
   const isZoomed = zoom.scale > 1.01;
@@ -749,6 +772,40 @@ function ZoomableProjectImage({ src, alt }: { src: string; alt: string }) {
     const constrainedZoom = constrainImageZoom(nextZoom, frameRef.current);
     zoomRef.current = constrainedZoom;
     setZoom(constrainedZoom);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+
+    tapGestureRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+    };
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const tapGesture = tapGestureRef.current;
+    if (!tapGesture || !event.isPrimary) return;
+
+    if (Math.hypot(event.clientX - tapGesture.startX, event.clientY - tapGesture.startY) > 8) {
+      tapGesture.moved = true;
+    }
+  };
+
+  const handleClick = () => {
+    const tapGesture = tapGestureRef.current;
+    tapGestureRef.current = null;
+    if (tapGesture?.moved) return;
+
+    onOpen();
+  };
+
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    onOpen();
   };
 
   const handleTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
@@ -835,6 +892,16 @@ function ZoomableProjectImage({ src, alt }: { src: string; alt: string }) {
       className="zoomable-image-frame"
       data-zoomed={isZoomed ? "true" : undefined}
       ref={frameRef}
+      role="button"
+      tabIndex={0}
+      aria-label="開啟圖片預覽"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerCancel={() => {
+        tapGestureRef.current = null;
+      }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -848,6 +915,210 @@ function ZoomableProjectImage({ src, alt }: { src: string; alt: string }) {
         draggable="false"
         style={{ transform: `translate3d(${zoom.x}px, ${zoom.y}px, 0) scale(${zoom.scale})` }}
       />
+    </div>
+  );
+}
+
+function ProjectImageLightbox({
+  screenshots,
+  activeIndex,
+  projectTitle,
+  onClose,
+  onSelect,
+}: {
+  screenshots: ProjectScreenshot[];
+  activeIndex: number;
+  projectTitle: string;
+  onClose: () => void;
+  onSelect: (index: number) => void;
+}) {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const swipeRef = useRef<LightboxSwipeGesture>(null);
+  const lastTapAtRef = useRef(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const activeScreenshot = screenshots[activeIndex];
+  const hasMultipleScreenshots = screenshots.length > 1;
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (!hasMultipleScreenshots) return;
+
+      if (event.key === "ArrowLeft") {
+        onSelect(Math.max(activeIndex - 1, 0));
+      }
+
+      if (event.key === "ArrowRight") {
+        onSelect(Math.min(activeIndex + 1, screenshots.length - 1));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeIndex, hasMultipleScreenshots, onClose, onSelect, screenshots.length]);
+
+  useEffect(() => {
+    setDragOffset(0);
+    swipeRef.current = null;
+  }, [activeIndex]);
+
+  if (!activeScreenshot) return null;
+
+  const selectImage = (index: number) => {
+    setDragOffset(0);
+    onSelect(clampValue(index, 0, screenshots.length - 1));
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+
+    swipeRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      intent: "pending",
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const gesture = swipeRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (gesture.intent === "pending") {
+      if (absX < 7 && absY < 7) return;
+      gesture.intent = absX > absY * 1.2 ? "horizontal" : "vertical";
+    }
+
+    if (gesture.intent !== "horizontal") return;
+
+    event.preventDefault();
+    const stageWidth = Math.max(stageRef.current?.clientWidth ?? 1, 1);
+    setDragOffset(clampValue(deltaX, -stageWidth * 0.34, stageWidth * 0.34));
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const gesture = swipeRef.current;
+    swipeRef.current = null;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    const stageWidth = Math.max(stageRef.current?.clientWidth ?? 1, 1);
+    const isTap = absX < 8 && absY < 8;
+
+    if (isTap) {
+      const now = window.performance.now();
+      if (now - lastTapAtRef.current < 320) {
+        lastTapAtRef.current = 0;
+        onClose();
+        return;
+      }
+
+      lastTapAtRef.current = now;
+      setDragOffset(0);
+      return;
+    }
+
+    lastTapAtRef.current = 0;
+
+    if (hasMultipleScreenshots && gesture.intent === "horizontal") {
+      const shouldSwitch = absX >= 70 || absX / stageWidth >= 0.18;
+      if (shouldSwitch) {
+        selectImage(activeIndex + (deltaX < 0 ? 1 : -1));
+        return;
+      }
+    }
+
+    setDragOffset(0);
+  };
+
+  const handlePointerCancel = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const gesture = swipeRef.current;
+    swipeRef.current = null;
+
+    if (gesture && event.currentTarget.hasPointerCapture(gesture.pointerId)) {
+      event.currentTarget.releasePointerCapture(gesture.pointerId);
+    }
+
+    setDragOffset(0);
+  };
+
+  const activeAlt = activeScreenshot.alt || `${projectTitle} 作品圖片 ${activeIndex + 1}`;
+
+  return (
+    <div className="project-image-lightbox" role="dialog" aria-modal="true" aria-label={`${projectTitle} 圖片預覽`}>
+      <button className="project-lightbox-close" type="button" aria-label="關閉圖片" onClick={onClose}>
+        <X size={22} aria-hidden="true" />
+      </button>
+      {hasMultipleScreenshots ? (
+        <button
+          className="project-lightbox-nav project-lightbox-nav-previous"
+          type="button"
+          aria-label="上一張圖片"
+          disabled={activeIndex === 0}
+          onClick={() => selectImage(activeIndex - 1)}
+        >
+          <ChevronLeft size={28} aria-hidden="true" />
+        </button>
+      ) : null}
+      <div
+        className="project-lightbox-stage"
+        data-dragging={dragOffset !== 0 ? "true" : undefined}
+        ref={stageRef}
+        onDoubleClick={onClose}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+      >
+        <img
+          src={resolvePublicAssetPath(activeScreenshot.src)}
+          alt={activeAlt}
+          draggable="false"
+          style={{ transform: `translate3d(${dragOffset}px, 0, 0)` }}
+        />
+      </div>
+      {hasMultipleScreenshots ? (
+        <button
+          className="project-lightbox-nav project-lightbox-nav-next"
+          type="button"
+          aria-label="下一張圖片"
+          disabled={activeIndex === screenshots.length - 1}
+          onClick={() => selectImage(activeIndex + 1)}
+        >
+          <ChevronRight size={28} aria-hidden="true" />
+        </button>
+      ) : null}
+      {hasMultipleScreenshots ? (
+        <div className="project-lightbox-counter" aria-live="polite">
+          {activeIndex + 1} / {screenshots.length}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -879,10 +1150,12 @@ function ProjectDetail({
   const projectSwipeRef = useRef<ProjectSwipeGesture>(null);
   const screenshots = getProjectScreenshots(project);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
   const hasMultipleScreenshots = screenshots.length > 1;
 
   useEffect(() => {
     setActiveImageIndex(0);
+    setLightboxImageIndex(null);
     gallerySwipeRef.current = null;
     galleryRef.current?.scrollTo({ left: 0 });
   }, [project.title]);
@@ -896,6 +1169,20 @@ function ProjectDetail({
       left: gallery.clientWidth * nextIndex,
       behavior: "smooth",
     });
+  };
+
+  const handleImageOpen = (index: number) => {
+    const nextIndex = Math.min(Math.max(index, 0), screenshots.length - 1);
+
+    handleImageSelect(nextIndex);
+    setLightboxImageIndex(nextIndex);
+  };
+
+  const handleLightboxImageSelect = (index: number) => {
+    const nextIndex = Math.min(Math.max(index, 0), screenshots.length - 1);
+
+    handleImageSelect(nextIndex);
+    setLightboxImageIndex(nextIndex);
   };
 
   const handleGalleryScroll = () => {
@@ -1109,7 +1396,11 @@ function ProjectDetail({
 
               return (
                 <figure className="project-gallery-slide" key={`${screenshot.src}-${index}`}>
-                  <ZoomableProjectImage src={resolvePublicAssetPath(screenshot.src)} alt={alt} />
+                  <ZoomableProjectImage
+                    src={resolvePublicAssetPath(screenshot.src)}
+                    alt={alt}
+                    onOpen={() => handleImageOpen(index)}
+                  />
                 </figure>
               );
             })}
@@ -1127,6 +1418,15 @@ function ProjectDetail({
                 />
               ))}
             </div>
+          ) : null}
+          {lightboxImageIndex !== null ? (
+            <ProjectImageLightbox
+              screenshots={screenshots}
+              activeIndex={lightboxImageIndex}
+              projectTitle={project.title}
+              onClose={() => setLightboxImageIndex(null)}
+              onSelect={handleLightboxImageSelect}
+            />
           ) : null}
         </section>
       ) : null}
