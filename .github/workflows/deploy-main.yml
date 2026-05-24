@@ -38,6 +38,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Sync demo project dates for this deploy
+        run: npm run track:github-updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRACK_PORTFOLIO_WRITE: "true"
+          TRACK_PORTFOLIO_DATE_FIELD: default_branch_committed_at
+          TRACK_OUTPUT_PATH: ${{ runner.temp }}/github-last-updated.json
+          TRACK_MARKDOWN_PATH: ${{ runner.temp }}/github-last-updated.md
+
       - name: Build GitHub Pages artifact
         run: npm run build:github-pages
 

@@ -5,7 +5,7 @@ const portfolioPath = process.env.TRACK_PORTFOLIO_PATH || "src/data/portfolio.js
 const outputPath = process.env.TRACK_OUTPUT_PATH || "docs/github-last-updated.json";
 const markdownPath = process.env.TRACK_MARKDOWN_PATH || "docs/github-last-updated.md";
 const maxHistory = Number.parseInt(process.env.TRACK_MAX_HISTORY || "30", 10);
-const portfolioWriteEnabled = process.env.TRACK_PORTFOLIO_WRITE !== "false";
+const portfolioWriteEnabled = process.env.TRACK_PORTFOLIO_WRITE === "true";
 const branchOverride = process.env.TRACK_BRANCH_NAME?.trim() || "";
 const portfolioDateField = process.env.TRACK_PORTFOLIO_DATE_FIELD || "default_branch_committed_at";
 

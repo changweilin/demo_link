@@ -82,11 +82,11 @@ npm run track:github-updates
 - `npm run build`：執行 TypeScript 檢查並建立正式輸出。
 - `npm run build:github-pages`：建立 GitHub Pages 用的 public build，會停用履歷編輯分頁。
 - `npm run preview`：預覽 `dist/` build 結果，同樣綁定 `0.0.0.0`。
-- `npm run track:github-updates`：手動讀取作品集中的 GitHub repository 連結，將每個 project 的 `updatedAt` 同步成 GitHub 的最後 push 時間，並輸出追蹤快照到 `docs/github-last-updated.*`。
+- `npm run track:github-updates`：手動讀取作品集中的 GitHub repository 連結，預設只輸出已忽略的追蹤快照到 `docs/github-last-updated.*`；若要回寫 `src/data/portfolio.json`，需明確設定 `TRACK_PORTFOLIO_WRITE=true`。
 
 ## GitHub Pages / Actions
 
-`.github/workflows/deploy-main.yml` 會在 push 到 `main` 或手動執行時建置主網頁，並透過 GitHub Pages artifact 部署 `dist/`。
+`.github/workflows/deploy-main.yml` 會在 push 到 `main` 或手動執行時建置主網頁。部署前會先在 GitHub Actions runner 內抓取各 Demo repository 的最後更新日期、暫時回寫 `src/data/portfolio.json` 供 build 使用，然後透過 GitHub Pages artifact 部署 `dist/`；這個日期更新不會 commit 或 push 回 `main`。
 
 第一次使用這個 workflow 前，請先到 GitHub repo 的 `Settings` → `Pages`，在 `Build and deployment` 的 `Source` 選 `GitHub Actions`。如果還沒啟用，`actions/configure-pages` 會在 build job 先失敗；目前 workflow 已避免這個預檢步驟，但 Pages 來源仍需設定成 GitHub Actions 後才能部署。
 
@@ -205,17 +205,27 @@ http://127.0.0.1:43177/api/resume-platform-auth/linkedin/callback
 
 ## GitHub 更新日期追蹤
 
-GitHub 專案更新日期追蹤保留為本機手動指令，不再由 GitHub Actions 排程執行。需要同步時執行：
+GitHub 專案更新日期追蹤會在 GitHub Actions 中執行，但不會把日期資料 commit 或 push 回 repository：
+
+- `deploy-main.yml`：push 到 `main` 且需要部署 public site 時，會在 build 前抓一次日期並只寫在 runner 工作目錄中。
+- `track-github-updates.yml`：push 到 `main`、手動執行或每日 04:00（Asia/Taipei）排程時會抓一次日期；輸出檔放在 runner temp，不寫回 repository。
+
+本機需要檢查時可執行：
 
 ```bash
 npm run track:github-updates
 ```
 
-同步後會更新：
+預設會輸出：
 
-- `src/data/portfolio.json`：回寫每個 project 的 `updatedAt`。
-- `docs/github-last-updated.json`：保留最近 30 次檢查快照。
-- `docs/github-last-updated.md`：產生方便閱讀的表格摘要。
+- `docs/github-last-updated.json`：保留最近 30 次檢查快照，但已列入 `.gitignore`。
+- `docs/github-last-updated.md`：產生方便閱讀的表格摘要，但已列入 `.gitignore`。
+
+若本機要直接回寫每個 project 的 `updatedAt`，請額外設定：
+
+```powershell
+$env:TRACK_PORTFOLIO_WRITE="true"; npm.cmd run track:github-updates
+```
 
 ## 專案結構
 
