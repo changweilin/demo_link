@@ -28,6 +28,42 @@
   },
   "projects": [
     {
+      "title": "Astro ELF (Black Hole Lab)",
+      "summary": "雙星與黑洞物理沙盒實驗室，模擬廣義相對論空間幾何、參考系拖曳、吸積盤 MHD 噴流與雙星重力波旋近。",
+      "description": "Astro ELF (Black Hole Lab) 是一個黑洞與天體物理交互式沙盒實驗室。使用 React、Babel Standalone 與 HTML5 Canvas 建立，支援 Kerr-Newman 黑洞、中子星、白矮星與恆星模擬。使用者可自訂質量、自旋與電荷參數，觀察事件視界、靜止極限（動圈）、光子球與 ISCO 等廣義相對論導出幾何，並能放置雙星伴星模擬 Peters (1964) 重力波旋近與最終的黑洞合併（merger）過程。同時內建吸積盤 MRI 磁流體（MHD）噴流與潮汐撕裂拉麵化（spaghettification）的互動診斷。",
+      "tags": [
+        "React",
+        "HTML5 Canvas",
+        "Astrophysics",
+        "General Relativity",
+        "Gravitational Waves",
+        "MHD Simulation"
+      ],
+      "category": "物理與科學模擬",
+      "year": "2026",
+      "createdAt": "2026-06-01T10:00:00Z",
+      "updatedAt": "2026-06-01T10:00:00Z",
+      "screenshot": {
+        "src": "project-screenshots/astrophysics-elf.png",
+        "alt": "Astro ELF 雙星黑洞旋近與重力波輻射沙盒模擬桌機版畫面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/astrophysics_elf/",
+        "repo": "https://github.com/changweilin/astrophysics_elf",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/astrophysics-elf.png",
+          "alt": "Astro ELF 雙星黑洞旋近與重力波輻射沙盒模擬桌機版畫面"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-mobile.png",
+          "alt": "Astro ELF 雙星黑洞旋近與重力波輻射沙盒模擬手機版畫面"
+        }
+      ]
+    },
+    {
       "title": "Mapping Star",
       "summary": "以 OpenStreetMap / Overpass API 搜尋 POI，計算五芒星或六芒星排列，並用 Leaflet 地圖呈現魔法陣動畫與匯出結果。",
       "description": "Mapping Star 是一個地理空間探索工具，使用 React、TypeScript、Leaflet 與 OpenStreetMap 圖資，透過 Overpass API 依目標類別抓取周邊 POI，再用幾何求解器尋找可形成五芒星或六芒星的點位組合。介面支援寺廟/宗教等類別篩選、半徑範圍調整、星形解算、魔法陣動畫播放器、結果收藏，以及 GPX / KML 匯出。",
