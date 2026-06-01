@@ -29,8 +29,8 @@
   "projects": [
     {
       "title": "Astro ELF (Black Hole Lab)",
-      "summary": "雙星與黑洞物理沙盒實驗室，模擬廣義相對論空間幾何、參考系拖曳、吸積盤 MHD 噴流與雙星重力波旋近。",
-      "description": "Astro ELF (Black Hole Lab) 是一個黑洞與天體物理交互式沙盒實驗室。使用 React、Babel Standalone 與 HTML5 Canvas 建立，支援 Kerr-Newman 黑洞、中子星、白矮星與恆星模擬。使用者可自訂質量、自旋與電荷參數，觀察事件視界、靜止極限（動圈）、光子球與 ISCO 等廣義相對論導出幾何，並能放置雙星伴星模擬 Peters (1964) 重力波旋近與最終的黑洞合併（merger）過程。同時內建吸積盤 MRI 磁流體（MHD）噴流與潮汐撕裂拉麵化（spaghettification）的互動診斷。",
+      "summary": "把黑洞、重力波與吸積盤等抽象概念做成可操作的天文物理小教室，讓使用者用參數與畫面理解宇宙尺度的物理現象。",
+      "description": "Astro ELF (Black Hole Lab) 的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以 React、Babel Standalone 與 HTML5 Canvas 建立，讓使用者調整質量、自旋與電荷，觀察事件視界、動圈、光子球、ISCO、雙星重力波旋近、黑洞合併與吸積盤 MHD 噴流等現象；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
       "tags": [
         "React",
         "HTML5 Canvas",
@@ -137,8 +137,8 @@
     },
     {
       "title": "Mapping Star",
-      "summary": "以 OpenStreetMap / Overpass API 搜尋 POI，計算五芒星或六芒星排列，並用 Leaflet 地圖呈現魔法陣動畫與匯出結果。",
-      "description": "Mapping Star 是一個地理空間探索工具，使用 React、TypeScript、Leaflet 與 OpenStreetMap 圖資，透過 Overpass API 依目標類別抓取周邊 POI，再用幾何求解器尋找可形成五芒星或六芒星的點位組合。介面支援寺廟/宗教等類別篩選、半徑範圍調整、星形解算、魔法陣動畫播放器、結果收藏，以及 GPX / KML 匯出。",
+      "summary": "搜尋指定目標類別的地理座標，將分散在地圖上的 POI 連成國土鍊成陣式的星形路徑與魔法陣視覺化。",
+      "description": "Mapping Star 的核心發想，是把地圖搜尋變成一種帶有儀式感的空間解謎：先指定目標類別，再從 OpenStreetMap / Overpass API 找出符合條件的座標，最後用幾何解算把點位排列成五芒星、六芒星或近似國土鍊成陣的圖形。專案以 React、TypeScript、Leaflet 與 OpenStreetMap 圖資實作，支援類別篩選、搜尋半徑調整、星形解算、魔法陣動畫、結果收藏與 GPX / KML 匯出，讓地理資料不只是查詢結果，也能成為可探索、可創作的圖案。",
       "tags": [
         "TypeScript",
         "React",
@@ -173,8 +173,8 @@
     },
     {
       "title": "Elven Chewing",
-      "summary": "Rust 實作的 Windows 注音輸入法與 WebAssembly 瀏覽器沙盒，展示模糊注音猜詞、雙排輸入、最近文字重轉與簡繁切換。",
-      "description": "Elven Chewing 是以 Rust 與 Windows Text Services Framework 打造的注音輸入法專案，延伸新酷音/libchewing 的轉換基礎，加入 out-of-process UI、雙排輸入、模糊注音猜詞、最近一次送出文字重轉、簡繁即時切換與 MSI 打包流程；公開 Web Demo 則透過 WebAssembly 在瀏覽器中驗證核心輸入體驗與候選面板行為。",
+      "summary": "以手機使用者的打字習慣為出發點，設計能容忍注音誤差、主動理解意圖的模糊智慧選詞輸入體驗。",
+      "description": "Elven Chewing 的開發緣由，是重新思考注音輸入法在手機與觸控時代應該如何服務使用者：不是要求每個按鍵都精準，而是讓系統能理解常見誤觸、近音與輸入節奏，提供更自然的候選詞。專案以 Rust 與 Windows Text Services Framework 打造輸入法核心，延伸新酷音/libchewing 的轉換基礎，加入模糊注音猜詞、候選面板、雙排輸入、最近文字重轉與簡繁切換；WebAssembly Demo 則用來快速驗證候選排序與互動流程，讓桌面實作也能吸收手機輸入習慣的直覺。",
       "tags": [
         "Rust",
         "WebAssembly",
@@ -209,8 +209,8 @@
     },
     {
       "title": "Novel Elf",
-      "summary": "小說與世界觀創作工作台，整合地圖、時間線、典籍、章節編輯與多語介面，用來管理 Aevenmere 世界資料。",
-      "description": "Novel Elf 是一套以 The Atelier of Aevenmere 為核心的創作工作台，將世界地圖、歷史時間線、角色與組織典籍、書庫章節、故事資料匯入匯出與多語介面集中在同一個瀏覽器介面中，適合整理長篇小說、TRPG 世界觀與設定集資料。",
+      "summary": "以 LLM-wiki 技術整理小說世界觀，把地圖、年表、角色與章節變成 AI 寫作可引用的地圖編年史系統。",
+      "description": "Novel Elf 是為 AI 輔助小說創作打造的地圖編年史系統。開發重點在於使用 LLM-wiki 的概念，將世界地圖、歷史時間線、角色、組織、地點、典籍與章節資料整理成可查詢、可追蹤、可持續擴寫的知識結構，讓 AI 不只是續寫文字，而能沿著既有世界觀脈絡創作。專案以 The Atelier of Aevenmere 為核心案例，集中管理地圖、年表、書庫章節、故事資料匯入匯出與多語介面，適合長篇小說、TRPG 世界設定與 AI 協作寫作流程。",
       "tags": [
         "JavaScript",
         "Worldbuilding",
@@ -245,8 +245,8 @@
     },
     {
       "title": "Agent Task Manager (ATM)",
-      "summary": "本機 npm dev server 管理台，可集中掃描、啟動、停止並監控多個前端專案，適合 Agent Coding 工作流使用。",
-      "description": "Agent Task Manager (ATM) 是一套面向 Windows 開發環境的本機開發伺服器管理工具，結合 Node.js HTTP/WebSocket 伺服器、靜態 Web UI 與 PowerShell CLI，自動掃描含有 dev script 的專案，集中管理啟動、停止、重啟、健康檢查、即時 log、終端工作階段與跨裝置測試 URL。",
+      "summary": "為 AI 協同開發打造的多專案任務管理台，集中掃描、啟動、監控並交接多個專案的開發工作流。",
+      "description": "Agent Task Manager (ATM) 的開發緣由，是讓人類開發者與 AI Agent 能在同一個工作台協同管理多個專案任務，而不是分散在不同終端、瀏覽器分頁與手動紀錄中。它結合 Node.js HTTP/WebSocket 伺服器、靜態 Web UI 與 PowerShell CLI，自動掃描含有 dev script 的專案，集中處理啟動、停止、重啟、健康檢查、即時 log、終端工作階段與跨裝置測試 URL；目標是把多專案開發變成可觀測、可交接、可由 AI 接續執行的任務系統。",
       "tags": [
         "Node.js",
         "WebSocket",
@@ -361,8 +361,8 @@
     },
     {
       "title": "Mapping Elf",
-      "summary": "GPX 軌跡生成器與戶外地圖工具，整合路線規劃、高度剖面、離線地圖與沿途天氣資訊。",
-      "description": "Mapping Elf 是為戶外活動設計的互動式地圖應用，支援步行、健行、越野跑、自行車與駕車等路線模式，可匯入/匯出 GPX、KML，並以高度剖面、距離統計、體能參數與天氣時間軸輔助行前規劃。作品把地圖操作、路線資料與視覺化資訊整合在同一流程中，讓使用者能更直覺地評估距離、爬升、補給與天候條件。",
+      "summary": "結合天氣預報與地圖軌跡規劃，依每小時與每公里配速追蹤沿途天候，協助戶外運動者安排行程。",
+      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案把地圖軌跡規劃、GPX/KML 匯入匯出、配速推估、高度剖面、距離統計與天氣預報整合在同一流程中，讓健行、越野跑、自行車、步行與駕車等使用者能依照每小時或每公里的位置追蹤風雨、溫度與行進狀態，做出更貼近實際行程的安全規劃。",
       "tags": [
         "JavaScript",
         "Leaflet",
@@ -398,8 +398,8 @@
     },
     {
       "title": "Hex Snake",
-      "summary": "六角格貪食蛇對戰遊戲，玩家與 AI 在棋盤上搶奪資源並使用角色技能對抗。",
-      "description": "Hex Snake 是單頁瀏覽器遊戲，核心包含六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬。玩家需要在棋盤上搶奪資源、判斷路線風險並利用技能創造優勢。作品將遊戲資料與平衡參數獨立管理，並搭配 tools 進行模擬、策略調校與回歸測試，適合展示互動遊戲、AI 決策與系統化驗證流程。",
+      "summary": "把貪食蛇搬上六角棋盤，讓不同角色用技能彼此對戰，在搶奪資源與路線封鎖中形成策略攻防。",
+      "description": "Hex Snake 的發想，是將經典貪食蛇從單純反應遊戲改造成六角棋盤上的角色對戰。玩家與 AI 不只要延長身體、搶奪資源，還要利用角色技能、地形角度與路線封鎖製造攻防節奏。專案以單頁瀏覽器遊戲實作六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬，並將遊戲資料與平衡參數獨立管理，方便透過工具進行策略調校與回歸測試。",
       "tags": [
         "HTML",
         "CSS",
@@ -434,8 +434,8 @@
     },
     {
       "title": "Railway Elf",
-      "summary": "鐵路主題互動網頁作品，以 GitHub Pages 發布並保留公開程式碼連結。",
-      "description": "Railway Elf 是鐵路主題的互動網頁作品，透過 GitHub Pages 提供線上 Demo，並保留公開程式碼入口，方便後續延伸功能與設計說明。作品目前以主題式互動體驗作為收錄重點，適合放在作品集中呈現前端頁面整合、公開部署與專案整理能力；後續可依 README 或實際功能補上路線資料、視覺化介面與操作流程等更完整細節。",
+      "summary": "在車站之間的任意地點推估列車經過時間，讓鐵道觀察與行程安排能從固定站點延伸到沿線位置。",
+      "description": "Railway Elf 的開發緣由，是想回答一個比時刻表更貼近現場的問題：如果我不在車站，而是在兩站之間的任意位置，火車大約什麼時候會經過？專案以鐵路路線、車站時刻與沿線位置推估為核心，將固定站點資料延伸成可互動的通過時間預測，適合鐵道觀察、拍攝規劃與沿線移動情境。作品以 GitHub Pages 發布 Demo，保留公開程式碼入口，方便後續擴充更完整的路線資料與視覺化介面。",
       "tags": [
         "JavaScript",
         "GitHub Pages",
