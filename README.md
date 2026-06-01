@@ -16,6 +16,8 @@ Vite + React + TypeScript 建置的個人作品集與本地履歷 UI。內容以
 | 作品 | 類型 | Demo | Repository |
 | --- | --- | --- | --- |
 | Astro ELF | 黑洞物理、科學模擬、重力波旋近、吸積盤 MHD | https://changweilin.github.io/astrophysics_elf/ | https://github.com/changweilin/astrophysics_elf |
+| Breeze Elf | 語音轉文字、麥克風即時串流、音高波形估算 | https://changweilin.github.io/breeze_elf/ | https://github.com/changweilin/breeze_elf |
+| YOLO Elf | 電腦視覺、即時物件偵測、瀏覽器串流與標記 | https://changweilin.github.io/yolo_elf/ | https://github.com/changweilin/yolo_elf |
 | Win Rate Calculator | 勝率計算、機率模型、互動工具 | https://changweilin.github.io/win_rate_calculator/ | https://github.com/changweilin/win_rate_calculator |
 | Mapping Elf | 戶外地圖、GPX/KML、路線規劃 | https://changweilin.github.io/mapping_elf/ | https://github.com/changweilin/mapping_elf |
 | Hex Snake | 六角格遊戲、AI 對弈、平衡模擬 | https://changweilin.github.io/hex_snake/ | https://github.com/changweilin/hex_snake |

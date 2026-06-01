@@ -64,6 +64,78 @@
       ]
     },
     {
+      "title": "Breeze Elf",
+      "summary": "即時語音串流與本機 ASR 語音轉文字工具，整合音高波形估算與遠端儲存。",
+      "description": "Breeze Elf 是一個即時語音辨識與分析工具。透過 HTML5 Audio API 與 AudioWorklet 從手機麥克風擷取即時音訊，以 WebSocket 串流至本機伺服器並使用 faster-whisper (Whisper) 模型進行超低延遲語音轉文字（ASR）。同時支援 VAD（語音活動偵測）以減少幻聽現象，並內建本地音高估算器（Pitch Estimator）以波形與火花圖（Sparklines）即時呈現說話音高變化，支援轉錄文字的遠端儲存、下載與簡繁轉換。",
+      "tags": [
+        "Python",
+        "Whisper ASR",
+        "WebSocket",
+        "AudioWorklet",
+        "Pitch Estimation",
+        "HTML5 Audio"
+      ],
+      "category": "語音辨識與 AI",
+      "year": "2026",
+      "createdAt": "2026-05-22T10:00:00Z",
+      "updatedAt": "2026-06-01T10:00:00Z",
+      "screenshot": {
+        "src": "project-screenshots/breeze-elf.png",
+        "alt": "Breeze Elf 即時語音轉文字與音高火花圖桌機版畫面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/breeze_elf/",
+        "repo": "https://github.com/changweilin/breeze_elf",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/breeze-elf.png",
+          "alt": "Breeze Elf 即時語音轉文字與音高火花圖桌機版畫面"
+        },
+        {
+          "src": "project-screenshots/breeze-elf-mobile.png",
+          "alt": "Breeze Elf 即時語音轉文字與音高火花圖手機版畫面"
+        }
+      ]
+    },
+    {
+      "title": "YOLO Elf",
+      "summary": "手機相機影像串流與本機 YOLOv8 即時物件偵測與瀏覽器畫格標記工具。",
+      "description": "YOLO Elf 是一套基於 FastAPI 與 WebSockets 的即時影像物件偵測工具。使用者可在手機瀏覽器開啟相機，將高畫質畫格即時以 WebSocket 串流至本地端電腦的 YOLOv8 偵測引擎，並在桌機瀏覽器端即時收到經深度學習模型標記出的物件邊界框（Bounding Boxes）與置信度，支援多人連線監控、低延遲影格串流、瀏覽器錄影上傳與背景遠端備份機制。",
+      "tags": [
+        "FastAPI",
+        "Python",
+        "WebSocket",
+        "YOLOv8",
+        "Computer Vision",
+        "HTML5 Canvas"
+      ],
+      "category": "電腦視覺與 AI",
+      "year": "2026",
+      "createdAt": "2026-05-18T10:00:00Z",
+      "updatedAt": "2026-06-01T10:00:00Z",
+      "screenshot": {
+        "src": "project-screenshots/yolo-elf.png",
+        "alt": "YOLO Elf 即時物件偵測串流與瀏覽器畫格標記桌機版畫面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/yolo_elf/",
+        "repo": "https://github.com/changweilin/yolo_elf",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/yolo-elf.png",
+          "alt": "YOLO Elf 即時物件偵測串流與瀏覽器畫格標記桌機版畫面"
+        },
+        {
+          "src": "project-screenshots/yolo-elf-mobile.png",
+          "alt": "YOLO Elf 即時物件偵測串流與瀏覽器畫格標記手機版畫面"
+        }
+      ]
+    },
+    {
       "title": "Mapping Star",
       "summary": "以 OpenStreetMap / Overpass API 搜尋 POI，計算五芒星或六芒星排列，並用 Leaflet 地圖呈現魔法陣動畫與匯出結果。",
       "description": "Mapping Star 是一個地理空間探索工具，使用 React、TypeScript、Leaflet 與 OpenStreetMap 圖資，透過 Overpass API 依目標類別抓取周邊 POI，再用幾何求解器尋找可形成五芒星或六芒星的點位組合。介面支援寺廟/宗教等類別篩選、半徑範圍調整、星形解算、魔法陣動畫播放器、結果收藏，以及 GPX / KML 匯出。",
