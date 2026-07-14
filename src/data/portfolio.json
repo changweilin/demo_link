@@ -28,24 +28,99 @@
   },
   "projects": [
     {
+      "title": "Steel vs Swarm · 無人戰略：鋼鐵與蜂群",
+      "summary": "DOTA × 第一人稱射擊對戰：武裝無人機蜂群對決雙足機甲，在真實世界地圖即時生成的 3D 戰場沿三路兵線推進、摧毀主堡。",
+      "description": "Steel vs Swarm（無人戰略：鋼鐵與蜂群）是一款結合 DOTA 與第一人稱射擊的多人連線對戰遊戲：一方操作武裝無人機（蜂群兵團），一方駕駛雙足機甲（鋼鐵軍團），在依真實世界地圖即時生成的 3D 戰場上，沿三條真實道路兵線推進、摧毀敵方主堡。專案以 Node.js + WebSocket 打造伺服器權威模擬（波次、小兵 AI、塔與主堡、彈藥填彈、經濟軍械庫、地雷與防空），以 Three.js 建構第一人稱座艙、碰撞／後座力／爆炸衝擊等物理與 2D 戰術地圖，並即時抓取 OSRM 道路、AWS 高程磚、Overpass 建物圖資與 Esri 衛星影像建構地形與五類地貌植被。內建伺服器端電腦玩家可單人開戰；地圖與地形繪製沿用自 Mapping Elf，房間配對與 3D 模型載入機制沿用自 AI Tycoon。",
+      "tags": [
+        "Node.js",
+        "WebSocket",
+        "Three.js",
+        "WebGL",
+        "OpenStreetMap",
+        "Multiplayer",
+        "FPS"
+      ],
+      "category": "遊戲與 AI",
+      "year": "2026",
+      "createdAt": "2026-07-02T11:06:44Z",
+      "updatedAt": "2026-07-14T16:14:20Z",
+      "screenshot": {
+        "src": "project-screenshots/steel-vs-swarm.png",
+        "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版標題與指揮官登入畫面"
+      },
+      "links": {
+        "demo": "",
+        "repo": "https://github.com/changweilin/steel_vs_swarm",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/steel-vs-swarm.png",
+          "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版標題與指揮官登入畫面"
+        },
+        {
+          "src": "project-screenshots/steel-vs-swarm-mobile.png",
+          "alt": "Steel vs Swarm 無人戰略:鋼鐵與蜂群手機版標題與指揮官登入畫面"
+        }
+      ]
+    },
+    {
+      "title": "AI Tycoon · 賽博貿易戰 2049",
+      "summary": "以科技巨頭為主題的多人回合制策略桌遊，在環太平洋科技冷戰版圖上經營產業、打作戰卡並與 AI 對戰。",
+      "description": "AI Tycoon（賽博貿易戰 2049）是一款以環太平洋科技冷戰為背景的多人回合制策略桌遊。玩家扮演米國矽谷、牆國神州、台灣護國神山、日本與韓國等陣營的科技巨頭，各自擁有交通、AI、娛樂、硬體與資訊等產業屬性與專屬能力（如晶片稅、算力抽卡、假新聞免費打出），透過移動、發展科技卡、打作戰卡與經營收入爭奪版圖。專案以 Node.js HTTP 靜態伺服器搭配 WebSocket 房間系統（PIN 房、公開／私人房、斷線重連與房主轉移）實作連線對戰，並以 Three.js 打造 3D 棋盤與角色立繪；支援單人對 AI 與上帝觀戰模式，GitHub Pages 上提供單機試玩版。房間系統與 3D 模型載入機制後續也沿用到 Steel vs Swarm。",
+      "tags": [
+        "JavaScript",
+        "Node.js",
+        "WebSocket",
+        "Three.js",
+        "Board Game",
+        "AI 對弈",
+        "Multiplayer"
+      ],
+      "category": "遊戲與 AI",
+      "year": "2026",
+      "createdAt": "2026-06-11T16:38:32Z",
+      "updatedAt": "2026-06-25T17:01:27Z",
+      "screenshot": {
+        "src": "project-screenshots/ai-tycoon.png",
+        "alt": "AI Tycoon 賽博貿易戰 2049 桌機版陣營與科技巨頭角色選擇畫面"
+      },
+      "links": {
+        "demo": "https://changweilin.github.io/ai_tycoon/",
+        "repo": "https://github.com/changweilin/ai_tycoon",
+        "caseStudy": ""
+      },
+      "screenshots": [
+        {
+          "src": "project-screenshots/ai-tycoon.png",
+          "alt": "AI Tycoon 賽博貿易戰 2049 桌機版陣營與科技巨頭角色選擇畫面"
+        },
+        {
+          "src": "project-screenshots/ai-tycoon-mobile.png",
+          "alt": "AI Tycoon 賽博貿易戰 2049 手機版遊戲開始與角色選擇畫面"
+        }
+      ]
+    },
+    {
       "title": "Astro ELF (Black Hole Lab)",
-      "summary": "把黑洞、重力波與吸積盤等抽象概念做成可操作的天文物理小教室，讓使用者用參數與畫面理解宇宙尺度的物理現象。",
-      "description": "Astro ELF (Black Hole Lab) 的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以 React、Babel Standalone 與 HTML5 Canvas 建立，讓使用者調整質量、自旋與電荷，觀察事件視界、動圈、光子球、ISCO、雙星重力波旋近、黑洞合併與吸積盤 MHD 噴流等現象；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
+      "summary": "把黑洞、重力波與吸積盤等抽象概念做成可操作的天文物理小教室，支援八國語言與可拖入的天體庫，讓使用者用參數與畫面理解宇宙尺度的物理現象。",
+      "description": "Astro ELF (Black Hole Lab) 的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以 React、WebGL 與 HTML5 Canvas 建立，直接對 Kerr-Newman 度規求解，讓使用者調整質量、自旋與電荷，觀察事件視界、動圈、光子球、ISCO、雙星重力波旋近、黑洞合併與吸積盤 MHD 噴流（Blandford-Znajek）等現象。近期加入八國語言介面、可拖入視圖的天體庫（岩質行星、氣態巨行星、彗星、棕矮星、載人飛船與帶電探測器）、ΔV 點火、潮汐顯微鏡、重力場圖與完整引擎遙測診斷；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
       "tags": [
         "React",
-        "HTML5 Canvas",
+        "WebGL",
         "Astrophysics",
         "General Relativity",
         "Gravitational Waves",
-        "MHD Simulation"
+        "MHD Simulation",
+        "i18n"
       ],
       "category": "物理與科學模擬",
       "year": "2026",
       "createdAt": "2026-06-01T10:00:00Z",
-      "updatedAt": "2026-06-01T10:00:00Z",
+      "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
         "src": "project-screenshots/astrophysics-elf.png",
-        "alt": "Astro ELF 雙星黑洞旋近與重力波輻射沙盒模擬桌機版畫面"
+        "alt": "Astro ELF 黑洞實驗室桌機版：Kerr-Newman 黑洞 3D 模擬、天體庫與 MHD 噴流監視器"
       },
       "links": {
         "demo": "https://changweilin.github.io/astrophysics_elf/",
@@ -55,18 +130,18 @@
       "screenshots": [
         {
           "src": "project-screenshots/astrophysics-elf.png",
-          "alt": "Astro ELF 雙星黑洞旋近與重力波輻射沙盒模擬桌機版畫面"
+          "alt": "Astro ELF 黑洞實驗室桌機版：Kerr-Newman 黑洞 3D 模擬、天體庫與 MHD 噴流監視器"
         },
         {
           "src": "project-screenshots/astrophysics-elf-mobile.png",
-          "alt": "Astro ELF 雙星黑洞旋近與重力波輻射沙盒模擬手機版畫面"
+          "alt": "Astro ELF 黑洞實驗室手機版：黑洞事件視界、動圈與 ISCO 互動模擬"
         }
       ]
     },
     {
       "title": "Breeze Elf",
-      "summary": "即時語音串流與本機 ASR 語音轉文字工具，整合音高波形估算與遠端儲存。",
-      "description": "Breeze Elf 是一個即時語音辨識與分析工具。透過 HTML5 Audio API 與 AudioWorklet 從手機麥克風擷取即時音訊，以 WebSocket 串流至本機伺服器並使用 faster-whisper (Whisper) 模型進行超低延遲語音轉文字（ASR）。同時支援 VAD（語音活動偵測）以減少幻聽現象，並內建本地音高估算器（Pitch Estimator）以波形與火花圖（Sparklines）即時呈現說話音高變化，支援轉錄文字的遠端儲存、下載與簡繁轉換。",
+      "summary": "即時語音串流與本機 ASR 語音轉文字工具，整合慣用詞庫、音高波形估算、文字轉簡譜與變聲後處理。",
+      "description": "Breeze Elf 是一個即時語音辨識與分析工具。透過 HTML5 Audio API 與 AudioWorklet 從手機麥克風擷取即時音訊，以 WebSocket 串流至本機伺服器並使用 faster-whisper (Whisper) 模型進行超低延遲語音轉文字（ASR）。同時支援 VAD（語音活動偵測）以減少幻聽現象，並內建本地音高估算器（Pitch Estimator）以波形與火花圖（Sparklines）即時呈現說話音高變化；可自訂慣用詞庫提升辨識準確度，並提供文字、文字＋簡譜（將音高轉為簡譜）、基頻分析與變聲等後處理模式，支援轉錄文字的遠端儲存、下載與簡繁轉換。線上 Demo 以示意模式（隱私功能凍結）展示介面流程。",
       "tags": [
         "Python",
         "Whisper ASR",
@@ -78,10 +153,10 @@
       "category": "語音辨識與 AI",
       "year": "2026",
       "createdAt": "2026-05-22T10:00:00Z",
-      "updatedAt": "2026-06-01T10:00:00Z",
+      "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
         "src": "project-screenshots/breeze-elf.png",
-        "alt": "Breeze Elf 即時語音轉文字與音高火花圖桌機版畫面"
+        "alt": "Breeze Elf 桌機版：語音逐字稿、慣用詞庫與文字／簡譜／基頻分析後處理介面"
       },
       "links": {
         "demo": "https://changweilin.github.io/breeze_elf/",
@@ -91,18 +166,18 @@
       "screenshots": [
         {
           "src": "project-screenshots/breeze-elf.png",
-          "alt": "Breeze Elf 即時語音轉文字與音高火花圖桌機版畫面"
+          "alt": "Breeze Elf 桌機版：語音逐字稿、慣用詞庫與文字／簡譜／基頻分析後處理介面"
         },
         {
           "src": "project-screenshots/breeze-elf-mobile.png",
-          "alt": "Breeze Elf 即時語音轉文字與音高火花圖手機版畫面"
+          "alt": "Breeze Elf 手機版：語音轉文字與變聲後處理介面"
         }
       ]
     },
     {
       "title": "YOLO Elf",
-      "summary": "手機相機影像串流與本機 YOLOv8 即時物件偵測與瀏覽器畫格標記工具。",
-      "description": "YOLO Elf 是一套基於 FastAPI 與 WebSockets 的即時影像物件偵測工具。使用者可在手機瀏覽器開啟相機，將高畫質畫格即時以 WebSocket 串流至本地端電腦的 YOLOv8 偵測引擎，並在桌機瀏覽器端即時收到經深度學習模型標記出的物件邊界框（Bounding Boxes）與置信度，支援多人連線監控、低延遲影格串流、瀏覽器錄影上傳與背景遠端備份機制。",
+      "summary": "手機相機影像串流與本機 YOLOv8 即時物件偵測工具，支援快速／精準辨識模式與串流效能監控。",
+      "description": "YOLO Elf 是一套基於 FastAPI 與 WebSockets 的即時影像物件偵測工具。使用者可在手機瀏覽器開啟相機，將高畫質畫格即時以 WebSocket 串流至本地端電腦的 YOLOv8 偵測引擎，並在桌機瀏覽器端即時收到經深度學習模型標記出的物件邊界框（Bounding Boxes）與置信度，支援多人連線監控、低延遲影格串流、瀏覽器錄影上傳與背景遠端備份機制。介面提供快速／精準兩種辨識模式切換，以及影格數、偵測框數、推論延遲與丟棄影格等即時串流指標；線上 Demo 以靜態快照示意偵測畫面。",
       "tags": [
         "FastAPI",
         "Python",
@@ -114,10 +189,10 @@
       "category": "電腦視覺與 AI",
       "year": "2026",
       "createdAt": "2026-05-18T10:00:00Z",
-      "updatedAt": "2026-06-01T10:00:00Z",
+      "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
         "src": "project-screenshots/yolo-elf.png",
-        "alt": "YOLO Elf 即時物件偵測串流與瀏覽器畫格標記桌機版畫面"
+        "alt": "YOLO Elf 桌機版：即時物件偵測邊界框、快速／精準辨識模式與串流效能指標"
       },
       "links": {
         "demo": "https://changweilin.github.io/yolo_elf/",
@@ -127,11 +202,11 @@
       "screenshots": [
         {
           "src": "project-screenshots/yolo-elf.png",
-          "alt": "YOLO Elf 即時物件偵測串流與瀏覽器畫格標記桌機版畫面"
+          "alt": "YOLO Elf 桌機版：即時物件偵測邊界框、快速／精準辨識模式與串流效能指標"
         },
         {
           "src": "project-screenshots/yolo-elf-mobile.png",
-          "alt": "YOLO Elf 即時物件偵測串流與瀏覽器畫格標記手機版畫面"
+          "alt": "YOLO Elf 手機版：物件偵測邊界框與串流效能指標"
         }
       ]
     },
@@ -361,8 +436,8 @@
     },
     {
       "title": "Mapping Elf",
-      "summary": "結合天氣預報與地圖軌跡規劃，依每小時與每公里配速追蹤沿途天候，協助戶外運動者安排行程。",
-      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案把地圖軌跡規劃、GPX/KML 匯入匯出、配速推估、高度剖面、距離統計與天氣預報整合在同一流程中，讓健行、越野跑、自行車、步行與駕車等使用者能依照每小時或每公里的位置追蹤風雨、溫度與行進狀態，做出更貼近實際行程的安全規劃。",
+      "summary": "結合天氣預報與地圖軌跡規劃，依每小時與每公里配速追蹤沿途天候，並提供多語介面、個人配速校正與離線地圖包。",
+      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案把地圖軌跡規劃（單程／來回／O 繞）、GPX/KML 匯入匯出、配速推估、高度剖面、距離統計、MET 熱量與補給估算與天氣預報整合在同一流程中，讓健行、越野跑、自行車、步行與駕車等使用者能依照每小時或每公里的位置追蹤風雨、溫度與行進狀態。近期加入八國語言介面、個人配速校正（匯入實際 GPX 耗時計算校正倍率）、Open-Meteo 與 Windy 多模式（ECMWF／GFS／ICON 等）天氣比較、天氣快取，以及可保存路線與圖磚的離線地圖包（.melmap），做出更貼近實際行程的安全規劃。",
       "tags": [
         "JavaScript",
         "Leaflet",
@@ -370,15 +445,16 @@
         "Vite",
         "PWA",
         "Capacitor",
-        "GPX/KML"
+        "GPX/KML",
+        "i18n"
       ],
       "category": "戶外地圖",
       "year": "2026",
       "createdAt": "2026-04-08T13:54:34Z",
-      "updatedAt": "2026-05-18T00:35:50Z",
+      "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
         "src": "project-screenshots/mapping-elf.png",
-        "alt": "Mapping Elf 桌機版玉山步道路線天氣卡"
+        "alt": "Mapping Elf 桌機版：地形圖層、路線規劃面板與 Windy 多模式天氣設定"
       },
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
@@ -388,11 +464,11 @@
       "screenshots": [
         {
           "src": "project-screenshots/mapping-elf.png",
-          "alt": "Mapping Elf 桌機版玉山步道路線天氣卡"
+          "alt": "Mapping Elf 桌機版：地形圖層、路線規劃面板與 Windy 多模式天氣設定"
         },
         {
           "src": "project-screenshots/mapping-elf-2.png",
-          "alt": "Mapping Elf 手機版玉山步道路線天氣卡"
+          "alt": "Mapping Elf 手機版：全螢幕地形圖與路線規劃介面"
         }
       ]
     },
