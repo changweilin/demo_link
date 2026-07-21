@@ -104,7 +104,7 @@
     {
       "title": "Astro ELF (Black Hole Lab)",
       "summary": "以克爾–紐曼黑洞為核心的零建置天文物理沙盒，即時模擬帶電、旋轉黑洞的吸積盤、噴流與重力波，並結合高擬真物理核心、AI 科學家對談與離線維基知識庫，把抽象物理變成可操作的雙語小教室。",
-      "description": "Astro ELF（Black Hole Lab）以克爾–紐曼（Kerr–Newman）度規為核心，在瀏覽器中即時模擬帶電、旋轉黑洞周遭的測試粒子運動、潮汐效應、吸積盤與相對論性噴流。前端採零建置架構，以瀏覽器內 Babel 即時轉譯搭配 React 18 UMD，桌面預設 WebGL／Three.js 3D、行動版以 Canvas2D 後備。使用者可調整質量、自旋與電荷，觀察外／內視界、動圈、光子球、ISCO、參考系拖曳（Lense–Thirring）、雙星重力波旋近與黑洞合併，以及 α–黏滯、磁旋轉不穩定性（MRI）與 Blandford–Znajek 噴流等吸積盤 MHD 現象；也能拖入岩質行星、氣態巨行星、彗星、飛船與帶電探測器，以彈弓式初速瞄準並讀取即時遙測。專案由四個模組協作：瀏覽器展示版、經基準測試的高擬真物理核心（full-physics，Boyer–Lindquist 座標搭配 RK4／自適應積分器）、以本機 LLM（Ollama）扮演知名物理學家的科學家對談後端，以及以維基百科建構、BM25 + 向量混合檢索的離線 RAG 知識庫；並搭配雙語教學圖書館與知識圖譜、八國語系介面。",
+      "description": "Astro ELF（Black Hole Lab）的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以克爾–紐曼（Kerr–Newman）度規為核心，在瀏覽器中即時模擬帶電、旋轉黑洞周遭的測試粒子運動、潮汐效應、吸積盤與相對論性噴流。前端採零建置架構，以瀏覽器內 Babel 即時轉譯搭配 React 18 UMD，桌面預設 WebGL／Three.js 3D、行動版以 Canvas2D 後備。使用者可調整質量、自旋與電荷，觀察外／內視界、動圈、光子球、ISCO、參考系拖曳（Lense–Thirring）、雙星重力波旋近與黑洞合併，以及 α–黏滯、磁旋轉不穩定性（MRI）與 Blandford–Znajek 噴流等吸積盤 MHD 現象；也能拖入岩質行星、氣態巨行星、彗星、飛船與帶電探測器，以彈弓式初速瞄準並讀取即時遙測。專案由四個模組協作：瀏覽器展示版、經基準測試的高擬真物理核心（full-physics，Boyer–Lindquist 座標搭配 RK4／自適應積分器）、以本機 LLM（Ollama）扮演知名物理學家的科學家對談後端，以及以維基百科建構、BM25 + 向量混合檢索的離線 RAG 知識庫；並搭配雙語教學圖書館與知識圖譜、八國語系介面；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
       "tags": [
         "React",
         "Three.js",
@@ -441,7 +441,7 @@
     {
       "title": "Mapping Elf",
       "summary": "純前端戶外路線規劃工具：多引擎路線、2D／3D 地形、逐點天氣、集水區水文、配速熱量與 GPX/KML 匯入匯出，支援 .melmap 離線圖資與八國語系，並以 Vite + Capacitor 建置為 PWA 與 Android／iOS App。",
-      "description": "Mapping Elf 是一套純前端（Vanilla JS ESM）的戶外路線規劃工具，可作為網頁 PWA，也能經 Capacitor 8 封裝為 Android／iOS App，所有狀態以 localStorage 持久化並可打包成可攜的 .melmap 圖資檔。核心把地圖點選路線規劃（單程／來回／O 繞）、經 BRouter（山徑）與 OSRM 的多引擎步行／山徑／自行車／駕車路線、高度剖面與距離統計整合在同一流程；並提供以 Three.js 打造、可繞行且貼附衛星影像的 3D 地形，附程序化 3D 天氣特效（雲、雨、雪、霧、閃電）與貼地軌跡回放。天氣整合 Open-Meteo 預報／歷史，於航點與高度圖顯示小格／詳細天氣卡並附 Windy 連結；水文模組可由單一出水點以 D8 演算圈繪集水區，再結合土壤含水、前後期雨量與 GLOFAS 河川流量估算參考級溪水暴漲／土石流指標。配速引擎依活動類型、體重、負重、疲勞與休息估算時間、熱量與補給，並可匯入 GPX/KML 做個人配速校正；匯出支援 GPX/KML、.melmap 與可 3D 列印的 STL／3MF 地形，離線地圖以 Service Worker 快取圖磚，App 版另支援魯地圖 .map／OpenAndroMaps／MBTiles 底圖。內建 8 種語系介面（繁中／EN／日／韓／法／德／西／義）。",
+      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案是一套純前端（Vanilla JS ESM）的戶外路線規劃工具，可作為網頁 PWA，也能經 Capacitor 8 封裝為 Android／iOS App，所有狀態以 localStorage 持久化並可打包成可攜的 .melmap 圖資檔。核心把地圖點選路線規劃（單程／來回／O 繞）、經 BRouter（山徑）與 OSRM 的多引擎步行／山徑／自行車／駕車路線、高度剖面與距離統計整合在同一流程；並提供以 Three.js 打造、可繞行且貼附衛星影像的 3D 地形，附程序化 3D 天氣特效（雲、雨、雪、霧、閃電）與貼地軌跡回放。天氣整合 Open-Meteo 預報／歷史，於航點與高度圖顯示小格／詳細天氣卡並附 Windy 連結；水文模組可由單一出水點以 D8 演算圈繪集水區，再結合土壤含水、前後期雨量與 GLOFAS 河川流量估算參考級溪水暴漲／土石流指標。配速引擎依活動類型、體重、負重、疲勞與休息估算時間、熱量與補給，並可匯入 GPX/KML 做個人配速校正；匯出支援 GPX/KML、.melmap 與可 3D 列印的 STL／3MF 地形，離線地圖以 Service Worker 快取圖磚，App 版另支援魯地圖 .map／OpenAndroMaps／MBTiles 底圖。內建 8 種語系介面（繁中／EN／日／韓／法／德／西／義）。",
       "tags": [
         "JavaScript",
         "Leaflet",
