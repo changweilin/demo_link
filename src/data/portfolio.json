@@ -30,7 +30,7 @@
     {
       "title": "Steel vs Swarm · 無人戰略：鋼鐵與蜂群",
       "summary": "DOTA × 第一人稱射擊對戰：武裝無人機蜂群對決雙足機甲，在真實世界地圖即時生成的 3D 戰場沿三路兵線推進、摧毀主堡。",
-      "description": "Steel vs Swarm（無人戰略：鋼鐵與蜂群）是一款結合 DOTA 與第一人稱射擊的多人連線對戰遊戲：一方操作武裝無人機（蜂群兵團），一方駕駛雙足機甲（鋼鐵軍團），在依真實世界地圖即時生成的 3D 戰場上，沿三條真實道路兵線推進、摧毀敵方主堡。專案以 Node.js + WebSocket 打造伺服器權威模擬（波次、小兵 AI、塔與主堡、彈藥填彈、經濟軍械庫、地雷與防空），以 Three.js 建構第一人稱座艙、碰撞／後座力／爆炸衝擊等物理與 2D 戰術地圖，並即時抓取 OSRM 道路、AWS 高程磚、Overpass 建物圖資與 Esri 衛星影像建構地形與五類地貌植被。內建伺服器端電腦玩家可單人開戰；地圖與地形繪製沿用自 Mapping Elf，房間配對與 3D 模型載入機制沿用自 AI Tycoon。",
+      "description": "Steel vs Swarm（無人戰略：鋼鐵與蜂群）是一款純瀏覽器、免安裝的即時多人連線對戰遊戲，結合 DOTA 與第一人稱射擊：一方操作武裝無人機（蜂群兵團），一方駕駛雙足機甲（鋼鐵軍團），在依真實世界地圖即時生成的 3D 戰場上，沿三條真實道路兵線推進、摧毀敵方主堡。系統即時抓取 OSRM 道路、AWS 高程磚、Esri 衛星影像與 Overpass 建物圖資生成地形，提供 21 個世界地標預設場地或直接在地圖上自訂選點，並搭配季節 × 日夜 × 天氣的動態環境。專案採權威伺服器單體架構，HP、傷害、彈藥、經濟與勝負全由伺服器結算，客戶端僅負責輸入回報與 8Hz 快照插值；並實作伺服器端戰爭迷霧、擊殺賞金與八軌升級經濟、水域／雷區／防空等戰場危險區、32 位英雄招式演出，以及狀態機電腦玩家可單人開戰。技術棧為零建置的 Vanilla ES module 搭配 Three.js（CDN importmap），伺服器唯一 npm 依賴為 ws；地圖與地形繪製沿用自 Mapping Elf，房間配對與 3D 模型載入機制沿用自 AI Tycoon。",
       "tags": [
         "Node.js",
         "WebSocket",
@@ -103,15 +103,17 @@
     },
     {
       "title": "Astro ELF (Black Hole Lab)",
-      "summary": "把黑洞、重力波與吸積盤等抽象概念做成可操作的天文物理小教室，支援八國語言與可拖入的天體庫，讓使用者用參數與畫面理解宇宙尺度的物理現象。",
-      "description": "Astro ELF (Black Hole Lab) 的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以 React、WebGL 與 HTML5 Canvas 建立，直接對 Kerr-Newman 度規求解，讓使用者調整質量、自旋與電荷，觀察事件視界、動圈、光子球、ISCO、雙星重力波旋近、黑洞合併與吸積盤 MHD 噴流（Blandford-Znajek）等現象。近期加入八國語言介面、可拖入視圖的天體庫（岩質行星、氣態巨行星、彗星、棕矮星、載人飛船與帶電探測器）、ΔV 點火、潮汐顯微鏡、重力場圖與完整引擎遙測診斷；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
+      "summary": "以克爾–紐曼黑洞為核心的零建置天文物理沙盒，即時模擬帶電、旋轉黑洞的吸積盤、噴流與重力波，並結合高擬真物理核心、AI 科學家對談與離線維基知識庫，把抽象物理變成可操作的雙語小教室。",
+      "description": "Astro ELF（Black Hole Lab）以克爾–紐曼（Kerr–Newman）度規為核心，在瀏覽器中即時模擬帶電、旋轉黑洞周遭的測試粒子運動、潮汐效應、吸積盤與相對論性噴流。前端採零建置架構，以瀏覽器內 Babel 即時轉譯搭配 React 18 UMD，桌面預設 WebGL／Three.js 3D、行動版以 Canvas2D 後備。使用者可調整質量、自旋與電荷，觀察外／內視界、動圈、光子球、ISCO、參考系拖曳（Lense–Thirring）、雙星重力波旋近與黑洞合併，以及 α–黏滯、磁旋轉不穩定性（MRI）與 Blandford–Znajek 噴流等吸積盤 MHD 現象；也能拖入岩質行星、氣態巨行星、彗星、飛船與帶電探測器，以彈弓式初速瞄準並讀取即時遙測。專案由四個模組協作：瀏覽器展示版、經基準測試的高擬真物理核心（full-physics，Boyer–Lindquist 座標搭配 RK4／自適應積分器）、以本機 LLM（Ollama）扮演知名物理學家的科學家對談後端，以及以維基百科建構、BM25 + 向量混合檢索的離線 RAG 知識庫；並搭配雙語教學圖書館與知識圖譜、八國語系介面。",
       "tags": [
         "React",
-        "WebGL",
+        "Three.js",
         "Astrophysics",
         "General Relativity",
         "Gravitational Waves",
         "MHD Simulation",
+        "Local LLM",
+        "RAG",
         "i18n"
       ],
       "category": "物理與科學模擬",
@@ -140,15 +142,17 @@
     },
     {
       "title": "Breeze Elf",
-      "summary": "即時語音串流與本機 ASR 語音轉文字工具，整合慣用詞庫、音高波形估算、文字轉簡譜與變聲後處理。",
-      "description": "Breeze Elf 是一個即時語音辨識與分析工具。透過 HTML5 Audio API 與 AudioWorklet 從手機麥克風擷取即時音訊，以 WebSocket 串流至本機伺服器並使用 faster-whisper (Whisper) 模型進行超低延遲語音轉文字（ASR）。同時支援 VAD（語音活動偵測）以減少幻聽現象，並內建本地音高估算器（Pitch Estimator）以波形與火花圖（Sparklines）即時呈現說話音高變化；可自訂慣用詞庫提升辨識準確度，並提供文字、文字＋簡譜（將音高轉為簡譜）、基頻分析與變聲等後處理模式，支援轉錄文字的遠端儲存、下載與簡繁轉換。線上 Demo 以示意模式（隱私功能凍結）展示介面流程。",
+      "summary": "透過 Tailscale 私有網路把手機麥克風串流到本機、以 faster-whisper 即時語音轉文字的隱私優先工具，整合慣用詞庫、音高簡譜、ASR 模型熱切換、神經降噪／人聲分離、語者分離、翻譯與變聲工作室。",
+      "description": "Breeze Elf 是一套隱私優先的即時語音辨識與分析工具：透過 HTML5 Audio API 與 AudioWorklet 擷取手機麥克風音訊，經 Tailscale 私有網路以 WebSocket 串流到本機，並以 faster-whisper 進行超低延遲語音轉文字（ASR）。內建 VAD 語音活動偵測以降低幻聽，支援最多四種辨識語言限定與自由偵測、慣用詞庫（就地編修並學習「原本 → 改成」修正，同時注入 initial_prompt 偏移解碼）、本地音高估算與逐字簡譜（含滑音），以及跨轉錄全文檢索、逐字稿遠端儲存／下載與簡繁轉換。辨識模型可在 Breeze ASR、Whisper medium 與 large-v3 間免重啟熱切換，長檔另支援批次轉錄（3–4 倍速）。進階選用模組包含 DeepFilterNet3 神經降噪除殘響、Demucs 音樂人聲分離、NLLB-200 翻譯、匿名語者分離、會後摘要，以及可儲存音色、B→A 變聲與文字轉語音的變聲工作室（mock DSP 或 OpenVoice v2 + MeloTTS）。線上 Demo 以示意模式（隱私功能凍結）展示介面流程。",
       "tags": [
         "Python",
-        "Whisper ASR",
+        "faster-whisper",
         "WebSocket",
         "AudioWorklet",
         "Pitch Estimation",
-        "HTML5 Audio"
+        "Voice Cloning",
+        "Diarization",
+        "Tailscale"
       ],
       "category": "語音辨識與 AI",
       "year": "2026",
@@ -436,11 +440,12 @@
     },
     {
       "title": "Mapping Elf",
-      "summary": "結合天氣預報與地圖軌跡規劃，依每小時與每公里配速追蹤沿途天候，並提供多語介面、個人配速校正與離線地圖包。",
-      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案把地圖軌跡規劃（單程／來回／O 繞）、GPX/KML 匯入匯出、配速推估、高度剖面、距離統計、MET 熱量與補給估算與天氣預報整合在同一流程中，讓健行、越野跑、自行車、步行與駕車等使用者能依照每小時或每公里的位置追蹤風雨、溫度與行進狀態。近期加入八國語言介面、個人配速校正（匯入實際 GPX 耗時計算校正倍率）、Open-Meteo 與 Windy 多模式（ECMWF／GFS／ICON 等）天氣比較、天氣快取，以及可保存路線與圖磚的離線地圖包（.melmap），做出更貼近實際行程的安全規劃。",
+      "summary": "純前端戶外路線規劃工具：多引擎路線、2D／3D 地形、逐點天氣、集水區水文、配速熱量與 GPX/KML 匯入匯出，支援 .melmap 離線圖資與八國語系，並以 Vite + Capacitor 建置為 PWA 與 Android／iOS App。",
+      "description": "Mapping Elf 是一套純前端（Vanilla JS ESM）的戶外路線規劃工具，可作為網頁 PWA，也能經 Capacitor 8 封裝為 Android／iOS App，所有狀態以 localStorage 持久化並可打包成可攜的 .melmap 圖資檔。核心把地圖點選路線規劃（單程／來回／O 繞）、經 BRouter（山徑）與 OSRM 的多引擎步行／山徑／自行車／駕車路線、高度剖面與距離統計整合在同一流程；並提供以 Three.js 打造、可繞行且貼附衛星影像的 3D 地形，附程序化 3D 天氣特效（雲、雨、雪、霧、閃電）與貼地軌跡回放。天氣整合 Open-Meteo 預報／歷史，於航點與高度圖顯示小格／詳細天氣卡並附 Windy 連結；水文模組可由單一出水點以 D8 演算圈繪集水區，再結合土壤含水、前後期雨量與 GLOFAS 河川流量估算參考級溪水暴漲／土石流指標。配速引擎依活動類型、體重、負重、疲勞與休息估算時間、熱量與補給，並可匯入 GPX/KML 做個人配速校正；匯出支援 GPX/KML、.melmap 與可 3D 列印的 STL／3MF 地形，離線地圖以 Service Worker 快取圖磚，App 版另支援魯地圖 .map／OpenAndroMaps／MBTiles 底圖。內建 8 種語系介面（繁中／EN／日／韓／法／德／西／義）。",
       "tags": [
         "JavaScript",
         "Leaflet",
+        "Three.js",
         "Chart.js",
         "Vite",
         "PWA",

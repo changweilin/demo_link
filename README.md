@@ -15,13 +15,13 @@ Vite + React + TypeScript 建置的個人作品集與本地履歷 UI。內容以
 
 | 作品 | 類型 | Demo | Repository |
 | --- | --- | --- | --- |
-| Steel vs Swarm | 真實地圖 3D 對戰、無人機 vs 機甲、DOTA×FPS、WebSocket | — | https://github.com/changweilin/steel_vs_swarm |
+| Steel vs Swarm | 真實地圖 3D 對戰、無人機 vs 機甲、DOTA×FPS、權威伺服器 | — | https://github.com/changweilin/steel_vs_swarm |
 | AI Tycoon | 科技巨頭策略桌遊、WebSocket 連線對戰、Three.js、AI 對弈 | https://changweilin.github.io/ai_tycoon/ | https://github.com/changweilin/ai_tycoon |
-| Astro ELF | 黑洞物理、科學模擬、重力波旋近、吸積盤 MHD | https://changweilin.github.io/astrophysics_elf/ | https://github.com/changweilin/astrophysics_elf |
-| Breeze Elf | 語音轉文字、麥克風即時串流、音高波形估算 | https://changweilin.github.io/breeze_elf/ | https://github.com/changweilin/breeze_elf |
+| Astro ELF | 克爾–紐曼黑洞、吸積盤 MHD、重力波、AI 科學家對談、RAG 知識庫 | https://changweilin.github.io/astrophysics_elf/ | https://github.com/changweilin/astrophysics_elf |
+| Breeze Elf | 語音轉文字、faster-whisper、音高簡譜、語者分離、變聲工作室 | https://changweilin.github.io/breeze_elf/ | https://github.com/changweilin/breeze_elf |
 | YOLO Elf | 電腦視覺、即時物件偵測、瀏覽器串流與標記 | https://changweilin.github.io/yolo_elf/ | https://github.com/changweilin/yolo_elf |
 | Win Rate Calculator | 勝率計算、機率模型、互動工具 | https://changweilin.github.io/win_rate_calculator/ | https://github.com/changweilin/win_rate_calculator |
-| Mapping Elf | 戶外地圖、GPX/KML、路線規劃 | https://changweilin.github.io/mapping_elf/ | https://github.com/changweilin/mapping_elf |
+| Mapping Elf | 戶外地圖、2D/3D 地形、逐點天氣、集水區水文、GPX/KML | https://changweilin.github.io/mapping_elf/ | https://github.com/changweilin/mapping_elf |
 | Hex Snake | 六角格遊戲、AI 對弈、平衡模擬 | https://changweilin.github.io/hex_snake/ | https://github.com/changweilin/hex_snake |
 | Railway Elf | 鐵路主題互動網頁 | https://changweilin.github.io/railway_elf/ | https://github.com/changweilin/railway_elf |
 | Web TSP App | TSP、最佳化、演算法視覺化 | https://changweilin.github.io/web_tsp_app/ | https://github.com/changweilin/web_tsp_app |
