@@ -59,8 +59,12 @@
           "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版標題與指揮官登入畫面"
         },
         {
-          "src": "project-screenshots/steel-vs-swarm-mobile.png",
-          "alt": "Steel vs Swarm 無人戰略:鋼鐵與蜂群手機版標題與指揮官登入畫面"
+          "src": "project-screenshots/steel-vs-swarm-select.png",
+          "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版角色選擇畫面，已選定鋼鐵軍團英雄「編號七」與其機甲、數值與武器"
+        },
+        {
+          "src": "project-screenshots/steel-vs-swarm-firefight.png",
+          "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版遊戲中第一人稱機甲於台北 101 戰場與敵方攻擊直升機、地面部隊交火畫面"
         }
       ]
     },
@@ -83,7 +87,7 @@
       "updatedAt": "2026-06-25T17:01:27Z",
       "screenshot": {
         "src": "project-screenshots/ai-tycoon.png",
-        "alt": "AI Tycoon 賽博貿易戰 2049 桌機版陣營與科技巨頭角色選擇畫面"
+        "alt": "AI Tycoon 賽博貿易戰 2049 桌機版標題與單人對 AI／上帝模式選單畫面"
       },
       "links": {
         "demo": "https://changweilin.github.io/ai_tycoon/",
@@ -93,11 +97,15 @@
       "screenshots": [
         {
           "src": "project-screenshots/ai-tycoon.png",
-          "alt": "AI Tycoon 賽博貿易戰 2049 桌機版陣營與科技巨頭角色選擇畫面"
+          "alt": "AI Tycoon 賽博貿易戰 2049 桌機版標題與單人對 AI／上帝模式選單畫面"
         },
         {
-          "src": "project-screenshots/ai-tycoon-mobile.png",
-          "alt": "AI Tycoon 賽博貿易戰 2049 手機版遊戲開始與角色選擇畫面"
+          "src": "project-screenshots/ai-tycoon-select.png",
+          "alt": "AI Tycoon 賽博貿易戰 2049 桌機版科技巨頭角色選擇畫面，已選定米國矽谷陣營角色"
+        },
+        {
+          "src": "project-screenshots/ai-tycoon-cardplay.png",
+          "alt": "AI Tycoon 賽博貿易戰 2049 桌機版遊戲中打出科技卡、於城市部署建設的對戰畫面"
         }
       ]
     },
@@ -137,6 +145,38 @@
         {
           "src": "project-screenshots/astrophysics-elf-mobile.png",
           "alt": "Astro ELF 黑洞實驗室手機版：黑洞事件視界、動圈與 ISCO 互動模擬"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-course.png",
+          "alt": "Astro ELF 黑洞實驗室桌機版課程：雙語教學圖書館「讀懂黑洞的時空幾何」章節與吸積盤剪影"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-course-mobile.png",
+          "alt": "Astro ELF 黑洞實驗室手機版課程：黑洞時空幾何章節與 Kerr-Newman 教學內容"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-graph.png",
+          "alt": "Astro ELF 黑洞實驗室桌機版知識圖譜：以黑洞為中心的維基知識關聯圖與條目詳情"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-graph-mobile.png",
+          "alt": "Astro ELF 黑洞實驗室手機版知識圖譜：以黑洞為中心的知識關聯圖與條目詳情"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-feynman.png",
+          "alt": "Astro ELF 黑洞實驗室桌機版科學家對談：以本機 LLM 扮演費曼，用直覺方式解說黑洞事件視界"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-feynman-mobile.png",
+          "alt": "Astro ELF 黑洞實驗室手機版科學家對談：費曼解說黑洞事件視界的單獨對話"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-discussion.png",
+          "alt": "Astro ELF 黑洞實驗室桌機版科學對話：牛頓與愛因斯坦就重力本質展開的多科學家討論"
+        },
+        {
+          "src": "project-screenshots/astrophysics-elf-discussion-mobile.png",
+          "alt": "Astro ELF 黑洞實驗室手機版科學對話：牛頓與愛因斯坦就重力本質展開的討論"
         }
       ]
     },
@@ -159,8 +199,8 @@
       "createdAt": "2026-05-22T10:00:00Z",
       "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
-        "src": "project-screenshots/breeze-elf.png",
-        "alt": "Breeze Elf 桌機版：語音逐字稿、慣用詞庫與文字／簡譜／基頻分析後處理介面"
+        "src": "project-screenshots/breeze-elf-asr-mobile.png",
+        "alt": "Breeze Elf 手機版語音辨識：載入儲存的錄音並以本機 faster-whisper（Breeze-ASR-25 CT2、CUDA float16）轉出帶時間戳的逐字稿"
       },
       "links": {
         "demo": "https://changweilin.github.io/breeze_elf/",
@@ -169,12 +209,12 @@
       },
       "screenshots": [
         {
-          "src": "project-screenshots/breeze-elf.png",
-          "alt": "Breeze Elf 桌機版：語音逐字稿、慣用詞庫與文字／簡譜／基頻分析後處理介面"
+          "src": "project-screenshots/breeze-elf-asr-mobile.png",
+          "alt": "Breeze Elf 手機版語音辨識：載入儲存的錄音並以本機 faster-whisper（Breeze-ASR-25 CT2、CUDA float16）轉出帶時間戳的逐字稿"
         },
         {
-          "src": "project-screenshots/breeze-elf-mobile.png",
-          "alt": "Breeze Elf 手機版：語音轉文字與變聲後處理介面"
+          "src": "project-screenshots/breeze-elf-demucs-mobile.png",
+          "alt": "Breeze Elf 手機版音樂人聲分離：以音樂情境載入儲存音檔，先執行 Demucs 人聲分離模型再辨識歌詞"
         }
       ]
     },
@@ -195,8 +235,8 @@
       "createdAt": "2026-05-18T10:00:00Z",
       "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
-        "src": "project-screenshots/yolo-elf.png",
-        "alt": "YOLO Elf 桌機版：即時物件偵測邊界框、快速／精準辨識模式與串流效能指標"
+        "src": "project-screenshots/yolo-elf-fast-mobile.png",
+        "alt": "YOLO Elf 手機版快速辨識模式：載入儲存的錄影並以本機 YOLOv8 即時偵測，標出行人等物件邊界框與置信度、串流效能指標"
       },
       "links": {
         "demo": "https://changweilin.github.io/yolo_elf/",
@@ -205,12 +245,12 @@
       },
       "screenshots": [
         {
-          "src": "project-screenshots/yolo-elf.png",
-          "alt": "YOLO Elf 桌機版：即時物件偵測邊界框、快速／精準辨識模式與串流效能指標"
+          "src": "project-screenshots/yolo-elf-fast-mobile.png",
+          "alt": "YOLO Elf 手機版快速辨識模式：載入儲存的錄影並以本機 YOLOv8 即時偵測，標出行人等物件邊界框與置信度、串流效能指標"
         },
         {
-          "src": "project-screenshots/yolo-elf-mobile.png",
-          "alt": "YOLO Elf 手機版：物件偵測邊界框與串流效能指標"
+          "src": "project-screenshots/yolo-elf-precise-mobile.png",
+          "alt": "YOLO Elf 手機版精準辨識模式：載入儲存的錄影並執行精準模型，標出機車等物件的高置信度邊界框與 GPU 推論延遲指標"
         }
       ]
     },
@@ -458,8 +498,8 @@
       "createdAt": "2026-04-08T13:54:34Z",
       "updatedAt": "2026-07-15T10:00:00Z",
       "screenshot": {
-        "src": "project-screenshots/mapping-elf.png",
-        "alt": "Mapping Elf 桌機版：地形圖層、路線規劃面板與 Windy 多模式天氣設定"
+        "src": "project-screenshots/mapping-elf-2d-desktop.png",
+        "alt": "Mapping Elf 桌機版 2D 地形圖：新竹尖石鄉養老→馬鞍→白石霞喀羅古道 O 繞路線、逐點天氣與高度剖面全部載入"
       },
       "links": {
         "demo": "https://changweilin.github.io/mapping_elf/",
@@ -468,12 +508,20 @@
       },
       "screenshots": [
         {
-          "src": "project-screenshots/mapping-elf.png",
-          "alt": "Mapping Elf 桌機版：地形圖層、路線規劃面板與 Windy 多模式天氣設定"
+          "src": "project-screenshots/mapping-elf-2d-desktop.png",
+          "alt": "Mapping Elf 桌機版 2D 地形圖：新竹尖石鄉養老→馬鞍→白石霞喀羅古道 O 繞路線、逐點天氣與高度剖面全部載入"
         },
         {
-          "src": "project-screenshots/mapping-elf-2.png",
-          "alt": "Mapping Elf 手機版：全螢幕地形圖與路線規劃介面"
+          "src": "project-screenshots/mapping-elf-3d-desktop.png",
+          "alt": "Mapping Elf 桌機版 3D 地形：養老→馬鞍→白石 O 繞路線立體地形、程序化天氣特效與配速人物資訊"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-2d-mobile.png",
+          "alt": "Mapping Elf 手機版 2D 地形圖：養老→馬鞍→白石 O 繞路線、逐點天氣與高度剖面全螢幕呈現"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-3d-mobile.png",
+          "alt": "Mapping Elf 手機版 3D 地形：養老→馬鞍→白石 O 繞路線立體地形與天氣特效"
         }
       ]
     },
