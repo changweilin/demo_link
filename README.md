@@ -15,7 +15,7 @@ Vite + React + TypeScript 建置的個人作品集與本地履歷 UI。內容以
 
 | 作品 | 類型 | Demo | Repository |
 | --- | --- | --- | --- |
-| Steel vs Swarm | 真實地圖 3D 對戰、無人機 vs 機甲、DOTA×FPS、權威伺服器 | — | https://github.com/changweilin/steel_vs_swarm |
+| Steel vs Swarm | 真實地圖 3D 對戰、無人機 vs 機甲、DOTA×FPS、權威伺服器 | https://changweilin.github.io/steel_vs_swarm/public/?mode=solo | https://github.com/changweilin/steel_vs_swarm |
 | AI Tycoon | 科技巨頭策略桌遊、WebSocket 連線對戰、Three.js、AI 對弈 | https://changweilin.github.io/ai_tycoon/ | https://github.com/changweilin/ai_tycoon |
 | Astro ELF | 克爾–紐曼黑洞、吸積盤 MHD、重力波、AI 科學家對談、RAG 知識庫 | https://changweilin.github.io/astrophysics_elf/ | https://github.com/changweilin/astrophysics_elf |
 | Breeze Elf | 語音轉文字、faster-whisper、音高簡譜、語者分離、變聲工作室 | https://changweilin.github.io/breeze_elf/ | https://github.com/changweilin/breeze_elf |
