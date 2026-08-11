@@ -1352,7 +1352,15 @@ function ProjectDetail({
         <span>更新 {formatProjectDate(project.updatedAt)}</span>
       </div>
       <h3>{project.title}</h3>
-      <p>{project.description}</p>
+      <div className="project-description">
+        {project.description
+          .split(/\n{2,}/)
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+          .map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+      </div>
       {screenshots.length > 0 ? (
         <section className="project-gallery" aria-label={`${project.title} 作品圖片`}>
           <div className="project-gallery-heading">

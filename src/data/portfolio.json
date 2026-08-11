@@ -30,7 +30,7 @@
     {
       "title": "Steel vs Swarm · 無人戰略：鋼鐵與蜂群",
       "summary": "DOTA × 第一人稱射擊對戰：武裝無人機蜂群對決雙足機甲，在真實世界地圖即時生成的 3D 戰場沿三路兵線推進、摧毀主堡。",
-      "description": "Steel vs Swarm（無人戰略：鋼鐵與蜂群）是一款純瀏覽器、免安裝的即時多人連線對戰遊戲，結合 DOTA 與第一人稱射擊：一方操作武裝無人機（蜂群兵團），一方駕駛雙足機甲（鋼鐵軍團），在依真實世界地圖即時生成的 3D 戰場上，沿三條真實道路兵線推進、摧毀敵方主堡。系統即時抓取 OSRM 道路、AWS 高程磚、Esri 衛星影像與 Overpass 建物圖資生成地形，提供 21 個世界地標預設場地或直接在地圖上自訂選點，並搭配季節 × 日夜 × 天氣的動態環境。專案採權威伺服器單體架構，HP、傷害、彈藥、經濟與勝負全由伺服器結算，客戶端僅負責輸入回報與 8Hz 快照插值；並實作伺服器端戰爭迷霧、擊殺賞金與八軌升級經濟、水域／雷區／防空等戰場危險區、32 位英雄招式演出，以及狀態機電腦玩家可單人開戰。技術棧為零建置的 Vanilla ES module 搭配 Three.js（CDN importmap），伺服器唯一 npm 依賴為 ws；地圖與地形繪製沿用自 Mapping Elf，房間配對與 3D 模型載入機制沿用自 AI Tycoon。",
+      "description": "Steel vs Swarm（無人戰略：鋼鐵與蜂群）是一款純瀏覽器、免安裝的即時多人連線對戰遊戲，結合 DOTA 與第一人稱射擊：一方操作武裝無人機（蜂群兵團），一方駕駛雙足機甲（鋼鐵軍團），在依真實世界地圖即時生成的 3D 戰場上，沿三條真實道路兵線推進、摧毀敵方主堡。系統即時抓取 OSRM 道路、AWS 高程磚、Esri 衛星影像與 Overpass 建物圖資生成地形，提供 21 個世界地標預設場地或直接在地圖上自訂選點，並搭配季節 × 日夜 × 天氣的動態環境。\n\n專案採權威伺服器單體架構，HP、傷害、彈藥、經濟與勝負全由伺服器結算，客戶端僅負責輸入回報與 8Hz 快照插值；同一份 RoomHub 可跑在三種連線機制上——雲端節點、區網／Tailscale 主機，或直接把伺服器搬進瀏覽器分頁的單機模式（GitHub Pages 上即為此版本，離線可玩）。內容面實作伺服器端戰爭迷霧與 LOS 遮蔽、擊殺賞金與八軌升級經濟、水域／雷區／防空等戰場危險區、32 位英雄招式演出、雙陣營各六章的劇情戰役與觀戰模式，以及依機體數值分成四種定位的狀態機電腦玩家。\n\n手機／平板開啟網頁即切換觸控版，提供類比十字鍵與 ABXY／LR 虛擬搖桿、陀螺儀瞄準與直式／橫式專屬版型，大廳並附上可先驗收判定結果的手機操控診斷面板。技術棧為零建置的 Vanilla ES module 搭配 Three.js（CDN importmap），伺服器唯一 npm 依賴為 ws；地圖與地形繪製沿用自 Mapping Elf，房間配對與 3D 模型載入機制沿用自 AI Tycoon。",
       "tags": [
         "Node.js",
         "WebSocket",
@@ -38,12 +38,13 @@
         "WebGL",
         "OpenStreetMap",
         "Multiplayer",
-        "FPS"
+        "FPS",
+        "Tailscale"
       ],
       "category": "遊戲與 AI",
       "year": "2026",
       "createdAt": "2026-07-02T11:06:44Z",
-      "updatedAt": "2026-07-14T16:14:20Z",
+      "updatedAt": "2026-08-11T14:34:43Z",
       "screenshot": {
         "src": "project-screenshots/steel-vs-swarm.png",
         "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版標題與指揮官登入畫面"
@@ -65,13 +66,25 @@
         {
           "src": "project-screenshots/steel-vs-swarm-firefight.png",
           "alt": "Steel vs Swarm 無人戰略：鋼鐵與蜂群桌機版遊戲中第一人稱機甲於台北 101 戰場與敵方攻擊直升機、地面部隊交火畫面"
+        },
+        {
+          "src": "project-screenshots/steel-vs-swarm-mapbuild.png",
+          "alt": "Steel vs Swarm 建立地圖畫面：於台北真實街道圖資上選定主堡位置，並列出 1v1 至 5v5 隊伍規模與 21 個世界地標預設場地"
+        },
+        {
+          "src": "project-screenshots/steel-vs-swarm-campaign.png",
+          "alt": "Steel vs Swarm 劇情戰役：鋼鐵與蜂群雙陣營故事線，各章節標註戰場地點、季節、日夜與天氣與解鎖進度"
+        },
+        {
+          "src": "project-screenshots/steel-vs-swarm-gamepad-mobile.png",
+          "alt": "Steel vs Swarm 手機橫式虛擬搖桿試玩：雙類比搖桿、ABXY 與 L/R/ZL/ZR 鍵位，並即時顯示推桿量、視角角度與陀螺儀狀態"
         }
       ]
     },
     {
       "title": "AI Tycoon · 賽博貿易戰 2049",
       "summary": "以科技巨頭為主題的多人回合制策略桌遊，在環太平洋科技冷戰版圖上經營產業、打作戰卡並與 AI 對戰。",
-      "description": "AI Tycoon（賽博貿易戰 2049）是一款以環太平洋科技冷戰為背景的多人回合制策略桌遊。玩家扮演米國矽谷、牆國神州、台灣護國神山、日本與韓國等陣營的科技巨頭，各自擁有交通、AI、娛樂、硬體與資訊等產業屬性與專屬能力（如晶片稅、算力抽卡、假新聞免費打出），透過移動、發展科技卡、打作戰卡與經營收入爭奪版圖。專案以 Node.js HTTP 靜態伺服器搭配 WebSocket 房間系統（PIN 房、公開／私人房、斷線重連與房主轉移）實作連線對戰，並以 Three.js 打造 3D 棋盤與角色立繪；支援單人對 AI 與上帝觀戰模式，GitHub Pages 上提供單機試玩版。房間系統與 3D 模型載入機制後續也沿用到 Steel vs Swarm。",
+      "description": "AI Tycoon（賽博貿易戰 2049）是一款以環太平洋科技冷戰為背景的多人回合制策略桌遊。玩家扮演米國矽谷、牆國神州、台灣護國神山、日本與韓國等陣營的科技巨頭，各自擁有交通、AI、娛樂、硬體與資訊等產業屬性與專屬能力（如晶片稅、算力抽卡、假新聞免費打出），透過移動、發展科技卡、打作戰卡與經營收入爭奪版圖。\n\n專案以 Node.js HTTP 靜態伺服器搭配 WebSocket 房間系統（PIN 房、公開／私人房、斷線重連與房主轉移）實作連線對戰，並以 Three.js 打造 3D 棋盤與角色立繪；支援單人對 AI 與上帝觀戰模式，GitHub Pages 上提供單機試玩版。房間系統與 3D 模型載入機制後續也沿用到 Steel vs Swarm。",
       "tags": [
         "JavaScript",
         "Node.js",
@@ -84,7 +97,7 @@
       "category": "遊戲與 AI",
       "year": "2026",
       "createdAt": "2026-06-11T16:38:32Z",
-      "updatedAt": "2026-06-25T17:01:27Z",
+      "updatedAt": "2026-06-25T17:01:24Z",
       "screenshot": {
         "src": "project-screenshots/ai-tycoon.png",
         "alt": "AI Tycoon 賽博貿易戰 2049 桌機版標題與單人對 AI／上帝模式選單畫面"
@@ -112,7 +125,7 @@
     {
       "title": "Astro ELF (Black Hole Lab)",
       "summary": "以克爾–紐曼黑洞為核心的零建置天文物理沙盒，即時模擬帶電、旋轉黑洞的吸積盤、噴流與重力波，並結合高擬真物理核心、AI 科學家對談與離線維基知識庫，把抽象物理變成可操作的雙語小教室。",
-      "description": "Astro ELF（Black Hole Lab）的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以克爾–紐曼（Kerr–Newman）度規為核心，在瀏覽器中即時模擬帶電、旋轉黑洞周遭的測試粒子運動、潮汐效應、吸積盤與相對論性噴流。前端採零建置架構，以瀏覽器內 Babel 即時轉譯搭配 React 18 UMD，桌面預設 WebGL／Three.js 3D、行動版以 Canvas2D 後備。使用者可調整質量、自旋與電荷，觀察外／內視界、動圈、光子球、ISCO、參考系拖曳（Lense–Thirring）、雙星重力波旋近與黑洞合併，以及 α–黏滯、磁旋轉不穩定性（MRI）與 Blandford–Znajek 噴流等吸積盤 MHD 現象；也能拖入岩質行星、氣態巨行星、彗星、飛船與帶電探測器，以彈弓式初速瞄準並讀取即時遙測。專案由四個模組協作：瀏覽器展示版、經基準測試的高擬真物理核心（full-physics，Boyer–Lindquist 座標搭配 RK4／自適應積分器）、以本機 LLM（Ollama）扮演知名物理學家的科學家對談後端，以及以維基百科建構、BM25 + 向量混合檢索的離線 RAG 知識庫；並搭配雙語教學圖書館與知識圖譜、八國語系介面；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
+      "description": "Astro ELF（Black Hole Lab）的開發起點，是想把天文物理從公式與文字說明轉化為可觀察、可操作的互動小教室。專案以克爾–紐曼（Kerr–Newman）度規為核心，在瀏覽器中即時模擬帶電、旋轉黑洞周遭的測試粒子運動、潮汐效應、吸積盤與相對論性噴流，中心天體也可切換為中子星、白矮星或主序星。\n\n前端採零建置架構，以瀏覽器內 Babel 即時轉譯搭配 React 18 UMD，桌面預設 WebGL／Three.js 3D、行動版以 Canvas2D 後備。使用者可調整質量、自旋與電荷，觀察外／內視界、動圈、光子球、ISCO、參考系拖曳（Lense–Thirring）、Web Worker 離線計算的重力透鏡偏折場、雙星重力波旋近與黑洞合併，以及 α–黏滯、磁旋轉不穩定性（MRI）與 Blandford–Znajek 噴流等吸積盤 MHD 現象；也能拖入岩質行星、氣態巨行星、彗星、飛船與帶電探測器，以彈弓式初速瞄準並讀取即時遙測。\n\n專案由四個模組協作：瀏覽器展示版、經基準測試的高擬真物理核心（full-physics，Boyer–Lindquist 座標搭配 RK4／自適應積分器）、以本機 LLM（Ollama）扮演知名物理學家並支援多科學家圓桌的對談後端，以及以維基百科建構、BM25 + 向量混合檢索的離線 RAG 知識庫（含爬取監測後台、黃金測試集與檢索品質 eval 基準）；並搭配雙語教學圖書館與知識圖譜、科學家檔案頁與八國語系介面；重點不是只展示酷炫模擬，而是把難懂的物理直覺拆成可以被實驗、比較與討論的學習場景。",
       "tags": [
         "React",
         "Three.js",
@@ -127,7 +140,7 @@
       "category": "物理與科學模擬",
       "year": "2026",
       "createdAt": "2026-06-01T10:00:00Z",
-      "updatedAt": "2026-07-15T10:00:00Z",
+      "updatedAt": "2026-08-11T15:31:49Z",
       "screenshot": {
         "src": "project-screenshots/astrophysics-elf.png",
         "alt": "Astro ELF 黑洞實驗室桌機版：Kerr-Newman 黑洞 3D 模擬、天體庫與 MHD 噴流監視器"
@@ -182,14 +195,16 @@
     },
     {
       "title": "Breeze Elf",
-      "summary": "透過 Tailscale 私有網路把手機麥克風串流到本機、以 faster-whisper 即時語音轉文字的隱私優先工具，整合慣用詞庫、音高簡譜、ASR 模型熱切換、神經降噪／人聲分離、語者分離、翻譯與變聲工作室。",
-      "description": "Breeze Elf 是一套隱私優先的即時語音辨識與分析工具：透過 HTML5 Audio API 與 AudioWorklet 擷取手機麥克風音訊，經 Tailscale 私有網路以 WebSocket 串流到本機，並以 faster-whisper 進行超低延遲語音轉文字（ASR）。內建 VAD 語音活動偵測以降低幻聽，支援最多四種辨識語言限定與自由偵測、慣用詞庫（就地編修並學習「原本 → 改成」修正，同時注入 initial_prompt 偏移解碼）、本地音高估算與逐字簡譜（含滑音），以及跨轉錄全文檢索、逐字稿遠端儲存／下載與簡繁轉換。辨識模型可在 Breeze ASR、Whisper medium 與 large-v3 間免重啟熱切換，長檔另支援批次轉錄（3–4 倍速）。進階選用模組包含 DeepFilterNet3 神經降噪除殘響、Demucs 音樂人聲分離、NLLB-200 翻譯、匿名語者分離、會後摘要，以及可儲存音色、B→A 變聲與文字轉語音的變聲工作室（mock DSP 或 OpenVoice v2 + MeloTTS）。線上 Demo 以示意模式（隱私功能凍結）展示介面流程。",
+      "summary": "透過 Tailscale 私有網路把手機麥克風串流到本機、以 faster-whisper 即時語音轉文字的隱私優先工具，整合慣用詞庫、簡譜與音準評分、歌詞對齊、LoRA 後訓練模型熱切換、神經降噪／人聲分離、語者分離、翻譯與變聲工作室。",
+      "description": "Breeze Elf 是一套隱私優先的即時語音辨識與分析工具：透過 HTML5 Audio API 與 AudioWorklet 擷取手機麥克風音訊，經 Tailscale 私有網路以 WebSocket 串流到本機，並以 faster-whisper 進行超低延遲語音轉文字（ASR）。內建 VAD 語音活動偵測以降低幻聽，支援最多四種辨識語言限定與自由偵測、慣用詞庫（就地編修並學習「原本 → 改成」修正，同時注入 initial_prompt 偏移解碼），以及跨轉錄全文檢索、由搜尋結果直接摘要、逐字稿遠端儲存／下載與簡繁轉換。\n\n歌唱分析是這一版的重點：以 Krumhansl-Schmuckler 調性偵測決定簡譜主音（而非取旋律中位數）、由頻譜流量包絡估計節拍並把每字時長量化成含附點的音符時值，簡譜以減時線、附點與延長線寫成真正的譜；再依持續時間加權評出音準分數，逐句標記走音、逐字標示準／略偏／走音，滑音則排除不計。已知歌詞可用「歌詞對齊」貼上取代辨識結果，沿用量到的時間軸修正錯字並補回被漏聽的句子。\n\n辨識模型可在 Breeze ASR、台語／歌唱 LoRA 後訓練版、Whisper medium 與 large-v3 之間免重啟熱切換以做 A/B 比較，並附 merge → CT2 轉換 → 冒煙測試 → 註冊的部署腳本；長檔另支援批次轉錄（3–4 倍速）。進階選用模組包含 DeepFilterNet3 神經降噪除殘響、Demucs 音樂人聲分離、NLLB-200 翻譯、匿名語者分離、會後摘要，以及可儲存音色、B→A 變聲與文字轉語音的變聲工作室（mock DSP 或 OpenVoice v2 + MeloTTS）；`breeze doctor` 可一次檢查執行環境與模型是否就緒。線上 Demo 以示意模式（隱私功能凍結）展示介面流程。",
       "tags": [
         "Python",
         "faster-whisper",
         "WebSocket",
         "AudioWorklet",
         "Pitch Estimation",
+        "Key Detection",
+        "LoRA",
         "Voice Cloning",
         "Diarization",
         "Tailscale"
@@ -197,7 +212,7 @@
       "category": "語音辨識與 AI",
       "year": "2026",
       "createdAt": "2026-05-22T10:00:00Z",
-      "updatedAt": "2026-07-15T10:00:00Z",
+      "updatedAt": "2026-08-11T15:25:59Z",
       "screenshot": {
         "src": "project-screenshots/breeze-elf-asr-mobile.png",
         "alt": "Breeze Elf 手機版語音辨識：載入儲存的錄音並以本機 faster-whisper（Breeze-ASR-25 CT2、CUDA float16）轉出帶時間戳的逐字稿"
@@ -215,28 +230,38 @@
         {
           "src": "project-screenshots/breeze-elf-demucs-mobile.png",
           "alt": "Breeze Elf 手機版音樂人聲分離：以音樂情境載入儲存音檔，先執行 Demucs 人聲分離模型再辨識歌詞"
+        },
+        {
+          "src": "project-screenshots/breeze-elf-jianpu.png",
+          "alt": "Breeze Elf 簡譜檢視：載入本機保存的歌唱錄音，逐字標出簡譜與滑音方向，每段標示自身調性主音頻率"
+        },
+        {
+          "src": "project-screenshots/breeze-elf-detail.png",
+          "alt": "Breeze Elf 逐字詳情：展開單句後列出每個字的時間區間、頻率（滑音為起訖）、音階與音分偏差、漸強／漸弱趨勢"
         }
       ]
     },
     {
       "title": "YOLO Elf",
-      "summary": "手機相機影像串流與本機 YOLOv8 即時物件偵測工具，支援快速／精準辨識模式與串流效能監控。",
-      "description": "YOLO Elf 是一套基於 FastAPI 與 WebSockets 的即時影像物件偵測工具。使用者可在手機瀏覽器開啟相機，將高畫質畫格即時以 WebSocket 串流至本地端電腦的 YOLOv8 偵測引擎，並在桌機瀏覽器端即時收到經深度學習模型標記出的物件邊界框（Bounding Boxes）與置信度，支援多人連線監控、低延遲影格串流、瀏覽器錄影上傳與背景遠端備份機制。介面提供快速／精準兩種辨識模式切換，以及影格數、偵測框數、推論延遲與丟棄影格等即時串流指標；線上 Demo 以靜態快照示意偵測畫面。",
+      "summary": "手機相機影像串流與本機 YOLO26 即時推論工具：七種任務通道、多物件追蹤、ROI 區域、規則告警、偵測歷史與多相機監看，另附 Florence-2 VLM 語意通道。",
+      "description": "YOLO Elf 是一套基於 FastAPI 與 WebSockets 的即時影像辨識工具。任何有相機的裝置都能擔任「錄影端」，把畫面編碼成 JPEG 經 WebSocket 推送到本機伺服器；伺服器以單槽佇列（只留最新一張、舊畫面直接丟棄）維持零延遲積壓的共用推論管線，再把畫面與結果廣播給不限數量的「檢視端」。推論全在自己的機器上完成，畫面不會離開本機。\n\n預設模型為 YOLO26，其一對一頭部直接輸出去重後的框、不跑 NMS；設定頁可即時切換七種任務通道——物件偵測、實例分割、姿態估計、旋轉框 OBB、文字提示的開放詞彙偵測，以及語意分割與單目深度兩種逐像素圖層，同分頁內最多可同時疊加四種。\n\n輸出框再串起完整的監控鏈：六種追蹤器（ByteTrack／BoT-SORT／TrackTrack 等）維持跨影格的 track_id，Viewer 可直接框選多邊形 ROI 區域並顯示佔用數，規則告警依類別、數量、信心與區域觸發並帶冷卻與 webhook，每個物件則以 track_id 聚合成含停留秒數與經過區域的出現紀錄寫入本機 SQLite，供歷史頁依類別／區域／時間查詢。\n\n另可設定多路相機成為輕量 NVR（各自擁有佇列、追蹤狀態、區域與歷史，Viewer 以格狀監看），並選用 Florence-2 VLM 語意通道與 YOLO 並存，慢速產生開放詞彙框與整張畫面的場景描述。周邊還包含共享權杖存取控制、Prometheus 指標輸出、TensorRT／ONNX 匯出加速、Tailscale 遠端錄影端，以及停用相機與上傳的 GitHub Pages 靜態展示版。",
       "tags": [
         "FastAPI",
         "Python",
         "WebSocket",
-        "YOLOv8",
-        "Computer Vision",
-        "HTML5 Canvas"
+        "YOLO26",
+        "ByteTrack",
+        "Florence-2 VLM",
+        "SQLite",
+        "Computer Vision"
       ],
       "category": "電腦視覺與 AI",
       "year": "2026",
       "createdAt": "2026-05-18T10:00:00Z",
-      "updatedAt": "2026-07-15T10:00:00Z",
+      "updatedAt": "2026-08-11T14:35:01Z",
       "screenshot": {
-        "src": "project-screenshots/yolo-elf-fast-mobile.png",
-        "alt": "YOLO Elf 手機版快速辨識模式：載入儲存的錄影並以本機 YOLOv8 即時偵測，標出行人等物件邊界框與置信度、串流效能指標"
+        "src": "project-screenshots/yolo-elf-viewer.png",
+        "alt": "YOLO Elf 桌機版檢視端：前門／後院雙相機同時監看，畫面疊加分割輪廓、旋轉框、姿態骨架與追蹤編號，並顯示 ROI 區域、告警與串流指標"
       },
       "links": {
         "demo": "https://changweilin.github.io/yolo_elf/",
@@ -245,8 +270,24 @@
       },
       "screenshots": [
         {
+          "src": "project-screenshots/yolo-elf-viewer.png",
+          "alt": "YOLO Elf 桌機版檢視端：前門／後院雙相機同時監看，畫面疊加分割輪廓、旋轉框、姿態骨架與追蹤編號，並顯示 ROI 區域、告警與串流指標"
+        },
+        {
+          "src": "project-screenshots/yolo-elf-vlm.png",
+          "alt": "YOLO Elf 桌機版 VLM 語意通道：以 Florence-2 產生開放詞彙偵測框與整張畫面的場景描述，與 YOLO 通道並存切換"
+        },
+        {
+          "src": "project-screenshots/yolo-elf-settings.png",
+          "alt": "YOLO Elf 設定頁任務通道：物件疊加分頁同時勾選物件＋分割＋姿態三種任務，並顯示 YOLO26 快速／精準模型與 NMS-free 端到端切換"
+        },
+        {
+          "src": "project-screenshots/yolo-elf-history.png",
+          "alt": "YOLO Elf 偵測歷史：本機 SQLite 累積的 83 筆出現紀錄，逐筆列出首次出現時間、類別、追蹤編號、停留秒數、最高信心與幀數"
+        },
+        {
           "src": "project-screenshots/yolo-elf-fast-mobile.png",
-          "alt": "YOLO Elf 手機版快速辨識模式：載入儲存的錄影並以本機 YOLOv8 即時偵測，標出行人等物件邊界框與置信度、串流效能指標"
+          "alt": "YOLO Elf 手機版快速辨識模式：載入儲存的錄影並以本機 YOLO 模型即時偵測，標出行人等物件邊界框與置信度、串流效能指標"
         },
         {
           "src": "project-screenshots/yolo-elf-precise-mobile.png",
@@ -269,7 +310,7 @@
       "category": "地理資訊與互動工具",
       "year": "2026",
       "createdAt": "2026-05-20T14:11:26Z",
-      "updatedAt": "2026-05-22T17:51:18Z",
+      "updatedAt": "2026-05-27T10:01:18Z",
       "screenshot": {
         "src": "project-screenshots/mapping-star.png",
         "alt": "Mapping Star 使用寺廟/宗教目標類別產生魔法陣動畫的地圖 demo 介面"
@@ -293,7 +334,7 @@
     {
       "title": "Elven Chewing",
       "summary": "以手機使用者的打字習慣為出發點，設計能容忍注音誤差、主動理解意圖的模糊智慧選詞輸入體驗。",
-      "description": "Elven Chewing 的開發緣由，是重新思考注音輸入法在手機與觸控時代應該如何服務使用者：不是要求每個按鍵都精準，而是讓系統能理解常見誤觸、近音與輸入節奏，提供更自然的候選詞。專案以 Rust 與 Windows Text Services Framework 打造輸入法核心，延伸新酷音/libchewing 的轉換基礎，加入模糊注音猜詞、候選面板、雙排輸入、最近文字重轉與簡繁切換；WebAssembly Demo 則用來快速驗證候選排序與互動流程，讓桌面實作也能吸收手機輸入習慣的直覺。",
+      "description": "Elven Chewing 的開發緣由，是重新思考注音輸入法在手機與觸控時代應該如何服務使用者：不是要求每個按鍵都精準，而是讓系統能理解常見誤觸、近音與輸入節奏，提供更自然的候選詞。專案以 Rust 與 Windows Text Services Framework 打造輸入法核心，延伸新酷音/libchewing 的轉換基礎，加入模糊注音猜詞、候選面板、雙排輸入、最近文字重轉與簡繁切換，並附一支原生設定程式集中管理輸入法偏好；WebAssembly Demo 則用來快速驗證候選排序與互動流程，讓桌面實作也能吸收手機輸入習慣的直覺。",
       "tags": [
         "Rust",
         "WebAssembly",
@@ -305,7 +346,7 @@
       "category": "輸入法與系統工具",
       "year": "2026",
       "createdAt": "2026-05-13T16:52:21Z",
-      "updatedAt": "2026-05-22T17:48:50Z",
+      "updatedAt": "2026-05-26T17:52:33Z",
       "screenshot": {
         "src": "project-screenshots/elven-chewing.png",
         "alt": "Elven Chewing 精靈語輸入法 Web Sandbox demo 介面"
@@ -341,7 +382,7 @@
       "category": "創作工具",
       "year": "2026",
       "createdAt": "2026-05-20T13:41:44Z",
-      "updatedAt": "2026-05-23T15:17:51Z",
+      "updatedAt": "2026-05-27T13:51:27Z",
       "screenshot": {
         "src": "project-screenshots/novel-elf.png",
         "alt": "Novel Elf Aevenmere 世界觀創作工作台介面"
@@ -364,11 +405,12 @@
     },
     {
       "title": "Agent Task Manager (ATM)",
-      "summary": "為 AI 協同開發打造的多專案任務管理台，集中掃描、啟動、監控並交接多個專案的開發工作流。",
-      "description": "Agent Task Manager (ATM) 的開發緣由，是讓人類開發者與 AI Agent 能在同一個工作台協同管理多個專案任務，而不是分散在不同終端、瀏覽器分頁與手動紀錄中。它結合 Node.js HTTP/WebSocket 伺服器、靜態 Web UI 與 PowerShell CLI，自動掃描含有 dev script 的專案，集中處理啟動、停止、重啟、健康檢查、即時 log、終端工作階段與跨裝置測試 URL；目標是把多專案開發變成可觀測、可交接、可由 AI 接續執行的任務系統。",
+      "summary": "為 AI 協同開發打造的多專案任務管理台，集中掃描、啟動、監控並交接多個專案的開發工作流，並整合終端分頁、連續提示 Pipeline、跨裝置記事本與 AI 額度監控。",
+      "description": "Agent Task Manager (ATM) 的開發緣由，是讓人類開發者與 AI Agent 能在同一個工作台協同管理多個專案任務，而不是分散在不同終端、瀏覽器分頁與手動紀錄中。它結合 Node.js HTTP/WebSocket 伺服器、靜態 Web UI 與 PowerShell CLI，自動遞迴掃描含有 dev script 的專案（可辨識 Vite、Next.js、Astro、Nuxt 與一般 Node 專案並帶入對應的 host/port 參數），集中處理啟動、停止、重啟、健康檢查失敗自動重啟、即時 stdout/stderr log 與 Profile 批次操作。\n\n每個專案的 Local、LAN、Tailscale 三種入口都可獨立開關，Tailscale HTTPS 連結讓手機或平板直接開啟開發中的頁面測試；狀態保存在本機，ATM 重啟後可復原先前分享中的專案。\n\n終端側以 node-pty 與 xterm.js 提供分頁式終端管理，並可用 Terminal Pipeline 把一串提示排成自動化流程交給 CLI agent 連續執行，搭配跨裝置同步的記事本記錄交接內容，以及可同時檢視 Claude Code、Codex CLI 與 Antigravity CLI 剩餘用量的 AI 額度監控。\n\n線上 Demo 為 GitHub Pages 展示模式，只使用去識別化樣本資料，不連線本機、LAN、Tailscale，也不執行任何指令。",
       "tags": [
         "Node.js",
         "WebSocket",
+        "xterm.js",
         "PowerShell",
         "Tailscale",
         "Dev Server",
@@ -377,10 +419,10 @@
       "category": "開發工具",
       "year": "2026",
       "createdAt": "2026-05-14T17:49:03Z",
-      "updatedAt": "2026-05-22T14:11:08Z",
+      "updatedAt": "2026-08-09T16:50:31Z",
       "screenshot": {
         "src": "project-screenshots/agent-task-manager.png",
-        "alt": "Agent Task Manager 管理多個本機 dev server 的 Web UI"
+        "alt": "Agent Task Manager 管理台：多專案狀態、框架、port、健康檢查與 Local／LAN／Tailscale 入口開關，側欄含專案來源、即時 log 與 Profile"
       },
       "links": {
         "demo": "https://changweilin.github.io/agent-task-manager/",
@@ -390,11 +432,15 @@
       "screenshots": [
         {
           "src": "project-screenshots/agent-task-manager.png",
-          "alt": "Agent Task Manager 管理多個本機 dev server 的 Web UI"
+          "alt": "Agent Task Manager 管理台：多專案狀態、框架、port、健康檢查與 Local／LAN／Tailscale 入口開關，側欄含專案來源、即時 log 與 Profile"
+        },
+        {
+          "src": "project-screenshots/agent-task-manager-quota.png",
+          "alt": "Agent Task Manager AI 額度監控：同時顯示 Claude Code、Codex CLI 與 Antigravity CLI 的用量百分比與讀取指令"
         },
         {
           "src": "project-screenshots/agent-task-manager-mobile.png",
-          "alt": "Agent Task Manager GitHub Pages 展示模式手機版 Web UI"
+          "alt": "Agent Task Manager 手機版：每個專案以卡片列出狀態、port 與啟動／重啟／終端操作鈕"
         }
       ]
     },
@@ -413,7 +459,7 @@
       "category": "音樂與音訊工具",
       "year": "2026",
       "createdAt": "2026-05-09T08:13:03Z",
-      "updatedAt": "2026-05-21T06:52:01Z",
+      "updatedAt": "2026-05-27T13:49:41Z",
       "screenshot": {
         "src": "project-screenshots/music-elf.png",
         "alt": "Music Elf Conductor Studio 音訊轉樂譜 demo 介面"
@@ -480,8 +526,8 @@
     },
     {
       "title": "Mapping Elf",
-      "summary": "純前端戶外路線規劃工具：多引擎路線、2D／3D 地形、逐點天氣、集水區水文、配速熱量與 GPX/KML 匯入匯出，支援 .melmap 離線圖資與八國語系，並以 Vite + Capacitor 建置為 PWA 與 Android／iOS App。",
-      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案是一套純前端（Vanilla JS ESM）的戶外路線規劃工具，可作為網頁 PWA，也能經 Capacitor 8 封裝為 Android／iOS App，所有狀態以 localStorage 持久化並可打包成可攜的 .melmap 圖資檔。核心把地圖點選路線規劃（單程／來回／O 繞）、經 BRouter（山徑）與 OSRM 的多引擎步行／山徑／自行車／駕車路線、高度剖面與距離統計整合在同一流程；並提供以 Three.js 打造、可繞行且貼附衛星影像的 3D 地形，附程序化 3D 天氣特效（雲、雨、雪、霧、閃電）與貼地軌跡回放。天氣整合 Open-Meteo 預報／歷史，於航點與高度圖顯示小格／詳細天氣卡並附 Windy 連結；水文模組可由單一出水點以 D8 演算圈繪集水區，再結合土壤含水、前後期雨量與 GLOFAS 河川流量估算參考級溪水暴漲／土石流指標。配速引擎依活動類型、體重、負重、疲勞與休息估算時間、熱量與補給，並可匯入 GPX/KML 做個人配速校正；匯出支援 GPX/KML、.melmap 與可 3D 列印的 STL／3MF 地形，離線地圖以 Service Worker 快取圖磚，App 版另支援魯地圖 .map／OpenAndroMaps／MBTiles 底圖。內建 8 種語系介面（繁中／EN／日／韓／法／德／西／義）。",
+      "summary": "純前端戶外路線規劃工具：多引擎路線、2D／3D 地形、逐點天氣、集水區水文、繪圖板 O 繞路線、配速熱量與 GPX/KML 匯入匯出，支援 .melmap 離線圖資與八國語系，並以 Vite + Capacitor 建置為 PWA 與 Android／iOS App。",
+      "description": "Mapping Elf 的開發起點，是解決戶外運動者常遇到的問題：知道路線總長還不夠，還需要知道自己在某個小時、某一公里可能會遇到什麼天氣。專案是一套純前端（Vanilla JS ESM）的戶外路線規劃工具，可作為網頁 PWA，也能經 Capacitor 8 封裝為 Android／iOS App，所有狀態以 localStorage 持久化並可打包成可攜的 .melmap 圖資檔。\n\n核心把地圖點選路線規劃（單程／來回／O 繞）、經 BRouter（山徑）與 OSRM 的多引擎步行／山徑／自行車／駕車路線、高度剖面與距離統計整合在同一流程；並提供以 Three.js 打造、可繞行且貼附衛星影像的 3D 地形，附程序化 3D 天氣特效（雲、雨、雪、霧、閃電）與貼地軌跡回放。\n\n天氣整合 Open-Meteo 預報／歷史，於航點與高度圖顯示小格／詳細天氣卡並附 Windy 連結；水文模組可由單一出水點圈繪集水區，邊界改以 D∞ 貢獻度連續場等值線繪製而非柵格階梯，並可在 2D 與 3D 地形上同時標出各航點的集水範圍，再結合土壤含水、前後期雨量與 GLOFAS 河川流量估算參考級溪水暴漲／土石流指標。\n\n新增的繪圖板讓使用者直接畫出想跑的形狀，系統會在目前位置附近搜出最接近該圖形的 O 繞路線——航點吸附步行路網、依角度誤差容忍度做方位搜尋、自動校準到目標里程並修剪來回路段，最後回報形狀相似度與最大偏差；另有整合軌跡區間、距離／面積與集水區的量測工具。\n\n配速引擎依活動類型、體重、負重、疲勞與休息估算時間、熱量與補給，並可匯入 GPX/KML 做個人配速校正；匯出支援 GPX/KML、.melmap 與可 3D 列印的 STL／3MF 地形，離線地圖以 Service Worker 快取圖磚，App 版另支援魯地圖 .map／OpenAndroMaps／MBTiles 底圖。內建 8 種語系介面（繁中／EN／日／韓／法／德／西／義）。",
       "tags": [
         "JavaScript",
         "Leaflet",
@@ -496,7 +542,7 @@
       "category": "戶外地圖",
       "year": "2026",
       "createdAt": "2026-04-08T13:54:34Z",
-      "updatedAt": "2026-07-15T10:00:00Z",
+      "updatedAt": "2026-08-11T15:37:47Z",
       "screenshot": {
         "src": "project-screenshots/mapping-elf-2d-desktop.png",
         "alt": "Mapping Elf 桌機版 2D 地形圖：新竹尖石鄉養老→馬鞍→白石霞喀羅古道 O 繞路線、逐點天氣與高度剖面全部載入"
@@ -522,13 +568,17 @@
         {
           "src": "project-screenshots/mapping-elf-3d-mobile.png",
           "alt": "Mapping Elf 手機版 3D 地形：養老→馬鞍→白石 O 繞路線立體地形與天氣特效"
+        },
+        {
+          "src": "project-screenshots/mapping-elf-drawboard.png",
+          "alt": "Mapping Elf 繪圖板：在畫布上畫出星形後，於台北信義區街道自動規劃出 18 個航點、9.78 km、形狀相似度 70% 的 O 繞跑步路線與高度剖面"
         }
       ]
     },
     {
       "title": "Hex Snake",
       "summary": "把貪食蛇搬上六角棋盤，讓不同角色用技能彼此對戰，在搶奪資源與路線封鎖中形成策略攻防。",
-      "description": "Hex Snake 的發想，是將經典貪食蛇從單純反應遊戲改造成六角棋盤上的角色對戰。玩家與 AI 不只要延長身體、搶奪資源，還要利用角色技能、地形角度與路線封鎖製造攻防節奏。專案以單頁瀏覽器遊戲實作六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬，並將遊戲資料與平衡參數獨立管理，方便透過工具進行策略調校與回歸測試。",
+      "description": "Hex Snake 的發想，是將經典貪食蛇從單純反應遊戲改造成六角棋盤上的角色對戰。玩家與 AI 不只要延長身體、搶奪資源，還要利用角色技能、地形角度與路線封鎖製造攻防節奏。專案以單頁瀏覽器遊戲實作六角格移動、角色技能、資源庫存、AI 自動對弈、重播控制與平衡模擬，對局結束後可封存與分享回放，並將遊戲資料與平衡參數獨立管理，方便透過工具進行策略調校與回歸測試。",
       "tags": [
         "HTML",
         "CSS",
@@ -540,7 +590,7 @@
       "category": "遊戲與 AI",
       "year": "2026",
       "createdAt": "2026-04-27T14:19:02Z",
-      "updatedAt": "2026-05-12T08:02:00Z",
+      "updatedAt": "2026-05-29T15:54:33Z",
       "screenshot": {
         "src": "project-screenshots/hex-snake.png",
         "alt": "Hex Snake 桌機版遊戲畫面"
