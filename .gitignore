@@ -6,3 +6,6 @@ vite.config.js
 vite.config.d.ts
 docs/github-last-updated.json
 docs/github-last-updated.md
+
+# 本地端專案位置對照表：含本機絕對路徑，僅供本地 AI agent 使用，不上傳雲端
+local-projects.local.json
